@@ -183,6 +183,21 @@ npm run dist:win
 
 ---
 
+---
+
+## ☕ Поддержка проекта (Support the project)
+
+Если вы хотите поддержать развитие и сопровождение проекта Hyperion:
+
+| Валюта | Сеть (Network) | Адрес (Address) |
+| :--- | :--- | :--- |
+| **BTC** | Bitcoin | `bc1q0u4pwuqxg7kt5y4p84lc8zzcawhzr3auzw005z` |
+| **ETH** | Ethereum | `0xD3002c0967a8D28FDF67c2Df8488006e965B9a6A` |
+| **USDT** | TRON (TRC-20) | `TYUkmupkzCGzkio77Db7PKEDu4JN8JD1eb` |
+| **TRX** | TRON | `TX7yRGo5xT2Mj5NBVhu7bdv58jmStHFuGZ` |
+
+---
+
 ## 📄 Лицензия
 
 Проект распространяется под лицензией **MIT License**.  
