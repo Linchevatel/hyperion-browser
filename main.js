@@ -16,6 +16,24 @@ const {
   WEBRTC_MODES
 } = require('./fingerprint');
 const updater = require('./updater');
+
+function getPythonScriptPath(scriptName) {
+  // 1. Check unpacked asar path
+  const unpackedPath = path.join(__dirname.replace(/app\.asar$/, 'app.asar.unpacked'), scriptName);
+  if (fs.existsSync(unpackedPath)) return unpackedPath;
+
+  // 2. Check process.resourcesPath
+  if (process.resourcesPath) {
+    const resPath = path.join(process.resourcesPath, 'app.asar.unpacked', scriptName);
+    if (fs.existsSync(resPath)) return resPath;
+    const directResPath = path.join(process.resourcesPath, scriptName);
+    if (fs.existsSync(directResPath)) return directResPath;
+  }
+
+  // 3. Fallback to standard __dirname (works in dev and unpacked modes)
+  return path.join(__dirname, scriptName);
+}
+
 function getPythonCommand() {
   const isWin = process.platform === 'win32';
   if (isWin) {
@@ -1163,7 +1181,7 @@ ipcMain.handle('install-extension', async (event, rawExtId) => {
     extId = match[1].toLowerCase();
   }
   const targetDir = path.join(EXTENSIONS_DIR, extId);
-  const scriptPath = path.join(__dirname, 'ext_installer.py');
+  const scriptPath = getPythonScriptPath('ext_installer.py');
   const pyCmd = getPythonCommand();
 
   return new Promise((resolve, reject) => {
@@ -1494,7 +1512,7 @@ ipcMain.handle('bulk-delete-profiles', async (event, ids) => {
 // ==========================================
 ipcMain.handle('import-cookies', async (event, profileId, cookiesJson) => {
   const dbPath = path.join(PROFILES_DATA_DIR, 'profile_' + profileId, 'Default', 'Network', 'Cookies');
-  const scriptPath = path.join(__dirname, 'cookie_manager.py');
+  const scriptPath = getPythonScriptPath('cookie_manager.py');
 
   return new Promise((resolve) => {
     const py = spawn(getPythonCommand(), [scriptPath, 'import', dbPath]);
@@ -1516,7 +1534,7 @@ ipcMain.handle('import-cookies', async (event, profileId, cookiesJson) => {
 
 ipcMain.handle('export-cookies', async (event, profileId) => {
   const dbPath = path.join(PROFILES_DATA_DIR, 'profile_' + profileId, 'Default', 'Network', 'Cookies');
-  const scriptPath = path.join(__dirname, 'cookie_manager.py');
+  const scriptPath = getPythonScriptPath('cookie_manager.py');
 
   return new Promise((resolve) => {
     const py = spawn(getPythonCommand(), [scriptPath, 'export', dbPath]);
@@ -1633,7 +1651,7 @@ ipcMain.handle('export-profile-package', async (event, profileId) => {
   let cookies = [];
   if (fs.existsSync(dbPath)) {
     try {
-      const scriptPath = path.join(__dirname, 'cookie_manager.py');
+      const scriptPath = getPythonScriptPath('cookie_manager.py');
       const { execFileSync } = require('child_process');
       const out = execFileSync(getPythonCommand(), [scriptPath, 'export', dbPath]);
       const res = JSON.parse(out.toString());
@@ -1682,7 +1700,7 @@ ipcMain.handle('import-profile-package', async (event) => {
   if (pkg.cookies && pkg.cookies.length > 0) {
     const dbPath = path.join(PROFILES_DATA_DIR, `profile_${newId}`, 'Default', 'Network', 'Cookies');
     try {
-      const scriptPath = path.join(__dirname, 'cookie_manager.py');
+      const scriptPath = getPythonScriptPath('cookie_manager.py');
       const { spawnSync } = require('child_process');
       spawnSync(getPythonCommand(), [scriptPath, 'import', dbPath], {
         input: JSON.stringify(pkg.cookies)
@@ -1704,7 +1722,7 @@ ipcMain.handle('warmup-profile', async (event, profileId, customUrls) => {
   const chromeInfo = getChromeBinary();
   const CHROME_BIN = chromeInfo.path;
   const profileDir = path.join(PROFILES_DATA_DIR, `profile_${profileId}`);
-  const scriptPath = path.join(__dirname, 'warmup_robot.py');
+  const scriptPath = getPythonScriptPath('warmup_robot.py');
 
   let proxyArg = 'none';
   if (p.proxy && p.proxy.enabled && p.proxy.host && p.proxy.port) {

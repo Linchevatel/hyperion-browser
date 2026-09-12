@@ -246,10 +246,9 @@ body {
 
 /* TOPBAR */
 .topbar {
-  height: 64px;
-  min-height: 64px;
+  min-height: 56px;
   border-bottom: 1px solid var(--border-color);
-  padding: 0 20px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -258,13 +257,21 @@ body {
   overflow: visible !important;
   position: relative;
   z-index: 50;
+  flex-wrap: nowrap;
 }
 
 .topbar-left {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.topbar-left::-webkit-scrollbar {
+  display: none;
 }
 
 .search-box {
@@ -359,6 +366,8 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0 !important;
+  margin-left: auto;
 }
 
 /* BUTTONS */
@@ -1843,7 +1852,7 @@ input[type="checkbox"]:not(.toggle-container input):focus-visible {
 
 /* General safe flex constraints */
 .topbar {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   height: auto;
   min-height: 56px;
   padding: 8px 16px;
@@ -1852,12 +1861,10 @@ input[type="checkbox"]:not(.toggle-container input):focus-visible {
 .topbar-left {
   flex: 1 1 auto;
   min-width: 0;
-  flex-wrap: wrap;
 }
 
 .topbar-right {
-  flex-shrink: 0;
-  flex-wrap: wrap;
+  flex-shrink: 0 !important;
   margin-left: auto;
 }
 

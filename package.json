@@ -1,6 +1,6 @@
 {
   "name": "hyperion-desktop",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Hyperion Anti-detect Multibrowser Desktop Client",
   "main": "main.js",
   "scripts": {
@@ -79,6 +79,10 @@
         ]
       }
     ],
-    "executableName": "hyperion-browser"
+    "executableName": "hyperion-browser",
+    "asarUnpack": [
+      "*.py",
+      "**/*.py"
+    ]
   }
 }
