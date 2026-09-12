@@ -1,13 +1,14 @@
 {
   "name": "hyperion-desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Hyperion Anti-detect Multibrowser Desktop Client",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder -mwl --publish never",
     "dist:linux": "electron-builder --linux AppImage deb rpm --publish never",
-    "dist:win": "electron-builder --win nsis portable --publish never"
+    "dist:win": "electron-builder --win nsis portable --publish never",
+    "download:engine": "node scripts/download_engine.js"
   },
   "keywords": [
     "antidetect",
@@ -38,7 +39,7 @@
       ],
       "maintainer": "Linchevatel <295051633+Linchevatel@users.noreply.github.com>",
       "category": "Network;WebBrowser;",
-      "icon": "assets/icon.png"
+      "icon": "assets/icons"
     },
     "deb": {
       "priority": "optional"
@@ -48,13 +49,16 @@
         "nsis",
         "portable"
       ],
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.ico"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico"
     },
     "files": [
       "**/*",
@@ -63,7 +67,18 @@
       "!*.jpg",
       "!run_full_antidetect_audit.js",
       "!test_buttons.js",
-      "!verify_antidetect.js"
-    ]
+      "!verify_antidetect.js",
+      "!bundle/**"
+    ],
+    "extraResources": [
+      {
+        "from": "bundle/chrome",
+        "to": "chrome",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "executableName": "hyperion-browser"
   }
 }

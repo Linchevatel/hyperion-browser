@@ -62,6 +62,8 @@ const api = {
   // Settings & System
   getSettings: () => ipcRenderer.invoke('get-settings'),
   saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
+  selectChromeBinary: () => ipcRenderer.invoke('select-chrome-binary'),
+  rescanChromeBinary: () => ipcRenderer.invoke('rescan-chrome-binary'),
   clearCache: () => ipcRenderer.invoke('clear-cache'),
   exportBackup: () => ipcRenderer.invoke('export-backup'),
   importBackup: () => ipcRenderer.invoke('import-backup'),
@@ -78,4 +80,3 @@ const api = {
 };
 
 contextBridge.exposeInMainWorld('hyperion', api);
-contextBridge.exposeInMainWorld('aegis', api);

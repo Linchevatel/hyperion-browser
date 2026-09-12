@@ -6,9 +6,9 @@ const http = require('http');
 
 const os = require('os');
 const HOME = os.homedir();
-const CHROME_BIN = path.join(HOME, 'hyperion-browser', 'chrome');
 const CONFIG_DIR = path.join(HOME, '.config', 'hyperion-browser');
 const SETTINGS_FILE = path.join(CONFIG_DIR, 'settings.json');
+const DEFAULT_REPO = 'Linchevatel/hyperion-browser';
 
 function fetchJson(url) {
   return new Promise((resolve) => {
@@ -18,7 +18,7 @@ function fetchJson(url) {
       const req = protocol.get({
         hostname: parsed.hostname,
         path: parsed.pathname + parsed.search,
-        headers: { 'User-Agent': 'Hyperion-Updater/1.0.0' }
+        headers: { 'User-Agent': 'Hyperion-Updater/1.0.1' }
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
@@ -41,10 +41,23 @@ function fetchJson(url) {
 function getAppVersion() {
   try {
     const pkg = require('./package.json');
-    return pkg.version || '1.0.0';
+    return pkg.version || '1.0.1';
   } catch (e) {
-    return '1.0.0';
+    return '1.0.1';
   }
+}
+
+function isNewerVersion(latest, current) {
+  const parse = v => String(v || '').replace(/^v/, '').split('.').map(x => parseInt(x, 10) || 0);
+  const l = parse(latest);
+  const c = parse(current);
+  for (let i = 0; i < Math.max(l.length, c.length); i++) {
+    const lPart = l[i] || 0;
+    const cPart = c[i] || 0;
+    if (lPart > cPart) return true;
+    if (lPart < cPart) return false;
+  }
+  return false;
 }
 
 // Background update check
@@ -58,39 +71,40 @@ async function checkForUpdates(customRepo = null) {
       repo = s.github_repo || '';
     } catch (e) {}
   }
+  if (!repo) {
+    repo = DEFAULT_REPO;
+  }
 
   let updateAvailable = false;
   let latestVersion = currentVersion;
   let releaseNotes = '';
   let downloadUrl = null;
 
-  // 1. Check configured GitHub repository if present
+  // 1. Check configured GitHub repository
   if (repo && repo.includes('/')) {
     const ghData = await fetchJson(`https://api.github.com/repos/${repo}/releases/latest`);
     if (ghData && ghData.tag_name) {
       const tagClean = ghData.tag_name.replace(/^v/, '');
       latestVersion = tagClean;
-      if (tagClean > currentVersion) {
+      if (isNewerVersion(tagClean, currentVersion)) {
         updateAvailable = true;
         releaseNotes = ghData.body || 'Новая версия Hyperion готова к установке.';
         if (ghData.assets && ghData.assets.length > 0) {
-          downloadUrl = ghData.assets[0].browser_download_url;
+          const isWin = process.platform === 'win32';
+          if (isWin) {
+            const exeAsset = ghData.assets.find(a => a.name && a.name.endsWith('.exe'));
+            downloadUrl = exeAsset ? exeAsset.browser_download_url : ghData.assets[0].browser_download_url;
+          } else {
+            const appImageAsset = ghData.assets.find(a => a.name && a.name.endsWith('.AppImage'));
+            downloadUrl = appImageAsset ? appImageAsset.browser_download_url : ghData.assets[0].browser_download_url;
+          }
+        }
+        if (!downloadUrl && ghData.html_url) {
+          downloadUrl = ghData.html_url;
         }
       }
     }
   }
-
-  // 2. Also check upstream for official browser engine updates in background
-  try {
-    const upstreamReleases = await fetchJson('https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux');
-    if (Array.isArray(upstreamReleases) && upstreamReleases.length > 0) {
-      const upstreamVer = upstreamReleases[0].version;
-      // If no github release was found, we still know whether new build is ready
-      if (!updateAvailable && upstreamVer) {
-        // Can track upstream silently without technical spam in UI
-      }
-    }
-  } catch (e) {}
 
   return {
     currentVersion,

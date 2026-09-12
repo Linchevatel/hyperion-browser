@@ -38,6 +38,9 @@ jobs:
       - name: Install NPM Dependencies
         run: npm install
 
+      - name: Download Bundled Chromium Core (Linux)
+        run: node scripts/download_engine.js --platform=linux64
+
       - name: Build Linux Installers (.AppImage, .deb, .rpm)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -67,6 +70,9 @@ jobs:
 
       - name: Install NPM Dependencies
         run: npm install
+
+      - name: Download Bundled Chromium Core (Windows)
+        run: node scripts/download_engine.js --platform=win64
 
       - name: Build Windows Installers (.exe)
         env:

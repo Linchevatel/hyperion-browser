@@ -40,7 +40,7 @@ index 710e3758ab..187d2a611e 100644
  #endif
    };
    renderer_cmd->CopySwitchesFrom(browser_cmd, kSwitchNames);
-+  static const char* const kAegisSwitches[] = {
++  static const char* const kHyperionSwitches[] = {
 +      "fingerprint-platform",
 +      "fingerprint-concurrency",
 +      "fingerprint-memory",
@@ -51,7 +51,7 @@ index 710e3758ab..187d2a611e 100644
 +      "fingerprint-screen-width",
 +      "fingerprint-screen-height",
 +  };
-+  renderer_cmd->CopySwitchesFrom(browser_cmd, kAegisSwitches);
++  renderer_cmd->CopySwitchesFrom(browser_cmd, kHyperionSwitches);
  
    // Propagate WebNN switches needed by backends that run in the renderer.
    renderer_cmd->CopySwitchesFrom(

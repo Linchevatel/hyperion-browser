@@ -270,15 +270,37 @@ async function checkSystemStatus() {
     const status = await window.hyperion.getSystemStatus();
     const dot = document.getElementById('sys-status-dot');
     const label = document.getElementById('sys-engine-name');
-    if (status && status.binaryExists) {
-      dot.className = 'status-dot pulse';
-      label.textContent = 'Hyperion v1.0.0';
-    } else {
-      dot.style.backgroundColor = 'var(--accent-rose)';
-      label.textContent = 'Chrome binary missing';
-    }
+    const badge = document.getElementById('settings-chrome-status-badge');
     const pathEl = document.getElementById('settings-engine-path');
-    if (pathEl) pathEl.textContent = status.binary;
+
+    if (status && status.binaryExists) {
+      if (dot) {
+        dot.className = 'status-dot pulse';
+        dot.style.backgroundColor = '';
+      }
+      if (label) label.textContent = 'Hyperion v1.0.1';
+      if (badge) {
+        badge.className = 'badge badge-success';
+        badge.textContent = 'Обнаружен';
+        badge.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+        badge.style.color = '#34d399';
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+      }
+    } else {
+      if (dot) {
+        dot.className = 'status-dot';
+        dot.style.backgroundColor = 'var(--accent-rose)';
+      }
+      if (label) label.textContent = 'Chrome binary missing';
+      if (badge) {
+        badge.className = 'badge badge-danger';
+        badge.textContent = 'Не найден';
+        badge.style.backgroundColor = 'rgba(244, 63, 94, 0.15)';
+        badge.style.color = '#f43f5e';
+        badge.style.borderColor = 'rgba(244, 63, 94, 0.3)';
+      }
+    }
+    if (pathEl) pathEl.textContent = (status && status.binary) ? status.binary : 'Не определен';
   } catch (e) {
     console.error('Status error:', e);
   }
@@ -1327,7 +1349,16 @@ function initEventListeners() {
   document.getElementById('btn-settings-check-update')?.addEventListener('click', () => window.checkSettingsUpdates(true));
   document.getElementById('sidebar-status-btn')?.addEventListener('click', () => {
     switchMainView('settings');
-    document.getElementById('settings-update-card')?.scrollIntoView({ behavior: 'smooth' });
+    const dot = document.getElementById('sys-status-dot');
+    const isMissing = dot && (dot.style.backgroundColor !== '');
+    if (isMissing) {
+      const card = document.getElementById('settings-engine-card');
+      card?.scrollIntoView({ behavior: 'smooth' });
+      card?.style.setProperty('border-color', 'var(--accent-rose)');
+      setTimeout(() => card?.style.removeProperty('border-color'), 2500);
+    } else {
+      document.getElementById('settings-update-card')?.scrollIntoView({ behavior: 'smooth' });
+    }
   });
   document.getElementById('btn-global-open-settings-update')?.addEventListener('click', () => {
     switchMainView('settings');
@@ -1674,6 +1705,32 @@ function initEventListeners() {
   });
 
   // SETTINGS CONTROLS
+  document.getElementById('btn-browse-chrome')?.addEventListener('click', async () => {
+    try {
+      const res = await window.hyperion.selectChromeBinary();
+      if (res && res.path) {
+        await checkSystemStatus();
+        showToast(`Браузер подключен: ${res.path}`, 'success');
+      }
+    } catch (e) {
+      showToast(`Ошибка выбора браузера: ${e.message}`, 'error');
+    }
+  });
+
+  document.getElementById('btn-rescan-chrome')?.addEventListener('click', async () => {
+    try {
+      const res = await window.hyperion.rescanChromeBinary();
+      await checkSystemStatus();
+      if (res && res.exists) {
+        showToast(`Браузер найден: ${res.path}`, 'success');
+      } else {
+        showToast('Браузер не найден автоматически в стандартных папках. Пожалуйста, укажите путь вручную.', 'error');
+      }
+    } catch (e) {
+      showToast(`Ошибка автопоиска: ${e.message}`, 'error');
+    }
+  });
+
   document.getElementById('btn-save-settings').addEventListener('click', async () => {
     const url = document.getElementById('settings-default-url').value.trim();
     await window.hyperion.saveSettings({ default_url: url });

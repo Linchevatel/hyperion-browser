@@ -73,7 +73,7 @@
       <div class="sidebar-status">
         <div class="status-indicator" id="sidebar-status-btn" style="margin-bottom: 0; cursor: pointer;" title="Открыть центр обновлений">
           <span class="status-dot pulse" id="sys-status-dot"></span>
-          <span class="status-label" id="sys-engine-name">Hyperion v1.0.0</span>
+          <span class="status-label" id="sys-engine-name">Hyperion v1.0.1</span>
         </div>
       </div>
     </aside>
@@ -232,14 +232,14 @@
         <table class="profiles-table">
             <thead>
               <tr>
-                <th style="width: 38px;"><input type="checkbox" id="th-check-all-profiles"></th>
-                <th style="width: 100px; min-width: 100px;">Статус</th>
-                <th style="min-width: 180px;">Название профиля</th>
-                <th style="min-width: 100px;">Теги</th>
-                <th style="min-width: 180px;">Прокси</th>
-                <th style="min-width: 280px;">Цифровой отпечаток (Hardware / GPU)</th>
-                <th style="width: 105px;">Расширения</th>
-                <th style="width: 310px; min-width: 310px; text-align: right;">Действия</th>
+                <th style="width: 34px;"><input type="checkbox" id="th-check-all-profiles"></th>
+                <th style="width: 76px;">Статус</th>
+                <th style="min-width: 110px;">Профиль</th>
+                <th style="min-width: 60px;">Теги</th>
+                <th style="min-width: 110px;">Прокси</th>
+                <th style="min-width: 150px;">Цифровой отпечаток</th>
+                <th style="width: 70px;">Плугины</th>
+                <th style="width: 260px; min-width: 250px; text-align: right;">Действия</th>
               </tr>
             </thead>
             <tbody id="profiles-tbody">
@@ -424,6 +424,34 @@
               <img src="assets/logo1.jpg" alt="Hyperion Anti-Detect Multibrowser">
             </div>
 
+          <div class="settings-card" id="settings-engine-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <h3 style="margin-bottom: 0;">Ядро браузера (Chromium / Chrome)</h3>
+              <span id="settings-chrome-status-badge" class="badge" style="font-size: 11px; padding: 4px 10px;">Проверка...</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+              Hyperion запускает изолированные сессии с патчами защиты цифрового отпечатка. На Windows поддерживаются установленные Google Chrome, Chromium, Brave или Edge, либо собственный бинарник.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.35); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                <span style="font-size: 12px; color: var(--text-dim); white-space: nowrap;">Текущий путь:</span>
+                <span style="flex: 1; word-break: break-all; font-family: var(--font-mono); font-size: 12px; color: #e2e8f0;" id="settings-engine-path">
+                  Поиск браузера...
+                </span>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" id="btn-browse-chrome">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  <span>Указать путь к chrome.exe вручную...</span>
+                </button>
+                <button type="button" class="btn btn-outline" id="btn-rescan-chrome" title="Сбросить на автоматический поиск в системе">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <span>Автопоиск в системе</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="settings-card">
             <h3>Глобальные настройки сессий</h3>
             <div class="form-group">
@@ -441,7 +469,7 @@
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
               <div>
                 <div style="font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px;">
-                  Hyperion Browser <span style="color: var(--text-dim); font-weight: 400;" id="settings-app-version">v1.0.0</span>
+                  Hyperion Browser <span style="color: var(--text-dim); font-weight: 400;" id="settings-app-version">v1.0.1</span>
                 </div>
                 <div style="font-size: 12.5px; color: var(--text-muted);" id="settings-update-status-text">
                   Установлена актуальная версия. Проверка выполняется автоматически.

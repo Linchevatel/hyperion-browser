@@ -17,15 +17,7 @@ const updater = require('./updater');
 
 const os = require('os');
 const HOME = os.homedir();
-const OLD_CONFIG_DIR = path.join(HOME, '.config', 'aegis-browser');
 const CONFIG_DIR = path.join(HOME, '.config', 'hyperion-browser');
-if (!fs.existsSync(CONFIG_DIR) && fs.existsSync(OLD_CONFIG_DIR)) {
-  try {
-    fs.cpSync(OLD_CONFIG_DIR, CONFIG_DIR, { recursive: true });
-  } catch (e) {
-    console.error('Config migration error:', e);
-  }
-}
 const PROFILES_FILE = path.join(CONFIG_DIR, 'profiles.json');
 const PROXIES_FILE = path.join(CONFIG_DIR, 'proxies.json');
 const EXTENSIONS_FILE = path.join(CONFIG_DIR, 'extensions.json');
@@ -33,9 +25,79 @@ const TEMPLATES_FILE = path.join(CONFIG_DIR, 'templates.json');
 const SETTINGS_FILE = path.join(CONFIG_DIR, 'settings.json');
 const PROFILES_DATA_DIR = path.join(CONFIG_DIR, 'profiles_data');
 const EXTENSIONS_DIR = path.join(CONFIG_DIR, 'extensions');
-const CHROME_BIN = fs.existsSync(path.join(HOME, 'hyperion-browser', 'chrome'))
-  ? path.join(HOME, 'hyperion-browser', 'chrome')
-  : path.join(HOME, 'aegis-browser', 'chrome');
+function getChromeBinary() {
+  const settings = readJson(SETTINGS_FILE, {});
+  if (settings.chrome_path && fs.existsSync(settings.chrome_path)) {
+    return { path: settings.chrome_path, exists: true };
+  }
+
+  const isWin = process.platform === 'win32';
+  const isMac = process.platform === 'darwin';
+  const candidates = [];
+
+  if (isWin) {
+    const localAppData = process.env.LOCALAPPDATA || '';
+    const progFiles = process.env.PROGRAMFILES || 'C:\\Program Files';
+    const progFilesX86 = process.env['PROGRAMFILES(X86)'] || 'C:\\Program Files (x86)';
+
+    candidates.push(
+      // Bundled / Embedded Chromium
+      path.join(process.resourcesPath || '', 'chrome', 'chrome.exe'),
+      path.join(path.dirname(process.execPath || ''), 'resources', 'chrome', 'chrome.exe'),
+      path.join(path.dirname(process.execPath || ''), 'chrome', 'chrome.exe'),
+      path.join(__dirname, 'bundle', 'chrome', 'chrome.exe'),
+      path.join(__dirname, 'chrome', 'chrome.exe'),
+      path.join(HOME, 'hyperion-browser', 'chrome.exe'),
+      path.join(localAppData, 'HyperionBrowser', 'chrome.exe'),
+      path.join(progFiles, 'Hyperion Browser', 'chrome', 'chrome.exe'),
+      // Standard Google Chrome on Windows
+      path.join(progFiles, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+      path.join(progFilesX86, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+      path.join(localAppData, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+      // Standard Chromium
+      path.join(localAppData, 'Chromium', 'Application', 'chrome.exe'),
+      path.join(progFiles, 'Chromium', 'Application', 'chrome.exe'),
+      // Brave
+      path.join(progFiles, 'BraveSoftware', 'Brave-Browser', 'Application', 'brave.exe'),
+      path.join(localAppData, 'BraveSoftware', 'Brave-Browser', 'Application', 'brave.exe'),
+      // Edge
+      path.join(progFilesX86, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+      path.join(progFiles, 'Microsoft', 'Edge', 'Application', 'msedge.exe')
+    );
+  } else if (isMac) {
+    candidates.push(
+      path.join(HOME, 'hyperion-browser', 'chrome'),
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      '/Applications/Chromium.app/Contents/MacOS/Chromium'
+    );
+  } else {
+    // Linux
+    candidates.push(
+      // Bundled / Embedded Chromium
+      path.join(process.resourcesPath || '', 'chrome', 'chrome'),
+      path.join(path.dirname(process.execPath || ''), 'resources', 'chrome', 'chrome'),
+      path.join(path.dirname(process.execPath || ''), 'chrome', 'chrome'),
+      path.join(__dirname, 'bundle', 'chrome', 'chrome'),
+      path.join(HOME, 'hyperion-browser', 'chrome'),
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/google-chrome',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chromium'
+    );
+  }
+
+  for (const c of candidates) {
+    if (c && fs.existsSync(c)) {
+      return { path: c, exists: true };
+    }
+  }
+
+  const defaultPath = isWin
+    ? path.join(HOME, 'hyperion-browser', 'chrome.exe')
+    : path.join(HOME, 'hyperion-browser', 'chrome');
+
+  return { path: defaultPath, exists: false };
+}
 
 if (!fs.existsSync(CONFIG_DIR)) fs.mkdirSync(CONFIG_DIR, { recursive: true });
 if (!fs.existsSync(PROFILES_DATA_DIR)) fs.mkdirSync(PROFILES_DATA_DIR, { recursive: true });
@@ -257,11 +319,20 @@ const POPULAR_EXTENSIONS = [
 ];
 
 function createWindow() {
+  const { screen } = require('electron');
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+
+  // Responsive default dimensions adapting to any screen resolution and Windows DPI scaling (100%, 125%, 150%)
+  const winWidth = Math.min(1366, Math.max(960, Math.floor(screenWidth * 0.94)));
+  const winHeight = Math.min(840, Math.max(560, Math.floor(screenHeight * 0.92)));
+
   mainWindow = new BrowserWindow({
-    width: 1700,
-    height: 980,
-    minWidth: 1280,
-    minHeight: 720,
+    width: winWidth,
+    height: winHeight,
+    minWidth: 920,
+    minHeight: 520,
+    center: true,
     title: "Hyperion Anti-Detect Multibrowser",
     icon: require('path').join(__dirname, 'assets/icon.png'),
     backgroundColor: "#070709",
@@ -272,7 +343,6 @@ function createWindow() {
     }
   });
 
-  mainWindow.maximize();
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
   mainWindow.setMenuBarVisibility(false);
 }
@@ -411,6 +481,13 @@ ipcMain.handle('clone-profile', async (event, id) => {
 });
 
 ipcMain.handle('open-profile-folder', async (event, id) => {
+  const chromeInfo = getChromeBinary();
+  if (!chromeInfo.exists) {
+    const binName = process.platform === 'win32' ? 'chrome.exe' : 'chrome';
+    throw new Error(`Исполняемый файл браузера (${binName}) не найден.\nУкажите путь к Chrome в разделе «Настройки» или установите Google Chrome.`);
+  }
+  const CHROME_BIN = chromeInfo.path;
+
   const profileDir = path.join(PROFILES_DATA_DIR, `profile_${id}`);
   if (!fs.existsSync(profileDir)) fs.mkdirSync(profileDir, { recursive: true });
 
@@ -557,7 +634,7 @@ function ensureProfileHelperExtension(profileDir, user, pass) {
   if (!fs.existsSync(extDir)) fs.mkdirSync(extDir, { recursive: true });
 
   const manifest = {
-    version: '1.0.0',
+    version: '1.0.1',
     manifest_version: 2,
     name: 'Hyperion Profile Helper',
     permissions: [
@@ -676,6 +753,13 @@ async function startProfileProcess(id, customUrls = null) {
   const profiles = readJson(PROFILES_FILE, []);
   const p = profiles.find(x => x.id === id);
   if (!p) throw new Error('Профиль не найден');
+
+  const chromeInfo = getChromeBinary();
+  if (!chromeInfo.exists) {
+    const binName = process.platform === 'win32' ? 'chrome.exe' : 'chrome';
+    throw new Error(`Исполняемый файл браузера (${binName}) не найден.\nУкажите путь к Chrome в разделе «Настройки» или установите Google Chrome.`);
+  }
+  const CHROME_BIN = chromeInfo.path;
 
   const profileDir = path.join(PROFILES_DATA_DIR, `profile_${id}`);
   if (!fs.existsSync(profileDir)) fs.mkdirSync(profileDir, { recursive: true });
@@ -1535,7 +1619,7 @@ ipcMain.handle('export-profile-package', async (event, profileId) => {
   }
 
   const pkg = {
-    format: "aegis_profile_v1",
+    format: "hyperion_profile_v1",
     exportedAt: Date.now(),
     profile: p,
     cookies: cookies
@@ -1594,6 +1678,8 @@ ipcMain.handle('warmup-profile', async (event, profileId, customUrls) => {
   const p = profiles.find(x => x.id === profileId);
   if (!p) throw new Error('Профиль не найден');
 
+  const chromeInfo = getChromeBinary();
+  const CHROME_BIN = chromeInfo.path;
   const profileDir = path.join(PROFILES_DATA_DIR, `profile_${profileId}`);
   const scriptPath = path.join(__dirname, 'warmup_robot.py');
 
@@ -1666,9 +1752,10 @@ ipcMain.handle('save-folders', async (event, folders) => {
 // IPC HANDLERS: SETTINGS & BACKUP
 // ==========================================
 ipcMain.handle('get-settings', async () => {
+  const chromeInfo = getChromeBinary();
   const def = {
     default_url: 'https://google.com',
-    engine_bin: CHROME_BIN,
+    engine_bin: chromeInfo.path,
     webrtc_default: 'proxy_only',
     clear_cache_on_exit: false
   };
@@ -1785,11 +1872,37 @@ ipcMain.handle('import-backup', async () => {
   }
 });
 
+
+ipcMain.handle('select-chrome-binary', async () => {
+  const isWin = process.platform === 'win32';
+  const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+    title: 'Выберите исполняемый файл Chrome / Chromium',
+    properties: ['openFile'],
+    filters: isWin
+      ? [{ name: 'Исполняемые файлы (*.exe)', extensions: ['exe'] }, { name: 'Все файлы', extensions: ['*'] }]
+      : [{ name: 'Исполняемые файлы', extensions: ['*'] }]
+  });
+  if (canceled || !filePaths || filePaths.length === 0) return null;
+  const chosenPath = filePaths[0];
+  const settings = readJson(SETTINGS_FILE, {});
+  settings.chrome_path = chosenPath;
+  writeJson(SETTINGS_FILE, settings);
+  return { path: chosenPath, exists: fs.existsSync(chosenPath) };
+});
+
+ipcMain.handle('rescan-chrome-binary', async () => {
+  const settings = readJson(SETTINGS_FILE, {});
+  delete settings.chrome_path;
+  writeJson(SETTINGS_FILE, settings);
+  return getChromeBinary();
+});
+
 ipcMain.handle('get-system-status', async () => {
+  const chromeInfo = getChromeBinary();
   return {
-    engine: "Hyperion v1.0.0",
-    binary: CHROME_BIN,
-    binaryExists: fs.existsSync(CHROME_BIN),
+    engine: "Hyperion v1.0.1",
+    binary: chromeInfo.path,
+    binaryExists: chromeInfo.exists,
     os: process.platform,
     arch: process.arch,
     profilesCount: readJson(PROFILES_FILE, []).length,

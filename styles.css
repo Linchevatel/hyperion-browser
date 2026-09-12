@@ -490,7 +490,7 @@ body {
 
 .profiles-table {
   width: 100%;
-  min-width: 1240px;
+  min-width: 780px;
   border-collapse: separate;
   border-spacing: 0 8px;
 }
@@ -682,30 +682,30 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 4px;
+  gap: 3px;
   flex-wrap: nowrap;
 }
 
 .row-actions .btn-icon {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
 }
 
 .row-actions .btn-start,
 .row-actions .btn-stop {
-  padding: 5px 10px;
-  font-size: 12px;
+  padding: 4px 8px;
+  font-size: 11.5px;
   gap: 4px;
   flex-shrink: 0;
-  height: 28px;
+  height: 26px;
 }
 
 /* EMPTY STATE */
@@ -1833,4 +1833,83 @@ input[type="checkbox"]:not(.toggle-container input):focus-visible {
 .btn-danger:hover {
   background-color: #dc2626;
   border-color: #dc2626;
+}
+
+
+/* ========================================================================= */
+/* RESPONSIVE SCALING (FOR 1366x768 & WINDOWS 125%/150% DPI SCALING)         */
+/* ========================================================================= */
+@media (max-width: 1366px) {
+  .sidebar {
+    width: 200px;
+    min-width: 200px;
+    padding: 14px 10px;
+  }
+  .brand {
+    padding: 4px 6px 16px;
+    gap: 8px;
+  }
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+  }
+  .brand-title {
+    font-size: 16px;
+  }
+  .nav-item {
+    padding: 8px 10px;
+    font-size: 12.5px;
+    gap: 8px;
+  }
+  .nav-item svg {
+    width: 16px;
+    height: 16px;
+  }
+  .topbar {
+    padding: 10px 16px;
+  }
+  .table-container {
+    padding: 8px 14px 16px;
+  }
+  .profiles-table thead th {
+    padding: 8px 8px;
+    font-size: 10.5px;
+  }
+  .profiles-table tbody tr td {
+    padding: 8px 8px;
+    font-size: 12px;
+  }
+  .fp-cell .fp-hw-badges {
+    gap: 3px;
+  }
+  .fp-cell .fp-pill {
+    font-size: 10px;
+    padding: 1px 4px;
+  }
+}
+
+@media (max-height: 768px) {
+  .sidebar {
+    padding: 10px 10px;
+  }
+  .brand {
+    padding: 4px 6px 10px;
+  }
+  .nav-menu {
+    margin-top: 10px;
+    gap: 4px;
+  }
+  .nav-item {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  .sidebar-status {
+    padding: 8px 10px;
+  }
+  .topbar {
+    padding: 8px 14px;
+  }
+  .profiles-table tbody tr td {
+    padding: 6px 8px;
+  }
 }

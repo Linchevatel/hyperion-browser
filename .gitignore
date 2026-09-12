@@ -25,3 +25,9 @@ Thumbs.db
 *.log
 check_*.png
 test_output/
+
+# Bundled Chromium binaries
+bundle/chrome/*
+!bundle/chrome/.gitkeep
+chromium-*.zip
+chromium-*-temp/
