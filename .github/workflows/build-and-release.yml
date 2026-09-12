@@ -3,17 +3,21 @@ name: Build and Release Hyperion Browser
 on:
   workflow_dispatch:
     inputs:
-      chromium_version:
-        description: 'Target Chromium version (or tag)'
+      release_tag:
+        description: "Release tag (e.g. v1.0.0)"
         required: false
-        default: 'auto'
+        default: ""
+      chromium_version:
+        description: "Chromium core version"
+        required: false
+        default: "auto"
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
-  build-desktop-app:
-    name: Build Hyperion Desktop (AppImage & Deb)
+  build-linux-packages:
+    name: Build Linux Packages (.deb, .rpm, .AppImage)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -22,34 +26,66 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
+          cache: "npm"
 
-      - name: Install Dependencies
+      - name: Install System Packaging Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm libarchive-tools
+
+      - name: Install NPM Dependencies
         run: npm ci || npm install
 
-      - name: Build Linux Installers
-        run: npm run dist
+      - name: Build Linux Installers (.AppImage, .deb, .rpm)
+        run: npm run dist:linux
 
-      - name: Upload Desktop Binaries
+      - name: Upload Linux Binaries
         uses: actions/upload-artifact@v4
         with:
-          name: hyperion-desktop-dist
+          name: hyperion-linux-binaries
           path: |
             dist/*.AppImage
             dist/*.deb
+            dist/*.rpm
+
+  build-windows-packages:
+    name: Build Windows Packages (.exe NSIS & Portable)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install NPM Dependencies
+        run: npm ci || npm install
+
+      - name: Build Windows Installers (.exe)
+        run: npm run dist:win
+
+      - name: Upload Windows Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperion-windows-binaries
+          path: dist/*.exe
 
   build-core-package:
-    name: Package Patches and Core Engine
+    name: Package C++ Patches and Engine Fonts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Validate Fingerprint Patches
+      - name: Validate Hyperion C++ Fingerprint Patches
         run: |
           echo "Verifying patch integrity..."
           if [ -f "patches/hyperion_core_fingerprint.patch" ]; then
-            echo "Patch size: $(wc -l < patches/hyperion_core_fingerprint.patch) lines"
+            echo "Patch valid: $(wc -l < patches/hyperion_core_fingerprint.patch) lines"
           else
             echo "Error: patches/hyperion_core_fingerprint.patch missing!"
             exit 1
@@ -63,7 +99,7 @@ jobs:
           cp CHROMIUM_VERSION package_temp/
           tar -czvf hyperion-browser-patches-and-fonts.tar.gz -C package_temp .
 
-      - name: Upload Core Package
+      - name: Upload Core Assets
         uses: actions/upload-artifact@v4
         with:
           name: hyperion-core-assets
@@ -71,7 +107,7 @@ jobs:
 
   create-github-release:
     name: Create GitHub Release
-    needs: [build-desktop-app, build-core-package]
+    needs: [build-linux-packages, build-windows-packages, build-core-package]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -79,10 +115,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download Desktop Binaries
+      - name: Create Artifacts Directory
+        run: mkdir -p release-binaries
+
+      - name: Download Linux Binaries
         uses: actions/download-artifact@v4
         with:
-          name: hyperion-desktop-dist
+          name: hyperion-linux-binaries
+          path: release-binaries/
+
+      - name: Download Windows Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: hyperion-windows-binaries
           path: release-binaries/
 
       - name: Download Core Assets
@@ -91,23 +136,44 @@ jobs:
           name: hyperion-core-assets
           path: release-binaries/
 
-      - name: Generate Checksums
+      - name: Generate Checksums (SHA-256)
         run: |
           cd release-binaries
           sha256sum * > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
+      - name: Determine Release Tag
+        id: rel_tag
+        run: |
+          if [ -n "${{ github.ref_name }}" ] && [[ "${{ github.ref_name }}" == v* ]]; then
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          elif [ -n "${{ inputs.release_tag }}" ]; then
+            echo "tag=${{ inputs.release_tag }}" >> $GITHUB_OUTPUT
+          else
+            CHROME_VER=$(cat CHROMIUM_VERSION | tr -d [:space:])
+            echo "tag=v${CHROME_VER:-1.0.0}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: release-binaries/*
-          name: "Hyperion Browser ${{ github.ref_name || 'v1.0.0' }}"
+          tag_name: ${{ steps.rel_tag.outputs.tag }}
+          name: "Hyperion Browser ${{ steps.rel_tag.outputs.tag }}"
           body: |
-            ## Hyperion Antidetect Browser Production Release
-            - **C++ Modifications**: Blink canvas micro-noise, WebAudio offline context, navigator hardware & screen spoofing, WebGL unmasked vendor.
-            - **WebRTC**: IP handling leak protection (`disable_non_proxied_udp`).
-            - **Proxy**: SOCKS5 authenticated local bridge (RFC 1928/1929).
-            - **Fonts**: Zero-footprint isolated Fontconfig MS fonts.
-            - **Checksums**: See SHA256SUMS.txt.
+            ## Hyperion Anti-Detect Multibrowser Production Release (${{ steps.rel_tag.outputs.tag }})
+
+            ### 📦 Download Packages
+            - **Linux**: `.AppImage` (Universal Portable), `.deb` (Debian/Ubuntu/Mint), `.rpm` (Fedora/RHEL/CentOS/ALT)
+            - **Windows**: `Hyperion-Setup-*.exe` (NSIS Installer), `Hyperion-*.exe` (Portable)
+            - **Engine Patches**: `hyperion-browser-patches-and-fonts.tar.gz` (C++ source patches & isolated font bundles)
+            - **Integrity**: See `SHA256SUMS.txt` for cryptographic checksums.
+
+            ### 🛡️ Core Antidetect Technologies
+            - **Kernel C++ Spoofing**: Deterministic Canvas micro-noise, WebAudio frequency perturbation, WebGL vendor/renderer spoofing, Screen dimensions, and Hardware Concurrency.
+            - **Native Automation Bypass**: `navigator.webdriver = false` natively hardcoded into Chromium Blink core — zero automation flags or detection vectors.
+            - **Zero-Footprint Font Subsystem**: Isolated Fontconfig instance per profile with authentic Microsoft core fonts without modifying host `/usr/share/fonts`.
+            - **WebRTC Zero-Leak Engine**: UDP policy enforcement (`disable_non_proxied_udp`) — absolute prevention of real ISP IP leaks.
+            - **SOCKS5/HTTP Proxy Engine**: Seamless authentication bridge and dynamic mobile proxy rotation.
           draft: false
           prerelease: false

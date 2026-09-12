@@ -2,8 +2,8 @@ name: Chromium Upstream Watcher
 
 on:
   schedule:
-    - cron: '0 2 * * *' # Every day at 02:00 UTC
-  workflow_dispatch:      # Manual trigger
+    - cron: "0 2 * * *" # Daily check at 02:00 UTC
+  workflow_dispatch:     # Manual run trigger
 
 jobs:
   check-upstream:
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Fetch Upstream Version from ChromiumDash
         id: check_version
@@ -40,11 +42,11 @@ jobs:
         run: |
           NEW_VER="${{ steps.check_version.outputs.upstream_version }}"
           echo "$NEW_VER" > CHROMIUM_VERSION
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "Linchevatel"
+          git config user.email "295051633+Linchevatel@users.noreply.github.com"
           git add CHROMIUM_VERSION
-          git commit -m "chore(upstream): bump Chromium core to $NEW_VER [skip ci]"
-          git tag -a "v$NEW_VER" -m "Automated Upstream Chromium Release $NEW_VER"
+          git commit -m "chore(upstream): bump Chromium core to $NEW_VER"
+          git tag -a "v$NEW_VER" -m "Hyperion Release for Chromium $NEW_VER"
           git push origin main --tags
 
       - name: Trigger Automated Build and Release Workflow
@@ -58,6 +60,7 @@ jobs:
               workflow_id: 'build-and-release.yml',
               ref: 'main',
               inputs: {
+                release_tag: 'v${{ steps.check_version.outputs.upstream_version }}',
                 chromium_version: '${{ steps.check_version.outputs.upstream_version }}'
               }
             });

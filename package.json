@@ -5,17 +5,23 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --linux AppImage deb"
+    "dist": "electron-builder -mwl",
+    "dist:linux": "electron-builder --linux AppImage deb rpm",
+    "dist:win": "electron-builder --win nsis portable"
   },
   "keywords": [
     "antidetect",
     "browser",
-    "privacy"
+    "multilogin",
+    "privacy",
+    "fingerprint",
+    "chromium"
   ],
-  "author": "Hyperion Team",
-  "license": "ISC",
+  "author": "Linchevatel",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^44.3.0",
+    "electron-builder": "^24.13.3",
     "playwright": "^1.50.0"
   },
   "build": {
@@ -27,13 +33,42 @@
     "linux": {
       "target": [
         "AppImage",
-        "deb"
+        "deb",
+        "rpm"
       ],
-      "category": "Network;WebBrowser;"
+      "category": "Network;WebBrowser;",
+      "icon": "assets/icon.png"
+    },
+    "deb": {
+      "priority": "optional"
+    },
+    "rpm": {
+      "fpm": [
+        "--rpm-os",
+        "linux"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     },
     "files": [
       "**/*",
-      "!dist/**"
+      "!dist/**",
+      "!*.png",
+      "!*.jpg",
+      "!run_full_antidetect_audit.js",
+      "!test_buttons.js",
+      "!verify_antidetect.js"
     ]
   }
 }
