@@ -2082,12 +2082,39 @@ ipcMain.handle('install-app-update', async () => {
     const launcherBat = path.join(os.tmpdir(), `hyperion_updater_${Date.now()}.bat`);
     const appExe = process.execPath;
     const updateExe = PENDING_UPDATE_FILE;
+    const appDir = path.dirname(appExe);
 
     const batContent = `@echo off
-timeout /t 1 /nobreak > nul
+setlocal enabledelayedexpansion
+timeout /t 2 /nobreak > nul
+
+REM 1. Run the update installer
 start "" /wait "${updateExe}" /S
-timeout /t 1 /nobreak > nul
-start "" "${appExe}"
+timeout /t 2 /nobreak > nul
+
+REM 2. Locate the updated executable
+set "TARGET_EXE=${appExe}"
+if not exist "!TARGET_EXE!" (
+  if exist "%LOCALAPPDATA%\Programs\hyperion-browser\hyperion-browser.exe" (
+    set "TARGET_EXE=%LOCALAPPDATA%\Programs\hyperion-browser\hyperion-browser.exe"
+  ) else if exist "%ProgramFiles%\Hyperion Browser\hyperion-browser.exe" (
+    set "TARGET_EXE=%ProgramFiles%\Hyperion Browser\hyperion-browser.exe"
+  ) else if exist "%ProgramFiles(x86)%\Hyperion Browser\hyperion-browser.exe" (
+    set "TARGET_EXE=%ProgramFiles(x86)%\Hyperion Browser\hyperion-browser.exe"
+  ) else if exist "${appDir}\hyperion-browser.exe" (
+    set "TARGET_EXE=${appDir}\hyperion-browser.exe"
+  )
+)
+
+REM 3. Relaunch the application safely
+if exist "!TARGET_EXE!" (
+  for %%F in ("!TARGET_EXE!") do set "EXE_DIR=%%~dpF"
+  start "" /D "!EXE_DIR!" "!TARGET_EXE!"
+) else (
+  REM Fallback to original path if not located
+  start "" "${appExe}"
+)
+
 del "%~f0"
 `;
     fs.writeFileSync(launcherBat, batContent, 'utf-8');
