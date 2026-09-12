@@ -16,6 +16,21 @@ const {
   WEBRTC_MODES
 } = require('./fingerprint');
 const updater = require('./updater');
+function getPythonCommand() {
+  const isWin = process.platform === 'win32';
+  if (isWin) {
+    const { execSync } = require('child_process');
+    for (const cmd of ['python', 'py', 'python3']) {
+      try {
+        execSync(`${cmd} --version`, { stdio: 'ignore' });
+        return cmd;
+      } catch (e) {}
+    }
+    return 'python';
+  }
+  return 'python3';
+}
+
 
 const os = require('os');
 const HOME = os.homedir();
@@ -383,13 +398,19 @@ ipcMain.handle('create-profile', async (event, data) => {
   const id = require('crypto').randomUUID();
   const fp = data.fingerprint || generateFingerprint(data.os || 'windows', id, '155');
 
+  const rawName = (data.name || `Профиль #${profiles.length + 1}`).trim().slice(0, 30);
+  const rawNotes = (data.notes || '').trim().slice(0, 30);
+  const rawTags = (Array.isArray(data.tags) ? data.tags : ['Main'])
+    .map(t => String(t).trim().replace(/^#/, '').slice(0, 10))
+    .filter(Boolean);
+
   const newProfile = {
     id,
-    name: data.name || `Профиль #${profiles.length + 1}`,
+    name: rawName,
     os: data.os || 'windows',
     browser_version: '155',
-    tags: data.tags || ['Main'],
-    notes: data.notes || '',
+    tags: rawTags,
+    notes: rawNotes,
     proxy: data.proxy || null,
     extensions: data.extensions || [],
     fingerprint: fp,
@@ -405,7 +426,13 @@ ipcMain.handle('update-profile', async (event, id, data) => {
   const profiles = readJson(PROFILES_FILE, []);
   const idx = profiles.findIndex(p => p.id === id);
   if (idx !== -1) {
-    profiles[idx] = { ...profiles[idx], ...data };
+    const sanitized = { ...data };
+    if (sanitized.name) sanitized.name = String(sanitized.name).trim().slice(0, 30);
+    if (sanitized.notes !== undefined) sanitized.notes = String(sanitized.notes).trim().slice(0, 30);
+    if (Array.isArray(sanitized.tags)) {
+      sanitized.tags = sanitized.tags.map(t => String(t).trim().replace(/^#/, '').slice(0, 10)).filter(Boolean);
+    }
+    profiles[idx] = { ...profiles[idx], ...sanitized };
     writeJson(PROFILES_FILE, profiles);
     return profiles[idx];
   }
@@ -1137,9 +1164,10 @@ ipcMain.handle('install-extension', async (event, rawExtId) => {
   }
   const targetDir = path.join(EXTENSIONS_DIR, extId);
   const scriptPath = path.join(__dirname, 'ext_installer.py');
+  const pyCmd = getPythonCommand();
 
   return new Promise((resolve, reject) => {
-    execFile(scriptPath, [extId, targetDir], (error, stdout, stderr) => {
+    execFile(pyCmd, [scriptPath, extId, targetDir], (error, stdout, stderr) => {
       if (error) {
         return resolve({ success: false, error: stderr || error.message });
       }
@@ -1469,7 +1497,7 @@ ipcMain.handle('import-cookies', async (event, profileId, cookiesJson) => {
   const scriptPath = path.join(__dirname, 'cookie_manager.py');
 
   return new Promise((resolve) => {
-    const py = spawn('python3', [scriptPath, 'import', dbPath]);
+    const py = spawn(getPythonCommand(), [scriptPath, 'import', dbPath]);
     let stdout = '', stderr = '';
     py.stdout.on('data', d => stdout += d.toString());
     py.stderr.on('data', d => stderr += d.toString());
@@ -1491,7 +1519,7 @@ ipcMain.handle('export-cookies', async (event, profileId) => {
   const scriptPath = path.join(__dirname, 'cookie_manager.py');
 
   return new Promise((resolve) => {
-    const py = spawn('python3', [scriptPath, 'export', dbPath]);
+    const py = spawn(getPythonCommand(), [scriptPath, 'export', dbPath]);
     let stdout = '', stderr = '';
     py.stdout.on('data', d => stdout += d.toString());
     py.stderr.on('data', d => stderr += d.toString());
@@ -1607,7 +1635,7 @@ ipcMain.handle('export-profile-package', async (event, profileId) => {
     try {
       const scriptPath = path.join(__dirname, 'cookie_manager.py');
       const { execFileSync } = require('child_process');
-      const out = execFileSync('python3', [scriptPath, 'export', dbPath]);
+      const out = execFileSync(getPythonCommand(), [scriptPath, 'export', dbPath]);
       const res = JSON.parse(out.toString());
       if (res.success) cookies = res.cookies;
     } catch (e) {}
@@ -1656,7 +1684,7 @@ ipcMain.handle('import-profile-package', async (event) => {
     try {
       const scriptPath = path.join(__dirname, 'cookie_manager.py');
       const { spawnSync } = require('child_process');
-      spawnSync('python3', [scriptPath, 'import', dbPath], {
+      spawnSync(getPythonCommand(), [scriptPath, 'import', dbPath], {
         input: JSON.stringify(pkg.cookies)
       });
     } catch (e) {}
@@ -1684,7 +1712,7 @@ ipcMain.handle('warmup-profile', async (event, profileId, customUrls) => {
   }
 
   return new Promise((resolve) => {
-    const py = spawn('python3', [scriptPath, CHROME_BIN, profileDir, proxyArg]);
+    const py = spawn(getPythonCommand(), [scriptPath, CHROME_BIN, profileDir, proxyArg]);
     let stdout = '', stderr = '';
     py.stdout.on('data', d => {
       const text = d.toString();

@@ -125,7 +125,7 @@ window.showConfirmDialog = showConfirmDialog;
 // =========================================================================
 // CUSTOM PROMPT MODAL (REPLACES WINDOW.PROMPT IN ELECTRON)
 // =========================================================================
-function openPromptDialog({ title, label, placeholder, defaultValue = '', onConfirm }) {
+function openPromptDialog({ title, label, placeholder, defaultValue = '', maxLength, onConfirm }) {
   const modal = document.getElementById('prompt-modal');
   const titleEl = document.getElementById('prompt-modal-title');
   const labelEl = document.getElementById('prompt-modal-label');
@@ -139,6 +139,11 @@ function openPromptDialog({ title, label, placeholder, defaultValue = '', onConf
   if (inputEl) {
     inputEl.placeholder = placeholder || '';
     inputEl.value = defaultValue;
+    if (maxLength) {
+      inputEl.setAttribute('maxlength', maxLength);
+    } else {
+      inputEl.removeAttribute('maxlength');
+    }
   }
 
   modal.style.display = 'flex';
@@ -1441,17 +1446,36 @@ function initEventListeners() {
     }
   });
 
+  
+  // Live tag input limiter (max 10 chars per individual tag)
+  formTags.addEventListener('input', () => {
+    const raw = formTags.value;
+    const parts = raw.split(/([,\s]+)/); // preserve delimiters
+    const constrained = parts.map((chunk, idx) => {
+      // even indexes are tag text, odd are delimiters
+      if (idx % 2 === 0) {
+        return chunk.slice(0, 10);
+      }
+      return chunk;
+    }).join('');
+    if (constrained !== raw) {
+      formTags.value = constrained;
+    }
+  });
+
   // Save profile
   document.getElementById('btn-modal-save').addEventListener('click', async () => {
-    const name = formName.value.trim();
+    const name = formName.value.trim().slice(0, 30);
     if (!name) {
-      alert('Введите название профиля');
+      alert('Введите название профиля (до 30 символов)');
       return;
     }
 
     const os = document.querySelector('input[name="form-os"]:checked')?.value || 'windows';
-    const tags = formTags.value.split(/[,\s]+/).map(t => t.trim().replace(/^#/, '')).filter(Boolean);
-    const notes = formNotes.value.trim();
+    const tags = formTags.value.split(/[,\s]+/)
+      .map(t => t.trim().replace(/^#/, '').slice(0, 10))
+      .filter(Boolean);
+    const notes = formNotes.value.trim().slice(0, 30);
 
     let proxy = null;
     if (formProxyEnabled.checked) {
@@ -2090,7 +2114,7 @@ window.closeBulkCreateModal = () => {
 };
 
 window.submitBulkCreate = async () => {
-  const baseName = document.getElementById('bulk-input-basename').value.trim() || 'Профиль';
+  const baseName = (document.getElementById('bulk-input-basename').value.trim() || 'Профиль').slice(0, 30);
   const count = parseInt(document.getElementById('bulk-input-count').value) || 5;
   const os = document.getElementById('bulk-select-os').value;
   const folder = document.getElementById('bulk-select-folder').value;
@@ -2285,12 +2309,13 @@ window.promptAddTag = (profileId, event) => {
   if (event) event.stopPropagation();
   openPromptDialog({
     title: 'Добавить тег к профилю',
-    label: 'Название тега:',
+    label: 'Название тега (до 10 символов):',
     placeholder: 'Например: Crypto, KYC, Warmup...',
+    maxLength: 10,
     onConfirm: async (cleanTag) => {
       const p = PROFILES.find(x => x.id === profileId);
       if (!p) return;
-      const tagClean = cleanTag.replace(/^#/, '').trim();
+      const tagClean = cleanTag.replace(/^#/, '').trim().slice(0, 10);
       if (!tagClean) return;
       const currentTags = Array.isArray(p.tags) ? [...p.tags] : [];
       if (!currentTags.includes(tagClean)) {
