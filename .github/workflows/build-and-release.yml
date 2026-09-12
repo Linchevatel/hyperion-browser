@@ -23,21 +23,24 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
-      - name: Install System Packaging Tools
+      - name: Install System Packaging Tools (rpm & fpm)
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm libarchive-tools
+          sudo apt-get install -y rpm ruby ruby-dev rubygems libarchive-tools
+          sudo gem install --no-document fpm
 
       - name: Install NPM Dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Build Linux Installers (.AppImage, .deb, .rpm)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:linux
 
       - name: Upload Linux Binaries
@@ -56,16 +59,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
       - name: Install NPM Dependencies
-        run: npm ci || npm install
+        run: npm install
 
       - name: Build Windows Installers (.exe)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:win
 
       - name: Upload Windows Binaries
@@ -150,7 +155,7 @@ jobs:
           elif [ -n "${{ inputs.release_tag }}" ]; then
             echo "tag=${{ inputs.release_tag }}" >> $GITHUB_OUTPUT
           else
-            CHROME_VER=$(cat CHROMIUM_VERSION | tr -d [:space:])
+            CHROME_VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
             echo "tag=v${CHROME_VER:-1.0.0}" >> $GITHUB_OUTPUT
           fi
 
@@ -164,16 +169,9 @@ jobs:
             ## Hyperion Anti-Detect Multibrowser Production Release (${{ steps.rel_tag.outputs.tag }})
 
             ### 📦 Download Packages
-            - **Linux**: `.AppImage` (Universal Portable), `.deb` (Debian/Ubuntu/Mint), `.rpm` (Fedora/RHEL/CentOS/ALT)
+            - **Linux**: `.AppImage` (Universal Portable), `.deb` (Debian/Ubuntu/Mint), `.rpm` (Fedora/RHEL/CentOS)
             - **Windows**: `Hyperion-Setup-*.exe` (NSIS Installer), `Hyperion-*.exe` (Portable)
             - **Engine Patches**: `hyperion-browser-patches-and-fonts.tar.gz` (C++ source patches & isolated font bundles)
             - **Integrity**: See `SHA256SUMS.txt` for cryptographic checksums.
-
-            ### 🛡️ Core Antidetect Technologies
-            - **Kernel C++ Spoofing**: Deterministic Canvas micro-noise, WebAudio frequency perturbation, WebGL vendor/renderer spoofing, Screen dimensions, and Hardware Concurrency.
-            - **Native Automation Bypass**: `navigator.webdriver = false` natively hardcoded into Chromium Blink core — zero automation flags or detection vectors.
-            - **Zero-Footprint Font Subsystem**: Isolated Fontconfig instance per profile with authentic Microsoft core fonts without modifying host `/usr/share/fonts`.
-            - **WebRTC Zero-Leak Engine**: UDP policy enforcement (`disable_non_proxied_udp`) — absolute prevention of real ISP IP leaks.
-            - **SOCKS5/HTTP Proxy Engine**: Seamless authentication bridge and dynamic mobile proxy rotation.
           draft: false
           prerelease: false
