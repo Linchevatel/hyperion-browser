@@ -17,7 +17,7 @@
     "fingerprint",
     "chromium"
   ],
-  "author": "Linchevatel",
+  "author": "Linchevatel <295051633+Linchevatel@users.noreply.github.com>",
   "license": "MIT",
   "devDependencies": {
     "electron": "^44.3.0",
@@ -36,6 +36,7 @@
         "deb",
         "rpm"
       ],
+      "maintainer": "Linchevatel <295051633+Linchevatel@users.noreply.github.com>",
       "category": "Network;WebBrowser;",
       "icon": "assets/icon.png"
     },

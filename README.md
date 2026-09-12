@@ -31,6 +31,40 @@
 
 ---
 
+## 📸 Скриншоты интерфейса (Interface Preview)
+
+<div align="center">
+
+### Главная панель управления профилями
+*Таблица профилей, папки, теги, статистика запущенных сессий и быстрые действия:*
+<br/>
+<img src="assets/screenshots/profiles.png" alt="Панель профилей" width="950" />
+
+<br/><br/>
+
+### Создание и детальная конфигурация профиля
+*Выбор операционной системы, подключение прокси и импорт стартовых cookies:*
+<br/>
+<img src="assets/screenshots/new_profile.png" alt="Создание профиля" width="950" />
+
+<br/><br/>
+
+### Тонкая настройка аппаратного отпечатка (Hardware & GPU)
+*Нативный C++ микро-шум Canvas/Audio, спуфинг видеокарты, ядер процессора, RAM и защита WebRTC:*
+<br/>
+<img src="assets/screenshots/fingerprint.png" alt="Аппаратный отпечаток" width="950" />
+
+<br/><br/>
+
+### Встроенный менеджер и каталог расширений
+*Подключение расширений из Chrome Web Store и установка локальных расширений:*
+<br/>
+<img src="assets/screenshots/extensions.png" alt="Менеджер расширений" width="950" />
+
+</div>
+
+---
+
 ## ⚡ Возможности Hyperion
 
 ### 🛡️ Уникальные аппаратные отпечатки
@@ -57,34 +91,6 @@
 - **Массовый запуск и остановка**: Быстрый старт выбранной группы аккаунтов.
 - **Портативные профили `.hyperion`**: Экспорт любого профиля со всеми сохраненными куками, сессиями и настройками в единый файл для переноса на другой ПК или передачи коллеге.
 - **Резервное копирование**: Создание и восстановление полной резервной копии базы данных всей программы.
-
----
-
-## 🏗️ Архитектура
-
-```mermaid
-flowchart TD
-    subgraph UI ["Пользовательский интерфейс Hyperion"]
-        A[Таблица профилей и дашборд] --> B[Внутренний контроллер IPC]
-        C[Настройки и резервные копии] --> B
-        D[Робот прогрева и массовое создание] --> B
-    end
-
-    subgraph CoreBridge ["Системный мост"]
-        B --> E[Формирование изолированного профиля]
-        B --> F[Маршрутизация прокси-трафика]
-        B --> G[Изолированная шрифтовая среда]
-    end
-
-    subgraph BrowserEngine ["C++ Ядро браузера Hyperion"]
-        E --> H[Исполняемый файл Chromium]
-        G --> H
-        F --> H
-        H --> I["C++ Модуль шума Canvas и Audio"]
-        H --> J["C++ Спуфинг WebGL и параметров железа"]
-        H --> K["Блокировка утечек WebRTC"]
-    end
-```
 
 ---
 
@@ -183,18 +189,16 @@ npm run dist:win
 
 ---
 
----
-
 ## ☕ Поддержка проекта (Support the project)
 
 Если вы хотите поддержать развитие и сопровождение проекта Hyperion:
 
 | Валюта | Сеть (Network) | Адрес (Address) |
-| :--- | :--- | :--- |
-| **BTC** | Bitcoin | `bc1q0u4pwuqxg7kt5y4p84lc8zzcawhzr3auzw005z` |
-| **ETH** | Ethereum | `0xD3002c0967a8D28FDF67c2Df8488006e965B9a6A` |
-| **USDT** | TRON (TRC-20) | `TYUkmupkzCGzkio77Db7PKEDu4JN8JD1eb` |
-| **TRX** | TRON | `TX7yRGo5xT2Mj5NBVhu7bdv58jmStHFuGZ` |
+| :---: | :--- | :--- |
+| <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" width="20" height="20" valign="middle" /> **BTC** | Bitcoin | `bc1q0u4pwuqxg7kt5y4p84lc8zzcawhzr3auzw005z` |
+| <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" width="20" height="20" valign="middle" /> **ETH** | Ethereum | `0xD3002c0967a8D28FDF67c2Df8488006e965B9a6A` |
+| <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png" width="20" height="20" valign="middle" /> **USDT** | TRON (TRC-20) | `TYUkmupkzCGzkio77Db7PKEDu4JN8JD1eb` |
+| <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/trx.png" width="20" height="20" valign="middle" /> **TRX** | TRON | `TX7yRGo5xT2Mj5NBVhu7bdv58jmStHFuGZ` |
 
 ---
 
