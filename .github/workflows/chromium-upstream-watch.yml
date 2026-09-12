@@ -7,7 +7,7 @@ on:
 
 jobs:
   check-upstream:
-    name: Check Official Chromium Stable Release
+    name: Check Clean Chromium Core Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,19 +19,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch Upstream Version from ChromiumDash
+      - name: Fetch Upstream Version
         id: check_version
         run: |
-          UPSTREAM_VER=$(curl -s "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux" | jq -r '.[0].version')
-          echo "Detected Upstream Chromium: $UPSTREAM_VER"
+          # Check latest Clean Chromium release
+          UNGOOGLED_VER=$(curl -s "https://api.github.com/repos/ungoogled-software/ungoogled-chromium-portablelinux/releases/latest" | jq -r '.tag_name // empty')
+          
+          # Fallback to ChromiumDash stable if API rate-limited
+          if [ -z "$UNGOOGLED_VER" ] || [ "$UNGOOGLED_VER" = "null" ]; then
+            UNGOOGLED_VER=$(curl -s "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux" | jq -r '.[0].version // empty')
+          fi
+
+          echo "Detected Upstream Chromium: $UNGOOGLED_VER"
           CURRENT_VER="none"
           if [ -f "CHROMIUM_VERSION" ]; then
             CURRENT_VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
           fi
           echo "Current Tracked Version: $CURRENT_VER"
-          echo "upstream_version=$UPSTREAM_VER" >> $GITHUB_OUTPUT
+          echo "upstream_version=$UNGOOGLED_VER" >> $GITHUB_OUTPUT
           echo "current_version=$CURRENT_VER" >> $GITHUB_OUTPUT
-          if [ "$UPSTREAM_VER" != "$CURRENT_VER" ] && [ -n "$UPSTREAM_VER" ] && [ "$UPSTREAM_VER" != "null" ]; then
+          
+          if [ -n "$UNGOOGLED_VER" ] && [ "$UNGOOGLED_VER" != "null" ] && [ "$UNGOOGLED_VER" != "$CURRENT_VER" ]; then
             echo "new_version_found=true" >> $GITHUB_OUTPUT
           else
             echo "new_version_found=false" >> $GITHUB_OUTPUT
@@ -45,8 +53,8 @@ jobs:
           git config user.name "Linchevatel"
           git config user.email "295051633+Linchevatel@users.noreply.github.com"
           git add CHROMIUM_VERSION
-          git commit -m "chore(upstream): bump Chromium core to $NEW_VER"
-          git tag -a "v$NEW_VER" -m "Hyperion Release for Chromium $NEW_VER"
+          git commit -m "chore(upstream): bump clean Chromium core to $NEW_VER"
+          git tag -a "v$NEW_VER" -m "Hyperion Release for Clean Chromium $NEW_VER"
           git push origin main --tags
 
       - name: Trigger Automated Build and Release Workflow
