@@ -1837,8 +1837,36 @@ input[type="checkbox"]:not(.toggle-container input):focus-visible {
 
 
 /* ========================================================================= */
-/* RESPONSIVE SCALING (FOR 1366x768 & WINDOWS 125%/150% DPI SCALING)         */
 /* ========================================================================= */
+/* COMPREHENSIVE RESPONSIVE DESIGN FOR ALL SCREEN SIZES & DPI                */
+/* ========================================================================= */
+
+/* General safe flex constraints */
+.topbar {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 56px;
+  padding: 8px 16px;
+}
+
+.topbar-left {
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.topbar-right {
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+#global-update-alert {
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+/* Tablets / Compact Screens / Small Laptops (<= 1366px) */
 @media (max-width: 1366px) {
   .sidebar {
     width: 200px;
@@ -1865,8 +1893,12 @@ input[type="checkbox"]:not(.toggle-container input):focus-visible {
     width: 16px;
     height: 16px;
   }
-  .topbar {
-    padding: 10px 16px;
+  .search-box {
+    width: 240px;
+    min-width: 180px;
+  }
+  .search-box:focus-within {
+    width: 280px;
   }
   .table-container {
     padding: 8px 14px 16px;
@@ -1888,6 +1920,66 @@ input[type="checkbox"]:not(.toggle-container input):focus-visible {
   }
 }
 
+/* Medium screens (<= 1100px) */
+@media (max-width: 1100px) {
+  .sidebar {
+    width: 180px;
+    min-width: 180px;
+  }
+  .os-filters {
+    display: none; /* Hide detailed OS filters on smaller screens to keep UI clean */
+  }
+  .search-box {
+    width: 200px;
+    min-width: 140px;
+  }
+  .search-box:focus-within {
+    width: 220px;
+  }
+  .toast-container {
+    right: 12px;
+    bottom: 12px;
+    max-width: calc(100vw - 24px);
+  }
+  .hyperion-toast {
+    max-width: calc(100vw - 24px);
+    min-width: 240px;
+  }
+}
+
+/* Compact screens / Low resolution (<= 860px) */
+@media (max-width: 860px) {
+  .sidebar {
+    width: 64px;
+    min-width: 64px;
+    padding: 12px 6px;
+    align-items: center;
+  }
+  .brand-title, .brand-subtitle, .nav-item span, .nav-item .badge, .status-label, .engine-badge, .free-badge {
+    display: none;
+  }
+  .brand {
+    padding: 0 0 12px;
+    justify-content: center;
+    border-bottom: none;
+  }
+  .nav-item {
+    justify-content: center;
+    padding: 10px;
+  }
+  .sidebar-status {
+    padding: 0;
+    justify-content: center;
+  }
+  .topbar {
+    gap: 8px;
+  }
+  .filter-group {
+    display: none; /* Hide filters in compact view */
+  }
+}
+
+/* Low vertical resolution (e.g. 768px, 720px screens or laptops with large taskbars) */
 @media (max-height: 768px) {
   .sidebar {
     padding: 10px 10px;
@@ -1907,9 +1999,25 @@ input[type="checkbox"]:not(.toggle-container input):focus-visible {
     padding: 8px 10px;
   }
   .topbar {
-    padding: 8px 14px;
+    padding: 6px 12px;
+    min-height: 48px;
   }
   .profiles-table tbody tr td {
     padding: 6px 8px;
+  }
+  .modal-dialog {
+    max-height: 96vh;
+  }
+  .modal-header {
+    padding: 12px 18px;
+  }
+  .modal-body {
+    padding: 14px 18px;
+  }
+  .modal-footer {
+    padding: 10px 18px;
+  }
+  .form-group {
+    margin-bottom: 12px;
   }
 }
