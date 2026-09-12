@@ -278,7 +278,7 @@ async function checkSystemStatus() {
         dot.className = 'status-dot pulse';
         dot.style.backgroundColor = '';
       }
-      if (label) label.textContent = 'Hyperion v1.0.3';
+      if (label) label.textContent = 'Hyperion v' + (status.version || '1.0.4');
       if (badge) {
         badge.className = 'badge badge-success';
         badge.textContent = 'Обнаружен';

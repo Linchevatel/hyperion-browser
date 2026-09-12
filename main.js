@@ -1895,7 +1895,7 @@ ipcMain.handle('rescan-chrome-binary', async () => {
 ipcMain.handle('get-system-status', async () => {
   const chromeInfo = getChromeBinary();
   return {
-    engine: "Hyperion v1.0.3",
+    engine: "Hyperion v" + app.getVersion(), version: app.getVersion(),
     binary: chromeInfo.path,
     binaryExists: chromeInfo.exists,
     os: process.platform,
