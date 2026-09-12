@@ -1,0 +1,532 @@
+diff --git a/components/embedder_support/user_agent_utils.cc b/components/embedder_support/user_agent_utils.cc
+index 3f87ec84fb..8e41cb6c7c 100644
+--- a/components/embedder_support/user_agent_utils.cc
++++ b/components/embedder_support/user_agent_utils.cc
+@@ -583,6 +583,13 @@ bool GetMobileBitForUAMetadata() {
+ }
+ 
+ std::string GetPlatformVersion() {
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
++    std::string p = cmd->GetSwitchValueASCII("fingerprint-platform");
++    if (p.find("Win") != std::string::npos) return "15.0.0";
++    if (p.find("Mac") != std::string::npos) return "14.5.0";
++    if (p.find("arm") != std::string::npos || p.find("Android") != std::string::npos) return "14.0.0";
++  }
+ #if BUILDFLAG(IS_ANDROID)
+   // For Android XR or desktop form factors, report a non-empty platform
+   // version when kAndroidDesktopUAPlatform is enabled to follow the spec:
+@@ -614,6 +621,15 @@ std::string GetPlatformVersion() {
+ }
+ 
+ std::string GetPlatformForUAMetadata() {
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
++    std::string p = cmd->GetSwitchValueASCII("fingerprint-platform");
++    if (p.find("Win") != std::string::npos) return "Windows";
++    if (p.find("Mac") != std::string::npos) return "macOS";
++    if (p.find("arm") != std::string::npos || p.find("Android") != std::string::npos) return "Android";
++    if (p.find("iPhone") != std::string::npos || p.find("iPad") != std::string::npos) return "iOS";
++    return "Linux";
++  }
+ #if BUILDFLAG(IS_ANDROID)
+   if (base::android::device_info::is_desktop() ||
+       base::android::device_info::is_xr()) {
+diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
+index 710e3758ab..187d2a611e 100644
+--- a/content/browser/renderer_host/render_process_host_impl.cc
++++ b/content/browser/renderer_host/render_process_host_impl.cc
+@@ -4036,6 +4036,18 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
+ #endif
+   };
+   renderer_cmd->CopySwitchesFrom(browser_cmd, kSwitchNames);
++  static const char* const kAegisSwitches[] = {
++      "fingerprint-platform",
++      "fingerprint-concurrency",
++      "fingerprint-memory",
++      "fingerprint-webgl-renderer",
++      "fingerprint-webgl-vendor",
++      "fingerprint-canvas-seed",
++      "fingerprint-audio-seed",
++      "fingerprint-screen-width",
++      "fingerprint-screen-height",
++  };
++  renderer_cmd->CopySwitchesFrom(browser_cmd, kAegisSwitches);
+ 
+   // Propagate WebNN switches needed by backends that run in the renderer.
+   renderer_cmd->CopySwitchesFrom(
+diff --git a/third_party/blink/renderer/core/execution_context/navigator_base.cc b/third_party/blink/renderer/core/execution_context/navigator_base.cc
+index 83f427c5ec..74f8c7c877 100644
+--- a/third_party/blink/renderer/core/execution_context/navigator_base.cc
++++ b/third_party/blink/renderer/core/execution_context/navigator_base.cc
+@@ -3,6 +3,7 @@
+ // found in the LICENSE file.
+ 
+ #include "third_party/blink/renderer/core/execution_context/navigator_base.h"
++#include "base/command_line.h"
+ 
+ #include "base/feature_list.h"
+ #include "build/build_config.h"
+@@ -67,6 +68,11 @@ String NavigatorBase::userAgent() const {
+ }
+ 
+ String NavigatorBase::platform() const {
++  // [Hyperion Antidetect Patch]
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
++    return String::FromUtf8(cmd->GetSwitchValueASCII("fingerprint-platform"));
++  }
+ #if BUILDFLAG(IS_ANDROID)
+   // We need to check the ReduceUserAgentMinorVersion feature flag for
+   // Android WebView, which does not currently ship a reduced User-Agent.
+diff --git a/third_party/blink/renderer/core/frame/navigator.cc b/third_party/blink/renderer/core/frame/navigator.cc
+index 583f05f8dd..b18f4c5888 100644
+--- a/third_party/blink/renderer/core/frame/navigator.cc
++++ b/third_party/blink/renderer/core/frame/navigator.cc
+@@ -1,3 +1,4 @@
++#include "base/command_line.h"
+ /*
+  *  Copyright (C) 2000 Harri Porten (porten@kde.org)
+  *  Copyright (c) 2000 Daniel Molkentin (molkentin@kde.org)
+@@ -56,6 +57,10 @@ String Navigator::vendorSub() const {
+ }
+ 
+ String Navigator::platform() const {
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
++    return String::FromUtf8(cmd->GetSwitchValueASCII("fingerprint-platform"));
++  }
+   // TODO(955620): Consider changing devtools overrides to only allow overriding
+   // the platform with a frozen platform to distinguish between
+   // mobile and desktop when ReduceUserAgent is enabled.
+@@ -98,12 +103,8 @@ bool Navigator::cookieEnabled() const {
+ }
+ 
+ bool Navigator::webdriver() const {
+-  if (RuntimeEnabledFeatures::AutomationControlledEnabled())
+-    return true;
+-
+-  bool automation_enabled = false;
+-  probe::ApplyAutomationOverride(GetExecutionContext(), automation_enabled);
+-  return automation_enabled;
++  // [Hyperion Antidetect Patch] Never expose automation to websites
++  return false;
+ }
+ 
+ String Navigator::GetAcceptLanguages() {
+diff --git a/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc b/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc
+index f5c0db2d1b..64e8bb55ee 100644
+--- a/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc
++++ b/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc
+@@ -3,12 +3,22 @@
+ // found in the LICENSE file.
+ 
+ #include "third_party/blink/renderer/core/frame/navigator_concurrent_hardware.h"
++#include "base/strings/string_number_conversions.h"
++#include "base/command_line.h"
+ 
+ #include "base/system/sys_info.h"
+ 
+ namespace blink {
+ 
+ unsigned NavigatorConcurrentHardware::hardwareConcurrency() const {
++  // [Hyperion Antidetect Patch]
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-concurrency")) {
++    int val = 0;
++    if (base::StringToInt(cmd->GetSwitchValueASCII("fingerprint-concurrency"), &val) && val > 0) {
++      return static_cast<unsigned>(val);
++    }
++  }
+   return static_cast<unsigned>(base::SysInfo::NumberOfProcessors());
+ }
+ 
+diff --git a/third_party/blink/renderer/core/frame/navigator_device_memory.cc b/third_party/blink/renderer/core/frame/navigator_device_memory.cc
+index 05fa33e456..9004cc6bfd 100644
+--- a/third_party/blink/renderer/core/frame/navigator_device_memory.cc
++++ b/third_party/blink/renderer/core/frame/navigator_device_memory.cc
+@@ -3,6 +3,8 @@
+ // found in the LICENSE file.
+ 
+ #include "third_party/blink/renderer/core/frame/navigator_device_memory.h"
++#include "base/strings/string_number_conversions.h"
++#include "base/command_line.h"
+ 
+ #include "third_party/blink/public/common/device_memory/approximated_device_memory.h"
+ #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom-shared.h"
+@@ -12,6 +14,14 @@
+ namespace blink {
+ 
+ float NavigatorDeviceMemory::deviceMemory() const {
++  // [Hyperion Antidetect Patch]
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-memory")) {
++    int val = 0;
++    if (base::StringToInt(cmd->GetSwitchValueASCII("fingerprint-memory"), &val) && val > 0) {
++      return static_cast<float>(val);
++    }
++  }
+   return ApproximatedDeviceMemory::GetApproximatedDeviceMemory();
+ }
+ 
+diff --git a/third_party/blink/renderer/core/frame/navigator_device_memory.idl b/third_party/blink/renderer/core/frame/navigator_device_memory.idl
+index 6a57f5507d..6305877490 100644
+--- a/third_party/blink/renderer/core/frame/navigator_device_memory.idl
++++ b/third_party/blink/renderer/core/frame/navigator_device_memory.idl
+@@ -5,6 +5,6 @@
+ // https://github.com/w3c/device-memory#the-web-exposed-api
+ 
+ interface mixin NavigatorDeviceMemory {
+-    [MeasureAs=NavigatorDeviceMemory,SecureContext]
++    [MeasureAs=NavigatorDeviceMemory]
+     readonly attribute float deviceMemory;
+ };
+diff --git a/third_party/blink/renderer/core/frame/navigator_id.cc b/third_party/blink/renderer/core/frame/navigator_id.cc
+index 22243ebf5e..7ad85f2092 100644
+--- a/third_party/blink/renderer/core/frame/navigator_id.cc
++++ b/third_party/blink/renderer/core/frame/navigator_id.cc
+@@ -30,6 +30,7 @@
+  */
+ 
+ #include "third_party/blink/renderer/core/frame/navigator_id.h"
++#include "base/command_line.h"
+ 
+ #include "base/feature_list.h"
+ #include "build/build_config.h"
+@@ -59,6 +60,11 @@ String NavigatorID::appVersion() {
+ }
+ 
+ String NavigatorID::platform() const {
++  // [Hyperion Antidetect Patch]
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
++    return String::FromUtf8(cmd->GetSwitchValueASCII("fingerprint-platform"));
++  }
+ #if BUILDFLAG(IS_MAC)
+   // Match Safari and Mozilla on Mac x86.
+   return "MacIntel";
+diff --git a/third_party/blink/renderer/core/frame/navigator_ua_data.cc b/third_party/blink/renderer/core/frame/navigator_ua_data.cc
+index 73ad371b32..cade4794e3 100644
+--- a/third_party/blink/renderer/core/frame/navigator_ua_data.cc
++++ b/third_party/blink/renderer/core/frame/navigator_ua_data.cc
+@@ -1,3 +1,4 @@
++#include "base/command_line.h"
+ // Copyright 2020 The Chromium Authors
+ // Use of this source code is governed by a BSD-style license that can be
+ // found in the LICENSE file.
+@@ -90,6 +91,11 @@ void NavigatorUAData::SetFormFactors(Vector<String> form_factors) {
+ }
+ 
+ bool NavigatorUAData::mobile() const {
++  // [Hyperion Antidetect Patch]
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && (cmd->HasSwitch("use-mobile-user-agent") || cmd->HasSwitch("touch-events"))) {
++    return true;
++  }
+   if (GetExecutionContext()) {
+     return is_mobile_;
+   }
+@@ -106,6 +112,18 @@ const HeapVector<Member<NavigatorUABrandVersion>>& NavigatorUAData::brands()
+ }
+ 
+ const String& NavigatorUAData::platform() const {
++  // [Hyperion Antidetect Patch]
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
++    static String s_platform;
++    std::string p = cmd->GetSwitchValueASCII("fingerprint-platform");
++    if (p.find("Win") != std::string::npos) s_platform = "Windows";
++    else if (p.find("Mac") != std::string::npos) s_platform = "macOS";
++    else if (p.find("arm") != std::string::npos || p.find("Android") != std::string::npos) s_platform = "Android";
++    else if (p.find("iPhone") != std::string::npos || p.find("iPad") != std::string::npos) s_platform = "iOS";
++    else s_platform = "Linux";
++    return s_platform;
++  }
+   if (GetExecutionContext()) {
+     return platform_;
+   }
+@@ -144,23 +162,30 @@ ScriptPromise<UADataValues> NavigatorUAData::getHighEntropyValues(
+   // convenience.
+ 
+   values->setBrands(brand_set_);
+-  values->setMobile(is_mobile_);
+-  values->setPlatform(platform_);
++  values->setMobile(mobile());
++  values->setPlatform(platform());
+ 
+   // If the "ch-ua-high-entropy-values" permission policy is enabled for a
+   // document, add high-entropy client hints to values (if requested)
+   if (AllowedToCollectHighEntropyValues(execution_context)) {
++    const String& current_plat = platform();
+     for (const String& hint : hints) {
+       if (hint == "platformVersion") {
+-        values->setPlatformVersion(platform_version_);
++        if (current_plat == "Windows") values->setPlatformVersion("15.0.0");
++        else if (current_plat == "macOS") values->setPlatformVersion("14.5.0");
++        else if (current_plat == "Android") values->setPlatformVersion("14.0.0");
++        else values->setPlatformVersion(platform_version_);
+       } else if (hint == "architecture") {
+-        values->setArchitecture(architecture_);
++        if (current_plat == "Windows") values->setArchitecture("x86");
++        else if (current_plat == "macOS") values->setArchitecture("arm");
++        else if (current_plat == "Android") values->setArchitecture("arm");
++        else values->setArchitecture(architecture_);
+       } else if (hint == "model") {
+         values->setModel(model_);
+       } else if (hint == "uaFullVersion") {
+         values->setUaFullVersion(ua_full_version_);
+       } else if (hint == "bitness") {
+-        values->setBitness(bitness_);
++        values->setBitness("64");
+       } else if (hint == "fullVersionList") {
+         values->setFullVersionList(full_version_list_);
+       } else if (hint == "wow64") {
+diff --git a/third_party/blink/renderer/core/frame/screen.cc b/third_party/blink/renderer/core/frame/screen.cc
+index ed5028943e..f87d63882d 100644
+--- a/third_party/blink/renderer/core/frame/screen.cc
++++ b/third_party/blink/renderer/core/frame/screen.cc
+@@ -27,6 +27,8 @@
+  */
+ 
+ #include "third_party/blink/renderer/core/frame/screen.h"
++#include "base/command_line.h"
++#include "base/strings/string_number_conversions.h" 
+ 
+ #include "base/numerics/safe_conversions.h"
+ #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom-blink.h"
+@@ -88,12 +90,22 @@ bool Screen::AreWebExposedScreenPropertiesEqual(
+ }
+ 
+ int Screen::height() const {
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-screen-height")) {
++    int h = 0;
++    if (base::StringToInt(cmd->GetSwitchValueASCII("fingerprint-screen-height"), &h) && h > 0) return h;
++  }
+   if (!DomWindow())
+     return 0;
+   return GetRect(/*available=*/false).height();
+ }
+ 
+ int Screen::width() const {
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-screen-width")) {
++    int w = 0;
++    if (base::StringToInt(cmd->GetSwitchValueASCII("fingerprint-screen-width"), &w) && w > 0) return w;
++  }
+   if (!DomWindow())
+     return 0;
+   return GetRect(/*available=*/false).width();
+@@ -131,12 +143,22 @@ int Screen::availTop() const {
+ }
+ 
+ int Screen::availHeight() const {
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-screen-height")) {
++    int h = 0;
++    if (base::StringToInt(cmd->GetSwitchValueASCII("fingerprint-screen-height"), &h) && h > 0) return h - 40;
++  }
+   if (!DomWindow())
+     return 0;
+   return GetRect(/*available=*/true).height();
+ }
+ 
+ int Screen::availWidth() const {
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  if (cmd && cmd->HasSwitch("fingerprint-screen-width")) {
++    int w = 0;
++    if (base::StringToInt(cmd->GetSwitchValueASCII("fingerprint-screen-width"), &w) && w > 0) return w;
++  }
+   if (!DomWindow())
+     return 0;
+   return GetRect(/*available=*/true).width();
+diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+index df451afece..eea9b7ff1d 100644
+--- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
++++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
+@@ -3,6 +3,9 @@
+ // found in the LICENSE file.
+ 
+ #include "third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.h"
++#include "base/command_line.h"
++#include "base/strings/string_number_conversions.h"
++#include <algorithm>
+ 
+ #include <cmath>
+ #include <cstdint>
+@@ -515,6 +518,33 @@ ImageData* BaseRenderingContext2D::getImageDataInternal(
+       SkIRect bounds =
+           snapshot->PaintImageForCurrentFrame().GetSkImageInfo().bounds();
+       DCHECK(!bounds.intersect(SkIRect::MakeXYWH(sx, sy, sw, sh)));
++    } else {
++      // [Hyperion Antidetect Patch] Deterministic micro-noise
++      auto* cmd = base::CommandLine::ForCurrentProcess();
++      if (cmd && cmd->HasSwitch("fingerprint-canvas-seed")) {
++        std::string seed_str = cmd->GetSwitchValueASCII("fingerprint-canvas-seed");
++        double seed_val = 0.0;
++        if (base::StringToDouble(seed_str, &seed_val) && seed_val != 0.0) {
++          int seed_int = static_cast<int>(std::abs(seed_val) * 1000000.0);
++          uint8_t* pixels = static_cast<uint8_t*>(image_data_pixmap.writable_addr());
++          int w = image_data_pixmap.width();
++          int h = image_data_pixmap.height();
++          size_t rBytes = image_data_pixmap.rowBytes();
++          if (image_data_pixmap.info().bytesPerPixel() == 4) {
++            for (int y = 0; y < h; y += 4) {
++              uint8_t* row = pixels + y * rBytes;
++              for (int x = 0; x < w; x += 4) {
++                uint8_t* p = row + x * 4;
++                if (p[3] > 10) {
++                  int shift = ((((x + sx) * 31 + (y + sy) * 17) ^ seed_int) % 3) - 1;
++                  int val = static_cast<int>(p[0]) + shift;
++                  p[0] = static_cast<uint8_t>(std::clamp(val, 0, 255));
++                }
++              }
++            }
++          }
++        }
++      }
+     }
+   }
+ 
+diff --git a/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc b/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
+index 4604be68ad..168ec81cec 100644
+--- a/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
++++ b/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
+@@ -24,6 +24,9 @@
+  */
+ 
+ #include "third_party/blink/renderer/modules/webaudio/offline_audio_context.h"
++#include "base/command_line.h"
++#include "base/strings/string_number_conversions.h"
++#include <cmath>
+ 
+ #include "base/metrics/histogram_functions.h"
+ #include "base/metrics/histogram_macros.h"
+@@ -437,6 +440,29 @@ void OfflineAudioContext::FireCompletionEvent() {
+       return;
+     }
+ 
++    // [Hyperion Antidetect Patch] Deterministic micro-noise
++    auto* cmd = base::CommandLine::ForCurrentProcess();
++    if (cmd && cmd->HasSwitch("fingerprint-audio-seed")) {
++      std::string seed_str = cmd->GetSwitchValueASCII("fingerprint-audio-seed");
++      double seed_val = 0.0;
++      if (base::StringToDouble(seed_str, &seed_val) && seed_val != 0.0) {
++        unsigned nchan = rendered_buffer->numberOfChannels();
++        for (unsigned c = 0; c < nchan; ++c) {
++          auto chan_data = rendered_buffer->getChannelData(c);
++          if (chan_data.Get()) {
++            float* data = chan_data.Get()->Data();
++            size_t len = chan_data.Get()->length();
++            for (size_t f = 0; f < len; f += 2) {
++              if (data[f] != 0.0f) {
++                float noise = static_cast<float>(std::sin(static_cast<double>(f) * 0.1 + seed_val * 10000.0) * 0.00001);
++                data[f] += noise;
++              }
++            }
++          }
++        }
++      }
++    }
++
+     // Call the offline rendering completion event listener and resolve the
+     // promise too.
+     DispatchEvent(*OfflineAudioCompletionEvent::Create(rendered_buffer));
+diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+index b452298c24..b95f71b115 100644
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+@@ -24,6 +24,7 @@
+  */
+ 
+ #include "third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h"
++#include "base/command_line.h"
+ 
+ #include <inttypes.h>
+ 
+@@ -4216,6 +4217,11 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+       return ScriptValue::CreateNull(script_state->GetIsolate());
+     case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
+       if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
++        // [Hyperion Antidetect Patch]
++        auto* cmd = base::CommandLine::ForCurrentProcess();
++        if (cmd && cmd->HasSwitch("fingerprint-webgl-renderer")) {
++          return WebGLAny(script_state, String::FromUtf8(cmd->GetSwitchValueASCII("fingerprint-webgl-renderer")));
++        }
+         return WebGLAny(script_state,
+                         String(ContextGL()->GetString(GL_RENDERER)));
+       }
+@@ -4225,6 +4231,11 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+       return ScriptValue::CreateNull(script_state->GetIsolate());
+     case WebGLDebugRendererInfo::kUnmaskedVendorWebgl:
+       if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
++        // [Hyperion Antidetect Patch] Override unmasked vendor
++        auto* cmd = base::CommandLine::ForCurrentProcess();
++        if (cmd && cmd->HasSwitch("fingerprint-webgl-vendor")) {
++          return WebGLAny(script_state, String::FromUtf8(cmd->GetSwitchValueASCII("fingerprint-webgl-vendor")));
++        }
+         return WebGLAny(script_state,
+                         String(ContextGL()->GetString(GL_VENDOR)));
+       }
+diff --git a/third_party/blink/renderer/platform/graphics/image_data_buffer.cc b/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
+index d05ea261a9..c744e4ed87 100644
+--- a/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
++++ b/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
+@@ -31,6 +31,10 @@
+  */
+ 
+ #include "third_party/blink/renderer/platform/graphics/image_data_buffer.h"
++#include "base/command_line.h"
++#include "base/strings/string_number_conversions.h"
++#include <algorithm>
++#include <cmath>
+ 
+ #include "base/compiler_specific.h"
+ #include "base/logging.h"
+@@ -69,8 +73,12 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
+       ImageEncoderUtils::GetColorInfoForEncoder(paint_image_info.colorInfo(),
+                                                 image->GetHdrMetadata());
+ 
++  auto* cmd = base::CommandLine::ForCurrentProcess();
++  bool has_canvas_seed = cmd && cmd->HasSwitch("fingerprint-canvas-seed");
++
+   if (target_color_info != paint_image_info.colorInfo() ||
+-      paint_image.IsTextureBacked() || paint_image.IsLazyGenerated()) {
++      paint_image.IsTextureBacked() || paint_image.IsLazyGenerated() ||
++      has_canvas_seed) {
+     // Unpremul is handled upfront, using readPixels, which will correctly clamp
+     // premul color values that would otherwise cause overflows in the skia
+     // encoder unpremul logic.
+@@ -88,6 +96,32 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
+       pixmap_.reset();
+       return;
+     }
++
++    if (has_canvas_seed) {
++      std::string seed_str = cmd->GetSwitchValueASCII("fingerprint-canvas-seed");
++      double seed_val = 0.0;
++      if (base::StringToDouble(seed_str, &seed_val) && seed_val != 0.0) {
++        int seed_int = static_cast<int>(std::abs(seed_val) * 1000000.0);
++        uint8_t* pixels = static_cast<uint8_t*>(pixmap_.writable_addr());
++        int w = pixmap_.width();
++        int h = pixmap_.height();
++        size_t rBytes = pixmap_.rowBytes();
++        if (info.bytesPerPixel() == 4) {
++          for (int y = 0; y < h; y += 4) {
++            uint8_t* row = pixels + y * rBytes;
++            for (int x = 0; x < w; x += 4) {
++              uint8_t* p = row + x * 4;
++              if (p[3] > 10) {
++                int shift = (((x * 31 + y * 17) ^ seed_int) % 3) - 1;
++                int val = static_cast<int>(p[0]) + shift;
++                p[0] = static_cast<uint8_t>(std::clamp(val, 0, 255));
++              }
++            }
++          }
++        }
++      }
++    }
++
+     MSAN_CHECK_MEM_IS_INITIALIZED(pixmap_.addr(), pixmap_.computeByteSize());
+     retained_image_ = SkImages::RasterFromData(info, std::move(data), rowBytes);
+   } else {

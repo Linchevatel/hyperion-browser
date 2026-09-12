@@ -1,0 +1,39 @@
+{
+  "name": "hyperion-desktop",
+  "version": "1.0.0",
+  "description": "Hyperion Anti-detect Multibrowser Desktop Client",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --linux AppImage deb"
+  },
+  "keywords": [
+    "antidetect",
+    "browser",
+    "privacy"
+  ],
+  "author": "Hyperion Team",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^44.3.0",
+    "playwright": "^1.50.0"
+  },
+  "build": {
+    "appId": "com.hyperion.browser",
+    "productName": "Hyperion Browser",
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Network;WebBrowser;"
+    },
+    "files": [
+      "**/*",
+      "!dist/**"
+    ]
+  }
+}

@@ -1,0 +1,113 @@
+name: Build and Release Hyperion Browser
+
+on:
+  workflow_dispatch:
+    inputs:
+      chromium_version:
+        description: 'Target Chromium version (or tag)'
+        required: false
+        default: 'auto'
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-desktop-app:
+    name: Build Hyperion Desktop (AppImage & Deb)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Build Linux Installers
+        run: npm run dist
+
+      - name: Upload Desktop Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperion-desktop-dist
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+
+  build-core-package:
+    name: Package Patches and Core Engine
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Fingerprint Patches
+        run: |
+          echo "Verifying patch integrity..."
+          if [ -f "patches/hyperion_core_fingerprint.patch" ]; then
+            echo "Patch size: $(wc -l < patches/hyperion_core_fingerprint.patch) lines"
+          else
+            echo "Error: patches/hyperion_core_fingerprint.patch missing!"
+            exit 1
+          fi
+
+      - name: Package Core Archive
+        run: |
+          mkdir -p package_temp
+          cp -r fonts package_temp/
+          cp -r patches package_temp/
+          cp CHROMIUM_VERSION package_temp/
+          tar -czvf hyperion-browser-patches-and-fonts.tar.gz -C package_temp .
+
+      - name: Upload Core Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperion-core-assets
+          path: hyperion-browser-patches-and-fonts.tar.gz
+
+  create-github-release:
+    name: Create GitHub Release
+    needs: [build-desktop-app, build-core-package]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Desktop Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: hyperion-desktop-dist
+          path: release-binaries/
+
+      - name: Download Core Assets
+        uses: actions/download-artifact@v4
+        with:
+          name: hyperion-core-assets
+          path: release-binaries/
+
+      - name: Generate Checksums
+        run: |
+          cd release-binaries
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-binaries/*
+          name: "Hyperion Browser ${{ github.ref_name || 'v1.0.0' }}"
+          body: |
+            ## Hyperion Antidetect Browser Production Release
+            - **C++ Modifications**: Blink canvas micro-noise, WebAudio offline context, navigator hardware & screen spoofing, WebGL unmasked vendor.
+            - **WebRTC**: IP handling leak protection (`disable_non_proxied_udp`).
+            - **Proxy**: SOCKS5 authenticated local bridge (RFC 1928/1929).
+            - **Fonts**: Zero-footprint isolated Fontconfig MS fonts.
+            - **Checksums**: See SHA256SUMS.txt.
+          draft: false
+          prerelease: false

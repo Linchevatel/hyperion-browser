@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hyperion Anti-Detect Multibrowser</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="assets/logo2.jpg" class="sidebar-brand-img" alt="Hyperion Logo">
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">HYPERION</div>
+          <div class="brand-subtitle">ANTI-DETECT MULTIBROWSER</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-view="profiles">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          <span>Профили</span>
+          <span class="badge" id="sidebar-profile-count">0</span>
+        </button>
+
+        <button class="nav-item" data-view="proxies">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <span>Прокси</span>
+          <span class="badge" id="sidebar-proxies-count">0</span>
+        </button>
+
+        <button class="nav-item" data-view="fingerprints">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4"/>
+            <path d="M5 19.5C5.5 18 6 15 6 12c0-.7.1-1.4.3-2"/>
+            <path d="M17.2 8.8A8.8 8.8 0 0 0 12 7.5c-3 0-5.5 2.5-5.5 5.5 0 2 .5 4 1.5 6"/>
+            <path d="M12 12a3.5 3.5 0 0 1 3.5 3.5c0 2-1 4-2 6"/>
+            <path d="M19 15c.5 1.5.7 3.2.7 5"/>
+          </svg>
+          <span>Отпечатки</span>
+        </button>
+
+        <button class="nav-item" data-view="extensions">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>Расширения</span>
+          <span class="badge" id="sidebar-ext-count">0</span>
+        </button>
+
+        <button class="nav-item" data-view="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Настройки</span>
+        </button>
+      </nav>
+
+      <!-- SYSTEM STATUS FOOTER -->
+      <div class="sidebar-status">
+        <div class="status-indicator" id="sidebar-status-btn" style="margin-bottom: 0; cursor: pointer;" title="Открыть центр обновлений">
+          <span class="status-dot pulse" id="sys-status-dot"></span>
+          <span class="status-label" id="sys-engine-name">Hyperion v1.0.0</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- ================= VIEW 1: PROFILES ================= -->
+      <section class="view-pane active" id="view-profiles">
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input type="text" id="search-input" placeholder="Поиск профилей, тегов, прокси...">
+            </div>
+
+            <div class="filter-group">
+              <button class="filter-btn active" data-filter-status="all">Все</button>
+              <button class="filter-btn" data-filter-status="running">
+                <span class="status-dot-mini green"></span> Активные
+              </button>
+              <button class="filter-btn" data-filter-status="stopped">Остановленные</button>
+            </div>
+
+            <div class="filter-group os-filters">
+              <button class="filter-btn active" data-filter-os="all">Все ОС</button>
+              <button class="filter-btn" data-filter-os="windows">Windows</button>
+              <button class="filter-btn" data-filter-os="macos">macOS</button>
+              <button class="filter-btn" data-filter-os="linux">Linux</button>
+              <button class="filter-btn" data-filter-os="android">Android</button>
+              <button class="filter-btn" data-filter-os="ios">iOS</button>
+            </div>
+          </div>
+
+          <div class="topbar-right">
+            <div id="global-update-alert" style="display: none; align-items: center; gap: 8px; padding: 4px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 12px; color: #fff;">
+              <span id="global-update-text">Доступно обновление Hyperion</span>
+              <button type="button" class="btn btn-primary" id="btn-global-open-settings-update" style="padding: 2px 10px; font-size: 11px; height: 24px;">Обновить</button>
+            </div>
+
+
+            <!-- Split Button for New Profile + Dropdown -->
+            <div class="split-btn-container" style="position: relative; display: inline-flex; align-items: stretch;">
+              <button class="btn btn-primary" id="btn-create-profile" style="border-top-right-radius: 0; border-bottom-right-radius: 0; padding-right: 12px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <span>Новый профиль</span>
+              </button>
+              <button class="btn btn-primary" id="btn-create-profile-dropdown" style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 1px solid rgba(255,255,255,0.25); padding: 0 10px;" title="Другие варианты">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div class="dropdown-menu" id="menu-create-profile" style="display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 270px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 1000; padding: 6px 0;">
+                <button type="button" class="dropdown-item" id="menu-item-new-profile" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: none; border: none; color: #fff; text-align: left; font-size: 13px; cursor: pointer;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Создать новый профиль</span>
+                </button>
+                <button type="button" class="dropdown-item" id="menu-item-import-file" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: none; border: none; color: #fff; text-align: left; font-size: 13px; cursor: pointer;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Импортировать профиль из файла</span>
+                </button>
+                <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                <button type="button" class="dropdown-item" id="menu-item-bulk-create" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: none; border: none; color: #fff; text-align: left; font-size: 13px; cursor: pointer;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  <span>Массовое создание профилей</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        
+        <!-- WORKSPACES & FOLDERS BAR (FEATURE 2) -->
+        <div class="folder-bar">
+          <div class="folder-pills" id="folder-pills-list">
+            <!-- Dynamically populated -->
+          </div>
+          <button class="btn-icon" id="btn-add-folder" title="Создать новую папку">+</button>
+        </div>
+
+        <!-- STATS BANNER -->
+        <section class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon icon-blue">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-total-profiles">0</div>
+              <div class="stat-label">Всего профилей</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-green">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-active-profiles">0</div>
+              <div class="stat-label">Запущенных сессий</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-purple">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-proxies-count">0</div>
+              <div class="stat-label">Подключенных прокси</div>
+            </div>
+          </div>
+
+
+        </section>
+
+        <!-- PROFILES TABLE CONTAINER -->
+        <section class="table-container">
+          
+        <!-- BULK ACTIONS BAR -->
+        <div class="bulk-bar" id="bulk-bar" style="display: none;">
+          <div class="bulk-info">
+            <span>Выбрано профилей: <strong id="bulk-selected-count">0</strong></span>
+          </div>
+          <div class="bulk-actions">
+            <button class="btn btn-start" id="btn-bulk-start">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Запустить выбранные</span>
+            </button>
+            <button class="btn btn-stop" id="btn-bulk-stop">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+              <span>Остановить выбранные</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-bulk-delete" style="color: var(--accent-rose);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Удалить выбранные</span>
+            </button>
+          </div>
+        </div>
+
+        <table class="profiles-table">
+            <thead>
+              <tr>
+                <th style="width: 38px;"><input type="checkbox" id="th-check-all-profiles"></th>
+                <th style="width: 100px; min-width: 100px;">Статус</th>
+                <th style="min-width: 180px;">Название профиля</th>
+                <th style="min-width: 100px;">Теги</th>
+                <th style="min-width: 180px;">Прокси</th>
+                <th style="min-width: 280px;">Цифровой отпечаток (Hardware / GPU)</th>
+                <th style="width: 105px;">Расширения</th>
+                <th style="width: 310px; min-width: 310px; text-align: right;">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="profiles-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+
+          <!-- EMPTY STATE -->
+          <div class="empty-state" id="empty-state" style="display: none;">
+            <div class="empty-icon">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <h3>Нет созданных профилей</h3>
+            <p>Создайте свой первый антидетект-профиль с уникальным аппаратным отпечатком прямо сейчас.</p>
+            <button class="btn btn-primary" id="btn-empty-create">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Создать профиль
+            </button>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= VIEW 2: PROXIES ================= -->
+      <section class="view-pane" id="view-proxies" style="display: none;">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h2 class="view-title">Менеджер прокси</h2>
+            <span class="view-desc">Управление SOCKS5 / HTTP прокси-серверами</span>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-secondary" id="btn-import-proxies-modal">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Импорт списком</span>
+            </button>
+            <button class="btn btn-primary" id="btn-add-proxy">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span>Добавить прокси</span>
+            </button>
+          </div>
+        </header>
+
+        <section class="table-container">
+          <table class="profiles-table">
+            <thead>
+              <tr>
+                <th style="width: 100px;">Протокол</th>
+                <th>Хост / IP</th>
+                <th style="width: 100px;">Порт</th>
+                <th>Авторизация</th>
+                <th style="width: 120px;">Пинг / Статус</th>
+                <th style="width: 160px; text-align: right;">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="proxies-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+
+          <div class="empty-state" id="empty-proxies-state" style="display: none;">
+            <div class="empty-icon">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <h3>Список прокси пуст</h3>
+            <p>Добавьте SOCKS5 или HTTP прокси для привязки к сессиям браузера.</p>
+            <button class="btn btn-primary" id="btn-empty-add-proxy">Добавить прокси</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= VIEW 3: FINGERPRINTS ================= -->
+      <section class="view-pane" id="view-fingerprints" style="display: none;">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h2 class="view-title">Библиотека аппаратных профилей</h2>
+            <span class="view-desc">Готовые эталонные комбинации видеокарт, ядер процессора и разрешений</span>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-primary" id="btn-open-create-template">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span>Создать шаблон</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="view-scroll-body">
+          <div class="templates-grid" id="templates-grid">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div id="dict-grid" style="display: none;"></div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW 4: EXTENSIONS ================= -->
+      <section class="view-pane" id="view-extensions" style="display: none;">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h2 class="view-title">Каталог и менеджер расширений</h2>
+            <span class="view-desc">Установка плагинов в профили из Web Store или распакованных папок</span>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-secondary" id="btn-pick-folder-ext">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Загрузить из папки (Unpacked)</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="view-scroll-body">
+          <!-- DIRECT URL / ID INSTALL BOX -->
+          <div class="ext-install-bar">
+            <input type="text" id="input-custom-ext-id" placeholder="Вставьте ссылку на расширение из Chrome Web Store или 32-значный ID...">
+            <button class="btn btn-primary" id="btn-install-custom-ext">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Установить по ссылке/ID</span>
+            </button>
+          </div>
+
+          <div class="ext-section-header">
+            <h3>Установленные расширения</h3>
+            <span class="ext-count-tag" id="installed-ext-count-tag">0 установлено</span>
+          </div>
+          <div class="ext-grid" id="installed-ext-grid">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- CATALOG WITH CATEGORIES -->
+          <div class="ext-section-header" style="margin-top: 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3>Каталог проверенных плагинов (24 расширения)</h3>
+              <span style="color:var(--text-dim); font-size:12px;">Автоматическая загрузка из Web Store и привязка к профилям</span>
+            </div>
+            <div class="filter-group" id="ext-category-filters">
+              <button class="filter-btn active" data-ext-cat="all">Все (24)</button>
+              <button class="filter-btn" data-ext-cat="Utility">Утилиты / Cookies</button>
+              <button class="filter-btn" data-ext-cat="Crypto">Web3 / Крипта</button>
+              <button class="filter-btn" data-ext-cat="Security">Безопасность / Капча</button>
+              <button class="filter-btn" data-ext-cat="Traffic">Трафик / Арбитраж</button>
+            </div>
+          </div>
+          <div class="ext-grid" id="catalog-ext-grid">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW 5: SETTINGS ================= -->
+      <section class="view-pane" id="view-settings" style="display: none;">
+        <header class="topbar">
+          <div class="topbar-left">
+            <h2 class="view-title">Настройки</h2>
+            <span class="view-desc">Конфигурация Hyperion Anti-Detect Multibrowser</span>
+          </div>
+        </header>
+
+        <div class="view-scroll-body">
+          <div class="settings-page">
+            <div class="brand-banner">
+              <img src="assets/logo1.jpg" alt="Hyperion Anti-Detect Multibrowser">
+            </div>
+
+          <div class="settings-card">
+            <h3>Глобальные настройки сессий</h3>
+            <div class="form-group">
+              <label for="settings-default-url">Стартовая страница по умолчанию:</label>
+              <input type="text" id="settings-default-url" value="https://google.com">
+            </div>
+
+            <div class="form-row">
+              <button class="btn btn-primary" id="btn-save-settings">Сохранить настройки</button>
+            </div>
+          </div>
+
+          <div class="settings-card" id="settings-update-card">
+            <h3>Обновление программы</h3>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <div style="font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px;">
+                  Hyperion Browser <span style="color: var(--text-dim); font-weight: 400;" id="settings-app-version">v1.0.0</span>
+                </div>
+                <div style="font-size: 12.5px; color: var(--text-muted);" id="settings-update-status-text">
+                  Установлена актуальная версия. Проверка выполняется автоматически.
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" class="btn btn-secondary" id="btn-settings-check-update">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <span>Проверить сейчас</span>
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-settings-install-update" style="display: none;">
+                  <span>Установить обновление</span>
+                </button>
+              </div>
+            </div>
+            <div id="settings-update-notification" style="display: none; margin-top: 14px; padding: 12px 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 12.5px; color: #e2e8f0;">
+              <!-- Dynamic update notification banner -->
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>Обслуживание и резервные копии</h3>
+            <div class="settings-actions-row">
+              <button class="btn btn-secondary" id="btn-clear-cache">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                <span>Очистить кэш всех сессий</span>
+              </button>
+
+              <button class="btn btn-secondary" id="btn-export-backup">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Экспорт резервной копии (JSON)</span>
+              </button>
+
+              <button class="btn btn-secondary" id="btn-import-backup">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span>Импорт резервной копии (JSON)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ================= PROFILE MODAL (CREATE / EDIT) ================= -->
+  <div class="modal-overlay" id="profile-modal" style="display: none;">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2 id="modal-heading">Новый профиль</h2>
+          <span class="modal-subtitle">Настройка параметров изоляции, отпечатка и расширений</span>
+        </div>
+        <button class="modal-close" id="btn-modal-close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- TABS -->
+        <div class="modal-tabs">
+          <button class="modal-tab active" data-tab="general">Основное</button>
+          <button class="modal-tab" data-tab="proxy">Прокси</button>
+          <button class="modal-tab" data-tab="fingerprint">Аппаратный отпечаток (Hardware)</button>
+          <button class="modal-tab" data-tab="extensions">Расширения</button>
+          <button class="modal-tab" data-tab="cookies">Cookies</button>
+        </div>
+
+        <form id="profile-form">
+          <input type="hidden" id="edit-profile-id" value="">
+
+          <!-- TAB 1: GENERAL -->
+          <div class="tab-pane active" id="pane-general">
+            <div class="form-group">
+              <label for="form-name">Название профиля <span class="req">*</span></label>
+              <input type="text" id="form-name" required placeholder="Например: FB Ads #1, Crypto farming...">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Операционная система</label>
+                <div class="os-selector">
+                  <label class="os-card">
+                    <input type="radio" name="form-os" value="windows" checked>
+                    <div class="os-card-content">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4h-13.051M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.849"/>
+                      </svg>
+                      <span>Windows</span>
+                    </div>
+                  </label>
+
+                  <label class="os-card">
+                    <input type="radio" name="form-os" value="macos">
+                    <div class="os-card-content">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.1.65-2.76 1.42-.58.67-1.08 1.74-1.02 2.81 1.06.08 2.15-.58 2.77-1.36z"/>
+                      </svg>
+                      <span>macOS</span>
+                    </div>
+                  </label>
+
+                  <label class="os-card">
+                    <input type="radio" name="form-os" value="linux">
+                    <div class="os-card-content">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.2.5 2.3 1.2 3.1-.7.7-1.2 1.7-1.2 2.9 0 1.6.9 3 2.2 3.7C8.5 17.5 7 19.5 7 22h10c0-2.5-1.5-4.5-2.7-5.8 1.3-.7 2.2-2.1 2.2-3.7 0-1.2-.5-2.2-1.2-2.9.7-.8 1.2-1.9 1.2-3.1C16.5 4 14.5 2 12 2z"/>
+                      </svg>
+                      <span>Linux</span>
+                    </div>
+                  </label>
+
+                  <label class="os-card">
+                    <input type="radio" name="form-os" value="android">
+                    <div class="os-card-content">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.1 12 8.1s-3.5902.3116-5.1368.8497L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
+                      </svg>
+                      <span>Android</span>
+                    </div>
+                  </label>
+
+                  <label class="os-card">
+                    <input type="radio" name="form-os" value="ios">
+                    <div class="os-card-content">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.1.65-2.76 1.42-.58.67-1.08 1.74-1.02 2.81 1.06.08 2.15-.58 2.77-1.36z"/>
+                      </svg>
+                      <span>iOS (iPhone)</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" style="width: 180px;">
+                <label for="form-folder-select">Папка / Группа</label>
+                <select id="form-folder-select">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label for="form-tags">Теги (через запятую)</label>
+                <input type="text" id="form-tags" placeholder="Facebook, Ads, Google, Farming">
+              </div>
+              <div class="form-group flex-1">
+                <label for="form-start-url">Стартовые вкладки сессии (URL через запятую или пробел)</label>
+                <input type="text" id="form-start-url" placeholder="https://google.com">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="form-notes">Заметки к профилю</label>
+              <textarea id="form-notes" rows="2" placeholder="Логины, назначения или заметки..."></textarea>
+            </div>
+          </div>
+
+          <!-- TAB 2: PROXY -->
+          <div class="tab-pane" id="pane-proxy">
+            <div class="form-group">
+              <label class="toggle-container">
+                <input type="checkbox" id="form-proxy-enabled">
+                <span class="toggle-switch"></span>
+                <span class="toggle-label">Использовать прокси-сервер</span>
+              </label>
+            </div>
+
+            <div id="proxy-fields-container" style="display: none;">
+              <div class="form-group">
+                <label for="form-saved-proxy-select">Выбрать из сохраненных прокси</label>
+                <select id="form-saved-proxy-select">
+                  <option value="">— Ввести вручную —</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group" style="width: 140px;">
+                  <label for="form-proxy-proto">Протокол</label>
+                  <select id="form-proxy-proto">
+                    <option value="socks5" selected>SOCKS5</option>
+                    <option value="http">HTTP</option>
+                    <option value="https">HTTPS</option>
+                  </select>
+                </div>
+
+                <div class="form-group flex-1">
+                  <label for="form-proxy-host">Хост / IP</label>
+                  <input type="text" id="form-proxy-host" placeholder="192.168.1.1 или proxy.domain.com">
+                </div>
+
+                <div class="form-group" style="width: 120px;">
+                  <label for="form-proxy-port">Порт</label>
+                  <input type="number" id="form-proxy-port" placeholder="1080">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="form-proxy-user">Логин (опционально)</label>
+                  <input type="text" id="form-proxy-user" placeholder="Логин">
+                </div>
+                <div class="form-group flex-1">
+                  <label for="form-proxy-pass">Пароль (опционально)</label>
+                  <input type="password" id="form-proxy-pass" placeholder="Пароль">
+                </div>
+              </div>
+
+              <div class="proxy-test-bar">
+                <button type="button" class="btn btn-secondary" id="btn-test-proxy">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                  </svg>
+                  <span>Проверить соединение</span>
+                </button>
+                <div class="proxy-test-result" id="proxy-test-result"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: FINGERPRINT (WITH MANUAL DROPDOWNS!) -->
+          <div class="tab-pane" id="pane-fingerprint">
+            <div class="fp-header-banner">
+              <div class="fp-header-info">
+                <span class="fp-title">Конфигуратор цифрового отпечатка</span>
+                <span class="fp-desc">Выбирайте видеокарту, процессор и параметры вручную из списков или генерируйте случайно</span>
+              </div>
+              <button type="button" class="btn btn-secondary btn-reroll" id="btn-reroll-fp">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="2" width="20" height="20" rx="5"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <circle cx="15.5" cy="15.5" r="1.5"/>
+                </svg>
+                <span>Случайный отпечаток</span>
+              </button>
+            </div>
+
+            <!-- MANUAL DROPDOWN CONTROLS -->
+            <div class="fp-custom-panel">
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="sel-fp-gpu">Видеокарта (WebGL Renderer) <span class="badge-mini">Blink Spoof</span></label>
+                  <select id="sel-fp-gpu" class="form-select-highlight">
+                    <!-- Populated dynamically based on OS -->
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="sel-fp-cores">Процессор (Ядра CPU)</label>
+                  <select id="sel-fp-cores">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+
+                <div class="form-group flex-1">
+                  <label for="sel-fp-ram">Память (RAM GB)</label>
+                  <select id="sel-fp-ram">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+
+                <div class="form-group flex-1">
+                  <label for="sel-fp-res">Разрешение экрана</label>
+                  <select id="sel-fp-res">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="sel-fp-tz">Часовой пояс (Timezone)</label>
+                  <select id="sel-fp-tz">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+
+                <div class="form-group flex-1">
+                  <label for="sel-fp-locale">Язык браузера (Locale)</label>
+                  <select id="sel-fp-locale">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="sel-fp-webrtc">Режим WebRTC</label>
+                  <select id="sel-fp-webrtc">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="fp-ua">User-Agent</label>
+                <input type="text" id="fp-ua" class="fp-input-editable">
+              </div>
+
+              <div class="fp-toggles-row">
+                <label class="toggle-container">
+                  <input type="checkbox" id="fp-toggle-canvas" checked>
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label-sm">Аппаратный шум Canvas</span>
+                </label>
+
+                <label class="toggle-container">
+                  <input type="checkbox" id="fp-toggle-audio" checked>
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label-sm">Аппаратный шум AudioContext</span>
+                </label>
+
+                <label class="toggle-container">
+                  <input type="checkbox" id="fp-toggle-dnt" checked>
+                  <span class="toggle-switch"></span>
+                  <span class="toggle-label-sm">Do Not Track (DNT)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: EXTENSIONS -->
+          <div class="tab-pane" id="pane-extensions">
+            <div class="ext-modal-header">
+              <p>Отметьте расширения, которые должны загружаться при запуске этого профиля:</p>
+            </div>
+            <div class="ext-profile-selector-list" id="ext-profile-selector-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+          
+          <!-- TAB 5: COOKIES -->
+          <div class="tab-pane" id="pane-cookies">
+            <div class="cookies-panel-header">
+              <div class="fp-header-info">
+                <span class="fp-title">Управление Cookies сессии</span>
+                <span class="fp-desc">Прямой импорт и экспорт в SQLite базу данных профиля (JSON / Netscape)</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-secondary" id="btn-export-profile-cookies">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Экспорт</span>
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-import-profile-cookies">
+                  <span>Импортировать в базу</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+              <label for="cookies-textarea">Вставьте cookies (JSON массив или строки Netscape):</label>
+              <textarea id="cookies-textarea" rows="9" style="font-family: var(--font-mono); font-size: 11.5px;" placeholder="[{"name": "session_id", "value": "xyz...", "domain": ".facebook.com", "path": "/"}]"></textarea>
+              <span class="hint-text" id="cookies-status-hint" style="margin-top: 6px;">Поддерживается стандартный экспорт из расширений Cookie-Editor и EditThisCookie</span>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-modal-cancel">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-modal-save">Сохранить профиль</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADD PROXY MODAL ================= -->
+  <div class="modal-overlay" id="add-proxy-modal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2>Добавить прокси</h2>
+        <button class="modal-close" id="btn-close-add-proxy">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group" style="width: 140px;">
+            <label>Протокол</label>
+            <select id="modal-proxy-proto">
+              <option value="socks5" selected>SOCKS5</option>
+              <option value="http">HTTP</option>
+              <option value="https">HTTPS</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label>Хост / IP <span class="req">*</span></label>
+            <input type="text" id="modal-proxy-host" placeholder="192.168.1.1">
+          </div>
+          <div class="form-group" style="width: 120px;">
+            <label>Порт <span class="req">*</span></label>
+            <input type="number" id="modal-proxy-port" placeholder="1080">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="modal-proxy-rotate-url">Ссылка смены IP (для мобильных прокси / Rotate URL)</label>
+          <input type="text" id="modal-proxy-rotate-url" placeholder="http://changeip.mobileproxy.space/?api_key=...">
+        </div>
+<div class="form-row">
+          <div class="form-group flex-1">
+            <label>Логин</label>
+            <input type="text" id="modal-proxy-user" placeholder="Пользователь">
+          </div>
+          <div class="form-group flex-1">
+            <label>Пароль</label>
+            <input type="password" id="modal-proxy-pass" placeholder="Пароль">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-add-proxy">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-save-new-proxy">Сохранить прокси</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= IMPORT PROXIES MODAL ================= -->
+  <div class="modal-overlay" id="import-proxies-modal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2>Импорт списка прокси</h2>
+        <button class="modal-close" id="btn-close-import-proxy">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="hint-text">Вставьте каждую строку в формате <code>ip:port:user:pass</code> или <code>protocol://user:pass@ip:port</code></p>
+        <textarea id="import-proxy-textarea" rows="8" placeholder="185.220.101.5:1080:login:password
+socks5://user:pass@185.220.101.6:1080
+192.168.1.100:8080"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-import-proxy">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-import-proxy">Импортировать</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CREATE TEMPLATE MODAL ================= -->
+  <div class="modal-overlay" id="create-template-modal" style="display: none;">
+    <div class="modal-dialog modal-large">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Создать шаблон отпечатка</h2>
+          <span class="modal-subtitle">Сохранение эталонной аппаратной конфигурации для быстрого создания профилей</span>
+        </div>
+        <button class="modal-close" id="btn-close-create-template">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="tpl-input-name">Название шаблона <span class="req">*</span></label>
+          <input type="text" id="tpl-input-name" placeholder="Например: RTX 4080 Gaming Rig, MacBook M3 Max Dev">
+        </div>
+
+        <div class="form-group">
+          <label>Операционная система</label>
+          <div class="os-selector">
+            <label class="os-card">
+              <input type="radio" name="tpl-os" value="windows" checked>
+              <div class="os-card-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4h-13.051M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.849"/>
+                </svg>
+                <span>Windows</span>
+              </div>
+            </label>
+            <label class="os-card">
+              <input type="radio" name="tpl-os" value="macos">
+              <div class="os-card-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.1.65-2.76 1.42-.58.67-1.08 1.74-1.02 2.81 1.06.08 2.15-.58 2.77-1.36z"/>
+                </svg>
+                <span>macOS</span>
+              </div>
+            </label>
+            <label class="os-card">
+              <input type="radio" name="tpl-os" value="linux">
+              <div class="os-card-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.2.5 2.3 1.2 3.1-.7.7-1.2 1.7-1.2 2.9 0 1.6.9 3 2.2 3.7C8.5 17.5 7 19.5 7 22h10c0-2.5-1.5-4.5-2.7-5.8 1.3-.7 2.2-2.1 2.2-3.7 0-1.2-.5-2.2-1.2-2.9.7-.8 1.2-1.9 1.2-3.1C16.5 4 14.5 2 12 2z"/>
+                </svg>
+                <span>Linux</span>
+              </div>
+            </label>
+            <label class="os-card">
+              <input type="radio" name="tpl-os" value="android">
+              <div class="os-card-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4116 13.8533 8.1 12 8.1s-3.5902.3116-5.1368.8497L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/>
+                </svg>
+                <span>Android</span>
+              </div>
+            </label>
+            <label class="os-card">
+              <input type="radio" name="tpl-os" value="ios">
+              <div class="os-card-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.1.65-2.76 1.42-.58.67-1.08 1.74-1.02 2.81 1.06.08 2.15-.58 2.77-1.36z"/>
+                </svg>
+                <span>iOS (iPhone)</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="tpl-select-gpu">Видеокарта (WebGL Renderer)</label>
+          <select id="tpl-select-gpu" class="form-select-highlight">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="tpl-select-cores">Ядра CPU</label>
+            <select id="tpl-select-cores">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="tpl-select-ram">Память RAM</label>
+            <select id="tpl-select-ram">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="tpl-select-res">Разрешение экрана</label>
+            <select id="tpl-select-res">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="tpl-select-tz">Часовой пояс (Timezone)</label>
+            <select id="tpl-select-tz">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="tpl-select-locale">Локаль (Язык)</label>
+            <select id="tpl-select-locale">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="tpl-select-webrtc">WebRTC</label>
+            <select id="tpl-select-webrtc">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-create-template">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-save-new-template">Сохранить шаблон</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= BULK CREATE PROFILES MODAL (FEATURE 6) ================= -->
+  <div class="modal-overlay" id="bulk-create-modal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Массовое создание профилей</h2>
+          <span class="modal-subtitle">Генерация N уникальных профилей с валидным железом в 1 клик</span>
+        </div>
+        <button class="modal-close" id="btn-close-bulk-create">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>Базовое название</label>
+            <input type="text" id="bulk-input-basename" value="FB Farm">
+          </div>
+          <div class="form-group" style="width: 140px;">
+            <label>Количество (1 - 50)</label>
+            <input type="number" id="bulk-input-count" value="5" min="1" max="50">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>Операционная система</label>
+            <select id="bulk-select-os">
+              <option value="windows" selected>Windows 11 / 10</option>
+              <option value="macos">macOS Sonoma / Ventura</option>
+              <option value="linux">Linux x86_64</option>
+              <option value="android">Android 14 (Samsung / Pixel / Xiaomi)</option>
+              <option value="ios">iOS 17 (Apple iPhone 15 / 14)</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label>Папка назначения</label>
+            <select id="bulk-select-folder">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Стартовые вкладки (через запятую)</label>
+          <input type="text" id="bulk-input-urls" value="https://google.com">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-bulk-create">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-bulk-create">Сгенерировать профили</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= WARM-UP ROBOT MODAL (FEATURE 3) ================= -->
+  <div class="modal-overlay" id="warmup-modal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Cookie Robot (Автопрогрев профиля)</h2>
+          <span class="modal-subtitle">Фоновый серфинг по сайтам для сбора истории и доверенных куки</span>
+        </div>
+        <button class="modal-close" id="btn-close-warmup">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="warmup-profile-id" value="">
+        <p class="hint-text">Робот запустит сессию в скрытом режиме и поочередно зайдет на каждый сайт с паузами, накапливая кэш и куки:</p>
+        <div class="form-group">
+          <label>Список URL для прогрева (по одному на строку):</label>
+          <textarea id="warmup-urls-textarea" rows="7" style="font-family: var(--font-mono); font-size: 12px;">https://www.wikipedia.org
+https://www.bbc.com
+https://news.ycombinator.com
+https://www.cnn.com
+https://www.reuters.com
+https://www.amazon.com
+https://www.reddit.com</textarea>
+        </div>
+        <div class="warmup-status-box" id="warmup-status-box" style="display:none; font-size:13px; color:var(--accent-cyan); font-weight:600;">
+          ⏳ Идет фоновый серфинг... Пожалуйста, подождите.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-warmup">Закрыть</button>
+        <button type="button" class="btn btn-primary" id="btn-start-warmup">Запустить прогрев</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= QUALITY SCORER MODAL (FEATURE 1) ================= -->
+  <div class="modal-overlay" id="scorer-modal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>Экспресс-тест качества отпечатка</h2>
+          <span class="modal-subtitle">Анализ согласованности сетевых и аппаратных параметров сессии</span>
+        </div>
+        <button class="modal-close" id="btn-close-scorer">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="scorer-summary-card" id="scorer-summary-card">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-close-scorer-footer">Закрыть</button>
+        <button type="button" class="btn btn-primary" id="btn-launch-verifier-tabs" onclick="launchVerifierTabs()">Открыть BrowserLeaks & Pixelscan</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <script src="app.js"></script>
+
+  <!-- ================= UNIVERSAL PROMPT MODAL ================= -->
+  <div class="modal-overlay" id="prompt-modal" style="display: none; z-index: 10000;">
+    <div class="modal-dialog" style="width: 420px; animation: modal-slide 0.15s ease;">
+      <div class="modal-header" style="padding: 14px 20px;">
+        <div class="modal-title-group">
+          <h2 id="prompt-modal-title" style="font-size: 15px;">Добавление</h2>
+        </div>
+        <button type="button" class="modal-close" id="prompt-modal-close">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 18px 20px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label id="prompt-modal-label" for="prompt-modal-input" style="font-size: 13px; margin-bottom: 6px; display: block;">Название:</label>
+          <input type="text" id="prompt-modal-input" style="font-size: 13.5px; width: 100%; box-sizing: border-box;" autocomplete="off">
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 12px 20px;">
+        <button type="button" class="btn btn-secondary" id="prompt-modal-cancel">Отмена</button>
+        <button type="button" class="btn btn-primary" id="prompt-modal-confirm">Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= UNIVERSAL CONFIRM MODAL ================= -->
+  <div class="modal-overlay" id="confirm-modal" style="display: none; z-index: 10001;">
+    <div class="modal-dialog" style="width: 440px; animation: modal-slide 0.15s ease;">
+      <div class="modal-header" style="padding: 14px 20px;">
+        <div class="modal-title-group">
+          <h2 id="confirm-modal-title" style="font-size: 15px;">Подтверждение</h2>
+        </div>
+        <button type="button" class="modal-close" id="confirm-modal-close">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 18px 20px;">
+        <p id="confirm-modal-message" style="margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--text-color);"></p>
+      </div>
+      <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn btn-secondary" id="confirm-modal-cancel">Отмена</button>
+        <button type="button" class="btn btn-danger" id="confirm-modal-confirm">Подтвердить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST CONTAINER ================= -->
+  <div id="toast-container" class="toast-container"></div>
+
+</body>
+</html>

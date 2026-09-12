@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+export DISPLAY="${DISPLAY:-:0}"
+if [ -n "$WAYLAND_DISPLAY" ]; then
+  export WAYLAND_DISPLAY="$WAYLAND_DISPLAY"
+fi
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$DIR"
+exec "$DIR/node_modules/.bin/electron" . "$@"

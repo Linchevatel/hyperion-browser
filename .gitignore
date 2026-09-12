@@ -1,0 +1,27 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+release-binaries/
+package_temp/
+*.tar.gz
+*.AppImage
+*.deb
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Test logs & artifacts
+*.log
+check_*.png
+test_output/

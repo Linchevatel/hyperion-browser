@@ -1,0 +1,63 @@
+name: Chromium Upstream Watcher
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Every day at 02:00 UTC
+  workflow_dispatch:      # Manual trigger
+
+jobs:
+  check-upstream:
+    name: Check Official Chromium Stable Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Upstream Version from ChromiumDash
+        id: check_version
+        run: |
+          UPSTREAM_VER=$(curl -s "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux" | jq -r '.[0].version')
+          echo "Detected Upstream Chromium: $UPSTREAM_VER"
+          CURRENT_VER="none"
+          if [ -f "CHROMIUM_VERSION" ]; then
+            CURRENT_VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
+          fi
+          echo "Current Tracked Version: $CURRENT_VER"
+          echo "upstream_version=$UPSTREAM_VER" >> $GITHUB_OUTPUT
+          echo "current_version=$CURRENT_VER" >> $GITHUB_OUTPUT
+          if [ "$UPSTREAM_VER" != "$CURRENT_VER" ] && [ -n "$UPSTREAM_VER" ] && [ "$UPSTREAM_VER" != "null" ]; then
+            echo "new_version_found=true" >> $GITHUB_OUTPUT
+          else
+            echo "new_version_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Version File and Tag
+        if: steps.check_version.outputs.new_version_found == 'true'
+        run: |
+          NEW_VER="${{ steps.check_version.outputs.upstream_version }}"
+          echo "$NEW_VER" > CHROMIUM_VERSION
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHROMIUM_VERSION
+          git commit -m "chore(upstream): bump Chromium core to $NEW_VER [skip ci]"
+          git tag -a "v$NEW_VER" -m "Automated Upstream Chromium Release $NEW_VER"
+          git push origin main --tags
+
+      - name: Trigger Automated Build and Release Workflow
+        if: steps.check_version.outputs.new_version_found == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build-and-release.yml',
+              ref: 'main',
+              inputs: {
+                chromium_version: '${{ steps.check_version.outputs.upstream_version }}'
+              }
+            });
