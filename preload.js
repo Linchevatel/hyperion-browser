@@ -72,6 +72,13 @@ const api = {
   // Updates
   checkForUpdates: (customRepo) => ipcRenderer.invoke('check-for-updates', customRepo),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+  downloadUpdate: (url) => ipcRenderer.invoke('download-app-update', url),
+  installUpdate: () => ipcRenderer.invoke('install-app-update'),
+  onUpdateProgress: (callback) => {
+    const handler = (event, data) => callback(data);
+    ipcRenderer.on('update-download-progress', handler);
+    return () => ipcRenderer.removeListener('update-download-progress', handler);
+  },
 
   // Events
   onProfileStopped: (cb) => {

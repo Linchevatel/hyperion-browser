@@ -278,7 +278,7 @@ async function checkSystemStatus() {
         dot.className = 'status-dot pulse';
         dot.style.backgroundColor = '';
       }
-      if (label) label.textContent = 'Hyperion v1.0.2';
+      if (label) label.textContent = 'Hyperion v1.0.3';
       if (badge) {
         badge.className = 'badge badge-success';
         badge.textContent = 'Обнаружен';
@@ -1347,6 +1347,8 @@ function initEventListeners() {
 
   // Settings Update Listeners
   document.getElementById('btn-settings-check-update')?.addEventListener('click', () => window.checkSettingsUpdates(true));
+  document.getElementById('btn-settings-start-download')?.addEventListener('click', () => window.startInAppUpdate());
+  document.getElementById('btn-settings-apply-restart')?.addEventListener('click', () => window.applyInAppUpdate());
   document.getElementById('sidebar-status-btn')?.addEventListener('click', () => {
     switchMainView('settings');
     const dot = document.getElementById('sys-status-dot');
@@ -1363,6 +1365,9 @@ function initEventListeners() {
   document.getElementById('btn-global-open-settings-update')?.addEventListener('click', () => {
     switchMainView('settings');
     document.getElementById('settings-update-card')?.scrollIntoView({ behavior: 'smooth' });
+    if (CURRENT_UPDATE_INFO && !IS_DOWNLOADING_UPDATE) {
+      window.startInAppUpdate();
+    }
   });
 
   // Background auto-check for updates after boot
@@ -2319,8 +2324,10 @@ window.removeTagFromProfile = async (profileId, tagToRemove, event) => {
 
 
 // ==========================================
-// FEATURE 7: HYPERION UPDATE IN SETTINGS
-// ==========================================
+// FEATURE 7: HYPERION IN-APP AUTO-UPDATE
+let CURRENT_UPDATE_INFO = null;
+let IS_DOWNLOADING_UPDATE = false;
+
 window.checkSettingsUpdates = async (isManual = false) => {
   const statusText = document.getElementById('settings-update-status-text');
   const notifBox = document.getElementById('settings-update-notification');
@@ -2343,21 +2350,24 @@ window.checkSettingsUpdates = async (isManual = false) => {
       if (appVerEl) appVerEl.textContent = 'v' + d.currentVersion;
 
       if (d.updateAvailable) {
+        CURRENT_UPDATE_INFO = d;
         if (statusText) {
           statusText.textContent = 'Доступно обновление Hyperion v' + d.latestVersion + '!';
           statusText.style.color = 'var(--accent-blue, #38bdf8)';
         }
         if (notifBox) {
           notifBox.style.display = 'block';
-          notifBox.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-              <div>
-                <strong style="color:#fff;">Обновление v${escapeHtml(d.latestVersion)} готово к установке</strong>
-                <div style="font-size:12px; color:var(--text-dim); margin-top:2px;">${escapeHtml(d.releaseNotes || 'Рекомендуется обновить приложение для максимальной стабильности.')}</div>
-              </div>
-              ${d.downloadUrl ? `<a href="${d.downloadUrl}" target="_blank" class="btn btn-primary" style="text-decoration:none; padding:4px 12px; font-size:12px;">Загрузить обновление</a>` : ''}
-            </div>
-          `;
+          const bannerTitle = document.getElementById('settings-update-banner-title');
+          const bannerNotes = document.getElementById('settings-update-banner-notes');
+          const downloadBtn = document.getElementById('btn-settings-start-download');
+          const restartBtn = document.getElementById('btn-settings-apply-restart');
+          const progressWrap = document.getElementById('settings-update-progress-wrap');
+
+          if (bannerTitle) bannerTitle.textContent = `Доступно обновление Hyperion v${d.latestVersion}`;
+          if (bannerNotes) bannerNotes.textContent = d.releaseNotes || 'Новая версия готова к автоматической установке.';
+          if (downloadBtn) downloadBtn.style.display = 'inline-flex';
+          if (restartBtn) restartBtn.style.display = 'none';
+          if (progressWrap) progressWrap.style.display = 'none';
         }
         if (globalAlert) {
           globalAlert.style.display = 'flex';
@@ -2385,7 +2395,98 @@ window.checkSettingsUpdates = async (isManual = false) => {
     if (checkBtn && isManual) {
       checkBtn.disabled = false;
       const btnSpan = checkBtn.querySelector('span');
-      if (btnSpan) btnSpan.textContent = 'Проверить обновления';
+      if (btnSpan) btnSpan.textContent = 'Проверить сейчас';
     }
+  }
+};
+
+window.startInAppUpdate = async () => {
+  if (!CURRENT_UPDATE_INFO || !CURRENT_UPDATE_INFO.downloadUrl) {
+    showToast('Ссылка на обновление не найдена. Попробуйте еще раз.', 'error');
+    return;
+  }
+  if (IS_DOWNLOADING_UPDATE) return;
+  IS_DOWNLOADING_UPDATE = true;
+
+  const downloadBtn = document.getElementById('btn-settings-start-download');
+  const restartBtn = document.getElementById('btn-settings-apply-restart');
+  const progressWrap = document.getElementById('settings-update-progress-wrap');
+  const progressBar = document.getElementById('settings-update-progress-bar');
+  const percentText = document.getElementById('settings-update-progress-percent');
+  const labelText = document.getElementById('settings-update-progress-label');
+  const sizeText = document.getElementById('settings-update-size-info');
+  const speedText = document.getElementById('settings-update-speed-info');
+
+  if (downloadBtn) downloadBtn.style.display = 'none';
+  if (progressWrap) progressWrap.style.display = 'block';
+  if (labelText) labelText.textContent = `Загрузка обновления v${CURRENT_UPDATE_INFO.latestVersion}...`;
+
+  if (window.hyperion && window.hyperion.onUpdateProgress) {
+    window.hyperion.onUpdateProgress((data) => {
+      const pct = Math.min(100, Math.max(0, data.percent || 0));
+      if (progressBar) progressBar.style.width = pct + '%';
+      if (percentText) percentText.textContent = Math.floor(pct) + '%';
+      if (sizeText && data.totalBytes > 0) {
+        const mb = (data.downloadedBytes / 1048576).toFixed(1);
+        const totalMb = (data.totalBytes / 1048576).toFixed(1);
+        sizeText.textContent = `${mb} МБ из ${totalMb} МБ`;
+      }
+      if (speedText && data.speedBytes !== undefined) {
+        const speedMb = (data.speedBytes / 1048576).toFixed(1);
+        speedText.textContent = `${speedMb} МБ/с`;
+      }
+    });
+  }
+
+  try {
+    showToast('Загрузка обновления запущена прямо в приложении...', 'info');
+    const res = await window.hyperion.downloadUpdate(CURRENT_UPDATE_INFO.downloadUrl);
+    if (res && res.success) {
+      if (progressBar) {
+        progressBar.style.width = '100%';
+        progressBar.style.background = 'var(--accent-emerald)';
+      }
+      if (percentText) percentText.textContent = '100%';
+      if (labelText) labelText.textContent = '✓ Обновление успешно загружено!';
+      if (sizeText) sizeText.textContent = 'Готово к установке';
+      if (speedText) speedText.textContent = '';
+      if (restartBtn) restartBtn.style.display = 'inline-flex';
+
+      showToast('Обновление загружено! Нажмите «Перезапустить и применить».', 'success', 6000);
+
+      // Auto countdown 5 seconds before applying
+      let count = 5;
+      const countInterval = setInterval(() => {
+        if (!restartBtn) return clearInterval(countInterval);
+        const span = restartBtn.querySelector('span');
+        if (span) span.textContent = `Перезапуск для обновления (${count})...`;
+        count--;
+        if (count < 0) {
+          clearInterval(countInterval);
+          window.applyInAppUpdate();
+        }
+      }, 1000);
+
+      restartBtn.onclick = () => {
+        clearInterval(countInterval);
+        window.applyInAppUpdate();
+      };
+    } else {
+      throw new Error(res?.error || 'Не удалось завершить загрузку');
+    }
+  } catch (e) {
+    IS_DOWNLOADING_UPDATE = false;
+    if (downloadBtn) downloadBtn.style.display = 'inline-flex';
+    if (progressWrap) progressWrap.style.display = 'none';
+    showToast(`Ошибка загрузки обновления: ${e.message}`, 'error', 5000);
+  }
+};
+
+window.applyInAppUpdate = async () => {
+  try {
+    showToast('Применение обновления и перезапуск...', 'info', 3000);
+    await window.hyperion.installUpdate();
+  } catch (e) {
+    showToast(`Ошибка установки обновления: ${e.message}`, 'error');
   }
 };

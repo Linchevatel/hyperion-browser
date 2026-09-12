@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const { spawn, execFile } = require('child_process');
 const net = require('net');
+const https = require('https');
+const http = require('http');
 const {
   generateFingerprint,
   GPU_PROFILES,
@@ -635,7 +637,7 @@ function ensureProfileHelperExtension(profileDir, user, pass) {
 
   const manifest = {
     name: 'Hyperion Profile Helper',
-    version: '1.0.2',
+    version: '1.0.3',
     manifest_version: 3,
     description: 'Hyperion profile helper for media spoofing and proxy authentication',
     permissions: [
@@ -1893,7 +1895,7 @@ ipcMain.handle('rescan-chrome-binary', async () => {
 ipcMain.handle('get-system-status', async () => {
   const chromeInfo = getChromeBinary();
   return {
-    engine: "Hyperion v1.0.2",
+    engine: "Hyperion v1.0.3",
     binary: chromeInfo.path,
     binaryExists: chromeInfo.exists,
     os: process.platform,
@@ -1958,3 +1960,148 @@ ipcMain.handle('get-github-repo', async () => {
 ipcMain.handle('get-app-version', async () => {
   return updater.getAppVersion();
 });
+
+let PENDING_UPDATE_FILE = null;
+
+ipcMain.handle('download-app-update', async (event, downloadUrl) => {
+  if (!downloadUrl) throw new Error('Отсутствует URL для скачивания обновления');
+
+  const isWin = process.platform === 'win32';
+  const ext = isWin ? '.exe' : '.AppImage';
+  const targetFile = path.join(os.tmpdir(), `hyperion-update-${Date.now()}${ext}`);
+
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(targetFile);
+
+    const makeRequest = (targetUrl) => {
+      const parsed = new URL(targetUrl);
+      const protocol = parsed.protocol === 'https:' ? https : http;
+
+      const req = protocol.get({
+        hostname: parsed.hostname,
+        path: parsed.pathname + parsed.search,
+        headers: { 'User-Agent': 'Hyperion-InApp-Updater/1.0' }
+      }, (res) => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          return makeRequest(res.headers.location);
+        }
+        if (res.statusCode !== 200) {
+          file.close();
+          if (fs.existsSync(targetFile)) fs.unlinkSync(targetFile);
+          return reject(new Error(`Ошибка скачивания: HTTP ${res.statusCode}`));
+        }
+
+        const totalBytes = parseInt(res.headers['content-length'] || '0', 10);
+        let downloadedBytes = 0;
+        let lastReportTime = Date.now();
+        let lastReportBytes = 0;
+
+        res.on('data', (chunk) => {
+          downloadedBytes += chunk.length;
+          file.write(chunk);
+
+          const now = Date.now();
+          const elapsedSec = (now - lastReportTime) / 1000;
+          if (elapsedSec >= 0.25 || downloadedBytes === totalBytes) {
+            const bytesSince = downloadedBytes - lastReportBytes;
+            const speedBytes = elapsedSec > 0 ? (bytesSince / elapsedSec) : 0;
+            const percent = totalBytes > 0 ? ((downloadedBytes / totalBytes) * 100) : 0;
+
+            try {
+              event.sender.send('update-download-progress', {
+                percent: Math.min(100, parseFloat(percent.toFixed(1))),
+                downloadedBytes,
+                totalBytes,
+                speedBytes
+              });
+            } catch (e) {}
+
+            lastReportTime = now;
+            lastReportBytes = downloadedBytes;
+          }
+        });
+
+        res.on('end', () => {
+          file.end(() => {
+            PENDING_UPDATE_FILE = targetFile;
+            if (!isWin) {
+              try { fs.chmodSync(targetFile, 0o755); } catch (e) {}
+            }
+            resolve({ success: true, filePath: targetFile });
+          });
+        });
+      });
+
+      req.on('error', (err) => {
+        file.close();
+        if (fs.existsSync(targetFile)) fs.unlinkSync(targetFile);
+        reject(err);
+      });
+    };
+
+    makeRequest(downloadUrl);
+  });
+});
+
+ipcMain.handle('install-app-update', async () => {
+  if (!PENDING_UPDATE_FILE || !fs.existsSync(PENDING_UPDATE_FILE)) {
+    throw new Error('Файл обновления не найден или не был загружен.');
+  }
+
+  const isWin = process.platform === 'win32';
+
+  if (isWin) {
+    const launcherBat = path.join(os.tmpdir(), `hyperion_updater_${Date.now()}.bat`);
+    const appExe = process.execPath;
+    const updateExe = PENDING_UPDATE_FILE;
+
+    const batContent = `@echo off
+timeout /t 1 /nobreak > nul
+start "" /wait "${updateExe}" /S
+timeout /t 1 /nobreak > nul
+start "" "${appExe}"
+del "%~f0"
+`;
+    fs.writeFileSync(launcherBat, batContent, 'utf-8');
+
+    const p = spawn('cmd.exe', ['/c', launcherBat], {
+      detached: true,
+      stdio: 'ignore'
+    });
+    p.unref();
+    app.quit();
+    return { success: true };
+  } else {
+    // Linux
+    const currentAppImage = process.env.APPIMAGE;
+    if (currentAppImage && fs.existsSync(currentAppImage)) {
+      const launcherSh = path.join(os.tmpdir(), `hyperion_updater_${Date.now()}.sh`);
+      const shContent = `#!/bin/sh
+sleep 1
+cp -f "${PENDING_UPDATE_FILE}" "${currentAppImage}"
+chmod +x "${currentAppImage}"
+rm -f "${PENDING_UPDATE_FILE}"
+exec "${currentAppImage}" &
+rm -f "$0"
+`;
+      fs.writeFileSync(launcherSh, shContent, { mode: 0o755 });
+      const p = spawn('/bin/sh', [launcherSh], {
+        detached: true,
+        stdio: 'ignore'
+      });
+      p.unref();
+      app.quit();
+      return { success: true };
+    } else {
+      // Direct binary execution
+      const p = spawn(PENDING_UPDATE_FILE, [], {
+        detached: true,
+        stdio: 'ignore'
+      });
+      p.unref();
+      app.quit();
+      return { success: true };
+    }
+  }
+});
+

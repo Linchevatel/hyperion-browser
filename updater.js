@@ -18,7 +18,7 @@ function fetchJson(url) {
       const req = protocol.get({
         hostname: parsed.hostname,
         path: parsed.pathname + parsed.search,
-        headers: { 'User-Agent': 'Hyperion-Updater/1.0.2' }
+        headers: { 'User-Agent': 'Hyperion-Updater/1.0.3' }
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
@@ -41,9 +41,9 @@ function fetchJson(url) {
 function getAppVersion() {
   try {
     const pkg = require('./package.json');
-    return pkg.version || '1.0.2';
+    return pkg.version || '1.0.3';
   } catch (e) {
-    return '1.0.2';
+    return '1.0.3';
   }
 }
 
@@ -92,7 +92,8 @@ async function checkForUpdates(customRepo = null) {
         if (ghData.assets && ghData.assets.length > 0) {
           const isWin = process.platform === 'win32';
           if (isWin) {
-            const exeAsset = ghData.assets.find(a => a.name && a.name.endsWith('.exe'));
+            const setupAsset = ghData.assets.find(a => a.name && a.name.endsWith('.exe') && /setup/i.test(a.name));
+            const exeAsset = setupAsset || ghData.assets.find(a => a.name && a.name.endsWith('.exe'));
             downloadUrl = exeAsset ? exeAsset.browser_download_url : ghData.assets[0].browser_download_url;
           } else {
             const appImageAsset = ghData.assets.find(a => a.name && a.name.endsWith('.AppImage'));
