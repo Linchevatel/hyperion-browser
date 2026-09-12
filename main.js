@@ -185,25 +185,11 @@ const POPULAR_EXTENSIONS = [
     icon: "🍪"
   },
   {
-    id: "fngmhnnpilhplaeedifhccceomclgfbg",
-    name: "EditThisCookie",
-    description: "Классический менеджер файлов cookie для профилей",
-    category: "Utility",
-    icon: "🍪"
-  },
-  {
     id: "cppjkneekbjaeellbfkmgnhonkkjfpdn",
     name: "Clear Cache",
     description: "Очистка кэша, истории и хранилища сессии в 1 клик",
     category: "Utility",
     icon: "🧹"
-  },
-  {
-    id: "bnjjngeaknajbdcgpfkgnonigaififfl",
-    name: "Fake Filler",
-    description: "Генератор реалистичных тестовых данных для автозаполнения форм",
-    category: "Utility",
-    icon: "📝"
   },
   {
     id: "fihnjjcciajhdojfnbdddfaoknhalnja",
@@ -231,7 +217,7 @@ const POPULAR_EXTENSIONS = [
   {
     id: "acmacodkjbdgmoleebolmdjonilkdbch",
     name: "Rabby Wallet",
-    description: "Лучший мультиязычный Web3 кошелек для мультиаккаунтинга",
+    description: "Лучший Web3 кошелек для мультиаккаунтинга",
     category: "Crypto",
     icon: "🐰"
   },
@@ -264,20 +250,34 @@ const POPULAR_EXTENSIONS = [
     icon: "💧"
   },
   {
-    id: "aflkmfhebedbjioipglmlcipjhmnnmhd",
-    name: "Backpack",
-    description: "Быстрый кошелек для Solana и Ethereum от создателей Mad Lads",
+    id: "hnfanknocfeofbddgcijnmhnfnkdnaad",
+    name: "Coinbase Wallet",
+    description: "Безопасный криптокошелек и Web3 браузер от Coinbase",
     category: "Crypto",
-    icon: "🎒"
+    icon: "🔵"
+  },
+  {
+    id: "ibnejdfjmmkpcnlpebklmnkoeoihofec",
+    name: "TronLink",
+    description: "Ведущий кошелек для сети TRON (TRX, TRC-20, USDT)",
+    category: "Crypto",
+    icon: "⚡"
   },
 
   // --- SECURITY & PRIVACY ---
   {
-    id: "cjpalhdlnbpafiamejdnhcphjbkeiagm",
-    name: "uBlock Origin",
-    description: "Блокировка рекламы, майнеров и трекеров без нагрузки на CPU",
+    id: "ddkjiahejlhfcafbddmgiahcphecmpfh",
+    name: "uBlock Origin Lite",
+    description: "Быстрая блокировка рекламы и трекеров нового поколения (Manifest V3)",
     category: "Security",
     icon: "🛡️"
+  },
+  {
+    id: "bgnkhhnnamicmpeenaelnjfhikgbkllg",
+    name: "AdGuard AdBlocker",
+    description: "Эффективный блокировщик всплывающих окон и баннеров",
+    category: "Security",
+    icon: "🟢"
   },
   {
     id: "bhghoamapcdpbohphigoooaddinpkbai",
@@ -286,49 +286,14 @@ const POPULAR_EXTENSIONS = [
     category: "Security",
     icon: "🔑"
   },
-  {
-    id: "mpbjkejclgiknjggghfdndbbakkmhgnl",
-    name: "Buster: Captcha Solver",
-    description: "Автоматическое решение reCAPTCHA и hCaptcha через распознавание аудио",
-    category: "Security",
-    icon: "🤖"
-  },
-  {
-    id: "fjkehfaokpmhgfgajbanhlkedmgnejbp",
-    name: "WebRTC Control",
-    description: "Блокировка прямых утечек локального и публичного IP через WebRTC",
-    category: "Security",
-    icon: "🔒"
-  },
-  {
-    id: "bhchdcejhohfmigjafaffggmofdmaanm",
-    name: "User-Agent Switcher",
-    description: "Инструмент подмены HTTP заголовков User-Agent на лету",
-    category: "Security",
-    icon: "🔄"
-  },
 
-  // --- TRAFFIC & ARBITRAGE ---
+  // --- TRAFFIC & TOOLS ---
   {
     id: "fdgfkebogiimcoedlicjlajpkdmockpc",
     name: "Meta Pixel Helper",
     description: "Проверка работы пикселей конверсий Facebook / Meta Ads",
     category: "Traffic",
     icon: "📊"
-  },
-  {
-    id: "aelgobmabdmlfmiblddbfnepnmmakepn",
-    name: "TikTok Pixel Helper",
-    description: "Валидация событий и пикселей рекламного кабинета TikTok Ads",
-    category: "Traffic",
-    icon: "🎵"
-  },
-  {
-    id: "padekgcemlokbadohgkifijomclgjgif",
-    name: "Proxy SwitchyOmega",
-    description: "Гибкая маршрутизация и смена прокси по доменам и вкладкам",
-    category: "Traffic",
-    icon: "🌐"
   },
   {
     id: "gcknhkkoolaabfmlnjonogaaifnjlfnp",
@@ -338,18 +303,18 @@ const POPULAR_EXTENSIONS = [
     icon: "🦊"
   },
   {
-    id: "jinjaccalgkegednnccohejagnlnfdag",
-    name: "Violentmonkey",
-    description: "Менеджер пользовательских скриптов (Userscripts) для авто-кликов",
+    id: "dhdgffkkebhmkfjojejmpbldmpobfkfo",
+    name: "Tampermonkey",
+    description: "Самый популярный менеджер пользовательских скриптов (Userscripts)",
     category: "Traffic",
-    icon: "🐒"
+    icon: "🐵"
   },
   {
-    id: "haiffjeecmjcggfcljggpdpjjedmjgle",
-    name: "AliSave Downloader",
-    description: "Скачивание фото и видео товаров в высоком качестве для дропшиппинга",
-    category: "Utility",
-    icon: "📦"
+    id: "jinjaccalgkegednnccohejagnlnfdag",
+    name: "Violentmonkey",
+    description: "Быстрый менеджер скриптов автоматизации с открытым кодом",
+    category: "Traffic",
+    icon: "🐒"
   }
 ];
 
@@ -1184,38 +1149,42 @@ ipcMain.handle('install-extension', async (event, rawExtId) => {
   const scriptPath = getPythonScriptPath('ext_installer.py');
   const pyCmd = getPythonCommand();
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     execFile(pyCmd, [scriptPath, extId, targetDir], (error, stdout, stderr) => {
+      if (stdout) {
+        try {
+          const res = JSON.parse(stdout);
+          if (res.success) {
+            const installed = readJson(EXTENSIONS_FILE, []);
+            const popular = POPULAR_EXTENSIONS.find(p => p.id === extId);
+            const extRecord = {
+              id: extId,
+              name: popular?.name || res.name || extId,
+              description: popular?.description || 'Пользовательское расширение',
+              version: res.version || '1.0',
+              path: targetDir,
+              icon: popular?.icon || '🧩',
+              installedAt: Date.now()
+            };
+            const existingIdx = installed.findIndex(e => e.id === extId);
+            if (existingIdx !== -1) {
+              installed[existingIdx] = extRecord;
+            } else {
+              installed.push(extRecord);
+            }
+            writeJson(EXTENSIONS_FILE, installed);
+            return resolve({ success: true, extension: extRecord });
+          } else {
+            return resolve({ success: false, error: res.error || 'Ошибка установки расширения' });
+          }
+        } catch (e) {
+          // stdout wasn't json
+        }
+      }
       if (error) {
         return resolve({ success: false, error: stderr || error.message });
       }
-      try {
-        const res = JSON.parse(stdout);
-        if (res.success) {
-          const installed = readJson(EXTENSIONS_FILE, []);
-          const popular = POPULAR_EXTENSIONS.find(p => p.id === extId);
-          const extRecord = {
-            id: extId,
-            name: popular?.name || res.name || extId,
-            description: popular?.description || 'Пользовательское расширение',
-            version: res.version || '1.0',
-            path: targetDir,
-            icon: popular?.icon || '🧩',
-            installedAt: Date.now()
-          };
-          const existingIdx = installed.findIndex(e => e.id === extId);
-          if (existingIdx !== -1) {
-            installed[existingIdx] = extRecord;
-          } else {
-            installed.push(extRecord);
-          }
-          writeJson(EXTENSIONS_FILE, installed);
-          return resolve({ success: true, extension: extRecord });
-        }
-        resolve(res);
-      } catch (e) {
-        resolve({ success: false, error: stdout });
-      }
+      return resolve({ success: false, error: 'Неизвестный ответ установщика расширений' });
     });
   });
 });
