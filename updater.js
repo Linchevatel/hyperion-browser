@@ -18,7 +18,7 @@ function fetchJson(url) {
       const req = protocol.get({
         hostname: parsed.hostname,
         path: parsed.pathname + parsed.search,
-        headers: { 'User-Agent': 'Hyperion-Updater/1.0.1' }
+        headers: { 'User-Agent': 'Hyperion-Updater/1.0.2' }
       }, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
@@ -41,9 +41,9 @@ function fetchJson(url) {
 function getAppVersion() {
   try {
     const pkg = require('./package.json');
-    return pkg.version || '1.0.1';
+    return pkg.version || '1.0.2';
   } catch (e) {
-    return '1.0.1';
+    return '1.0.2';
   }
 }
 

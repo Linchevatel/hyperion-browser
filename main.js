@@ -634,34 +634,34 @@ function ensureProfileHelperExtension(profileDir, user, pass) {
   if (!fs.existsSync(extDir)) fs.mkdirSync(extDir, { recursive: true });
 
   const manifest = {
-    version: '1.0.1',
-    manifest_version: 2,
     name: 'Hyperion Profile Helper',
+    version: '1.0.2',
+    manifest_version: 3,
+    description: 'Hyperion profile helper for media spoofing and proxy authentication',
     permissions: [
-      'proxy',
-      'tabs',
-      'unlimitedStorage',
-      '<all_urls>',
-      'webRequest',
-      'webRequestBlocking'
+      'storage'
     ],
-    background: {
-      scripts: ['background.js']
-    },
+    host_permissions: [
+      '<all_urls>'
+    ],
     content_scripts: [
       {
         matches: ['<all_urls>'],
         js: ['content.js'],
         run_at: 'document_start',
         all_frames: true,
-        match_about_blank: true
+        match_about_blank: true,
+        world: 'MAIN'
       }
-    ],
-    minimum_chrome_version: '22.0.0'
+    ]
   };
 
-  let backgroundJs = '';
+  let backgroundJs = '// Hyperion Profile Helper\n';
   if (user && pass) {
+    manifest.permissions.push('webRequest', 'webRequestAuthProvider');
+    manifest.background = {
+      service_worker: 'background.js'
+    };
     backgroundJs = `chrome.webRequest.onAuthRequired.addListener(
   function(details) {
     return {
@@ -677,68 +677,60 @@ function ensureProfileHelperExtension(profileDir, user, pass) {
 `;
   }
 
-  // Realistic Media Devices content script:
-  // Spoofs realistic audio and video input/output devices to avoid 0-device or Linux ALSA/Pulse leaks
+  // Realistic Media Devices content script directly in page execution context:
   const contentJs = `(function() {
   try {
-    const s = document.createElement('script');
-    s.textContent = \`
-      (function() {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
-        const fakeDevs = [
-          {
-            deviceId: "default",
-            kind: "audioinput",
-            label: "Default - Microphone (Realtek High Definition Audio)",
-            groupId: "group_audio_in"
-          },
-          {
-            deviceId: "audio_in_1",
-            kind: "audioinput",
-            label: "Microphone (Realtek High Definition Audio)",
-            groupId: "group_audio_in"
-          },
-          {
-            deviceId: "default",
-            kind: "audiooutput",
-            label: "Default - Speakers (Realtek High Definition Audio)",
-            groupId: "group_audio_out"
-          },
-          {
-            deviceId: "audio_out_1",
-            kind: "audiooutput",
-            label: "Speakers (Realtek High Definition Audio)",
-            groupId: "group_audio_out"
-          },
-          {
-            deviceId: "video_in_1",
-            kind: "videoinput",
-            label: "HD WebCam",
-            groupId: "group_video_in"
-          }
-        ];
-        const origEnumerate = navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
-        navigator.mediaDevices.enumerateDevices = async function() {
-          try {
-            const real = await origEnumerate();
-            if (real && real.length > 0 && !real.some(d => d.label && (d.label.toLowerCase().includes('pulse') || d.label.toLowerCase().includes('alsa')))) {
-              return real;
-            }
-          } catch(e) {}
-          return fakeDevs.map(d => ({
-            deviceId: d.deviceId,
-            kind: d.kind,
-            label: d.label,
-            groupId: d.groupId,
-            toJSON: function() {
-              return { deviceId: this.deviceId, kind: this.kind, label: this.label, groupId: this.groupId };
-            }
-          }));
-        };
-      })();
-    \`;
-    (document.head || document.documentElement).appendChild(s);
-    s.remove();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+    const fakeDevs = [
+      {
+        deviceId: "default",
+        kind: "audioinput",
+        label: "Default - Microphone (Realtek High Definition Audio)",
+        groupId: "group_audio_in"
+      },
+      {
+        deviceId: "audio_in_1",
+        kind: "audioinput",
+        label: "Microphone (Realtek High Definition Audio)",
+        groupId: "group_audio_in"
+      },
+      {
+        deviceId: "default",
+        kind: "audiooutput",
+        label: "Default - Speakers (Realtek High Definition Audio)",
+        groupId: "group_audio_out"
+      },
+      {
+        deviceId: "audio_out_1",
+        kind: "audiooutput",
+        label: "Speakers (Realtek High Definition Audio)",
+        groupId: "group_audio_out"
+      },
+      {
+        deviceId: "video_in_1",
+        kind: "videoinput",
+        label: "HD WebCam",
+        groupId: "group_video_in"
+      }
+    ];
+    const origEnumerate = navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
+    navigator.mediaDevices.enumerateDevices = async function() {
+      try {
+        const real = await origEnumerate();
+        if (real && real.length > 0 && !real.some(d => d.label && (d.label.toLowerCase().includes('pulse') || d.label.toLowerCase().includes('alsa')))) {
+          return real;
+        }
+      } catch(e) {}
+      return fakeDevs.map(d => ({
+        deviceId: d.deviceId,
+        kind: d.kind,
+        label: d.label,
+        groupId: d.groupId,
+        toJSON: function() {
+          return { deviceId: this.deviceId, kind: this.kind, label: this.label, groupId: this.groupId };
+        }
+      }));
+    };
   } catch(e) {}
 })();
 `;
@@ -885,6 +877,7 @@ async function startProfileProcess(id, customUrls = null) {
   // Extensions (including profile helper extension)
   if (extPaths.length > 0) {
     args.push(`--load-extension=${extPaths.join(',')}`);
+    args.push('--disable-features=ExtensionManifestV2DeprecationWarning');
   }
 
   // Start URL
@@ -1900,7 +1893,7 @@ ipcMain.handle('rescan-chrome-binary', async () => {
 ipcMain.handle('get-system-status', async () => {
   const chromeInfo = getChromeBinary();
   return {
-    engine: "Hyperion v1.0.1",
+    engine: "Hyperion v1.0.2",
     binary: chromeInfo.path,
     binaryExists: chromeInfo.exists,
     os: process.platform,
