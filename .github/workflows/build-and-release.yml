@@ -156,13 +156,19 @@ jobs:
       - name: Determine Release Tag
         id: rel_tag
         run: |
+          CHROME_VER="152.0.7977.82"
+          if [ -f CHROMIUM_VERSION ]; then
+            CHROME_VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
+          fi
+          echo "chrome_ver=${CHROME_VER}" >> $GITHUB_OUTPUT
+
           if [ -n "${{ github.ref_name }}" ] && [[ "${{ github.ref_name }}" == v* ]]; then
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           elif [ -n "${{ inputs.release_tag }}" ]; then
             echo "tag=${{ inputs.release_tag }}" >> $GITHUB_OUTPUT
           else
-            CHROME_VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
-            echo "tag=v${CHROME_VER:-1.0.0}" >> $GITHUB_OUTPUT
+            APP_VER=$(node -p "require('./package.json').version")
+            echo "tag=v${APP_VER:-1.0.0}" >> $GITHUB_OUTPUT
           fi
 
       - name: Publish GitHub Release
@@ -173,6 +179,8 @@ jobs:
           name: "Hyperion Browser ${{ steps.rel_tag.outputs.tag }}"
           body: |
             ## Hyperion Anti-Detect Multibrowser Production Release (${{ steps.rel_tag.outputs.tag }})
+
+            - **Browser Engine**: Clean Chromium `${{ steps.rel_tag.outputs.chrome_ver }}`
 
             ### 📦 Download Packages
             - **Linux**: `.AppImage` (Universal Portable), `.deb` (Debian/Ubuntu/Mint), `.rpm` (Fedora/RHEL/CentOS)

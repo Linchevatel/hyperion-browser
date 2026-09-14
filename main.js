@@ -164,14 +164,21 @@ function readJson(file, def = []) {
 }
 
 function writeJson(file, data) {
-  const tmp = file + '.tmp.' + process.pid + '.' + Date.now();
-  const bak = file + '.bak';
   const str = JSON.stringify(data, null, 2);
-  fs.writeFileSync(tmp, str, 'utf-8');
+  const bak = file + '.bak';
   if (fs.existsSync(file)) {
     try { fs.copyFileSync(file, bak); } catch (e) {}
   }
-  fs.renameSync(tmp, file);
+  try {
+    fs.writeFileSync(file, str, 'utf-8');
+  } catch (err) {
+    try {
+      fs.writeFileSync(file, str, 'utf-8');
+    } catch (err2) {
+      console.error('writeJson error: ' + file, err2);
+      throw err2;
+    }
+  }
 }
 
 // Built-in catalog of popular antidetect / web3 extensions
@@ -363,7 +370,8 @@ app.on('window-all-closed', () => {
 // IPC HANDLERS: PROFILES
 // ==========================================
 ipcMain.handle('get-profiles', async () => {
-  const profiles = readJson(PROFILES_FILE, []);
+  const raw = readJson(PROFILES_FILE, []);
+  const profiles = Array.isArray(raw) ? raw : [];
   return profiles.map(p => {
     const proc = RUNNING_PROCESSES.get(p.id);
     const isRunning = proc && !proc.killed && proc.exitCode === null;
@@ -377,7 +385,8 @@ ipcMain.handle('get-profiles', async () => {
 });
 
 ipcMain.handle('create-profile', async (event, data) => {
-  const profiles = readJson(PROFILES_FILE, []);
+  const raw = readJson(PROFILES_FILE, []);
+  const profiles = Array.isArray(raw) ? raw : [];
   const id = require('crypto').randomUUID();
   const fp = data.fingerprint || generateFingerprint(data.os || 'windows', id, '155');
 
@@ -397,7 +406,9 @@ ipcMain.handle('create-profile', async (event, data) => {
     proxy: data.proxy || null,
     extensions: data.extensions || [],
     fingerprint: fp,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    lastLaunchedAt: null,
+    folder: data.folder || null
   };
 
   profiles.unshift(newProfile);

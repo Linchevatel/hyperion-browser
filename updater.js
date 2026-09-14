@@ -51,6 +51,9 @@ function isNewerVersion(latest, current) {
   const parse = v => String(v || '').replace(/^v/, '').split('.').map(x => parseInt(x, 10) || 0);
   const l = parse(latest);
   const c = parse(current);
+  // Major version of Hyperion is 1.x. Any tag with major >= 50 is a browser core release, ignore!
+  if ((l[0] || 0) >= 50) return false;
+
   for (let i = 0; i < Math.max(l.length, c.length); i++) {
     const lPart = l[i] || 0;
     const cPart = c[i] || 0;
@@ -82,26 +85,43 @@ async function checkForUpdates(customRepo = null) {
 
   // 1. Check configured GitHub repository
   if (repo && repo.includes('/')) {
-    const ghData = await fetchJson(`https://api.github.com/repos/${repo}/releases/latest`);
+    // Fetch recent releases to find the latest valid desktop app release (major < 50)
+    const releases = await fetchJson(`https://api.github.com/repos/${repo}/releases?per_page=10`);
+    let ghData = null;
+    if (Array.isArray(releases) && releases.length > 0) {
+      ghData = releases.find(r => {
+        if (!r || !r.tag_name) return false;
+        const clean = r.tag_name.replace(/^v/, '');
+        const major = parseInt(clean.split('.')[0], 10);
+        return !isNaN(major) && major < 50;
+      });
+    }
+    if (!ghData) {
+      ghData = await fetchJson(`https://api.github.com/repos/${repo}/releases/latest`);
+    }
+
     if (ghData && ghData.tag_name) {
       const tagClean = ghData.tag_name.replace(/^v/, '');
-      latestVersion = tagClean;
-      if (isNewerVersion(tagClean, currentVersion)) {
-        updateAvailable = true;
-        releaseNotes = ghData.body || 'Новая версия Hyperion готова к установке.';
-        if (ghData.assets && ghData.assets.length > 0) {
-          const isWin = process.platform === 'win32';
-          if (isWin) {
-            const setupAsset = ghData.assets.find(a => a.name && a.name.endsWith('.exe') && /setup/i.test(a.name));
-            const exeAsset = setupAsset || ghData.assets.find(a => a.name && a.name.endsWith('.exe'));
-            downloadUrl = exeAsset ? exeAsset.browser_download_url : ghData.assets[0].browser_download_url;
-          } else {
-            const appImageAsset = ghData.assets.find(a => a.name && a.name.endsWith('.AppImage'));
-            downloadUrl = appImageAsset ? appImageAsset.browser_download_url : ghData.assets[0].browser_download_url;
+      const major = parseInt(tagClean.split('.')[0], 10);
+      if (major < 50) {
+        latestVersion = tagClean;
+        if (isNewerVersion(tagClean, currentVersion)) {
+          updateAvailable = true;
+          releaseNotes = ghData.body || 'Новая версия Hyperion готова к установке.';
+          if (ghData.assets && ghData.assets.length > 0) {
+            const isWin = process.platform === 'win32';
+            if (isWin) {
+              const setupAsset = ghData.assets.find(a => a.name && a.name.endsWith('.exe') && /setup/i.test(a.name));
+              const exeAsset = setupAsset || ghData.assets.find(a => a.name && a.name.endsWith('.exe'));
+              downloadUrl = exeAsset ? exeAsset.browser_download_url : ghData.assets[0].browser_download_url;
+            } else {
+              const appImageAsset = ghData.assets.find(a => a.name && a.name.endsWith('.AppImage'));
+              downloadUrl = appImageAsset ? appImageAsset.browser_download_url : ghData.assets[0].browser_download_url;
+            }
           }
-        }
-        if (!downloadUrl && ghData.html_url) {
-          downloadUrl = ghData.html_url;
+          if (!downloadUrl && ghData.html_url) {
+            downloadUrl = ghData.html_url;
+          }
         }
       }
     }
