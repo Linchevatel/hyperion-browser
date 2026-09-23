@@ -659,9 +659,6 @@ function renderProfiles() {
             <button class="btn-icon" onclick="openWarmupRobot('${escapeHtml(p.id)}')" title="Cookie Robot (Прогрев)" style="color:var(--accent-amber);">
               🤖
             </button>
-            <button class="btn-icon" onclick="openQualityScorer('${escapeHtml(p.id)}')" title="🔍 Тест отпечатка" style="color:var(--accent-cyan);">
-              🔍
-            </button>
             <button class="btn-icon" onclick="exportProfilePackage('${escapeHtml(p.id)}')" title="Экспорт в архив .hyperion">
               📦
             </button>
@@ -1300,10 +1297,6 @@ function initEventListeners() {
   document.getElementById('btn-close-warmup')?.addEventListener('click', window.closeWarmupRobot);
   document.getElementById('btn-cancel-warmup')?.addEventListener('click', window.closeWarmupRobot);
   document.getElementById('btn-start-warmup')?.addEventListener('click', window.startWarmupSession);
-
-  document.getElementById('btn-close-scorer')?.addEventListener('click', window.closeQualityScorer);
-  document.getElementById('btn-close-scorer-footer')?.addEventListener('click', window.closeQualityScorer);
-  document.getElementById('btn-launch-verifier-tabs')?.addEventListener('click', window.launchVerifierTabs);
 
   // BULK ACTIONS LISTENERS
   const thCheckAll = document.getElementById('th-check-all-profiles');
@@ -2279,84 +2272,6 @@ window.startWarmupSession = async () => {
 // ==========================================
 // FEATURE 1: QUALITY SCORER
 // ==========================================
-let CURRENT_SCORER_PROFILE_ID = null;
-
-window.openQualityScorer = (profileId) => {
-  CURRENT_SCORER_PROFILE_ID = profileId;
-  const p = PROFILES.find(x => x.id === profileId);
-  if (!p) return;
-  const fp = p.fingerprint || {};
-
-  const card = document.getElementById('scorer-summary-card');
-  const hasProxy = p.proxy && p.proxy.enabled && p.proxy.host;
-  const webrtcStatus = fp.webrtc_mode === 'proxy_only' ? 'Защищен (No-leak)' : (fp.webrtc_mode === 'disabled' ? 'Отключен' : 'Прямой');
-  
-  const gpuRenderer = fp.webgl?.unmasked_renderer || 'OK';
-  const gpuRendererShort = gpuRenderer.length > 50 ? gpuRenderer.slice(0, 47) + '...' : gpuRenderer;
-
-  card.innerHTML = `
-    <div class="score-metric">
-      <span>Аппаратная маскировка (Hardware Spoofing)</span>
-      <span class="score-badge pass">100% Native</span>
-    </div>
-    <div class="score-metric">
-      <span>navigator.webdriver</span>
-      <span class="score-badge pass">FALSE (Native)</span>
-    </div>
-    <div class="score-metric">
-      <span>WebGL Renderer</span>
-      <span class="score-badge pass" title="${escapeHtml(gpuRenderer)}">${escapeHtml(gpuRendererShort)}</span>
-    </div>
-    <div class="score-metric">
-      <span>WebRTC IP Leak Protection</span>
-      <span class="score-badge pass">${escapeHtml(webrtcStatus)}</span>
-    </div>
-    <div class="score-metric">
-      <span>Прокси и сетевая изоляция</span>
-      <span class="score-badge ${hasProxy ? 'pass' : 'warn'}">${hasProxy ? 'Активен (' + escapeHtml(p.proxy.host) + ')' : 'Прямой домашний IP'}</span>
-    </div>
-    <div class="score-metric">
-      <span>Canvas & Audio Шум</span>
-      <span class="score-badge ${fp.canvas_noise !== false ? 'pass' : 'warn'}">${fp.canvas_noise !== false ? 'Включен (+Seed)' : 'Выключен'}</span>
-    </div>
-  `;
-
-  document.getElementById('scorer-modal').style.display = 'flex';
-};
-
-window.closeQualityScorer = () => {
-  document.getElementById('scorer-modal').style.display = 'none';
-};
-
-window.launchVerifierTabs = async () => {
-  if (!CURRENT_SCORER_PROFILE_ID) {
-    window.closeQualityScorer();
-    return;
-  }
-  const profileId = CURRENT_SCORER_PROFILE_ID;
-  window.closeQualityScorer();
-
-  // Verifier URLs configuration
-  const VERIFIER_URLS = [
-    'https://browserleaks.com/javascript',
-    'https://pixelscan.net/'
-  ];
-
-  try {
-    const res = await window.hyperion.startProfile(profileId, VERIFIER_URLS);
-    const p = PROFILES.find(x => x.id === profileId);
-    if (p) {
-      p.status = 'RUNNING';
-      if (res && res.pid) p.pid = res.pid;
-      if (!p.startTime) p.startTime = Date.now();
-    }
-    renderProfiles();
-    updateStats();
-  } catch (e) {
-    alert('Ошибка запуска проверочных вкладок: ' + e.message);
-  }
-};
-
 window.promptAddTag = (profileId, event) => {
   if (event) event.stopPropagation();
   openPromptDialog({

@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const { spawn, execFile } = require('child_process');
 const net = require('net');
 const https = require('https');
@@ -652,13 +653,13 @@ function createSocks5Bridge(remoteHost, remotePort, user, pass) {
   });
 }
 
-function ensureProfileHelperExtension(profileDir, user, pass) {
+function ensureProfileHelperExtension(profileDir, user, pass, os = 'windows', profileId = '') {
   const extDir = path.join(profileDir, 'profile_helper_ext');
   if (!fs.existsSync(extDir)) fs.mkdirSync(extDir, { recursive: true });
 
   const manifest = {
     name: 'Hyperion Profile Helper',
-    version: '1.0.3',
+    version: '1.0.4',
     manifest_version: 3,
     description: 'Hyperion profile helper for media spoofing and proxy authentication',
     permissions: [
@@ -700,50 +701,68 @@ function ensureProfileHelperExtension(profileDir, user, pass) {
 `;
   }
 
-  // Realistic Media Devices content script directly in page execution context:
+  // Generate deterministic device IDs and group IDs per profile
+  const seed = profileId || crypto.randomUUID();
+  const h = (suffix) => crypto.createHash('sha256').update(seed + suffix).digest('hex');
+
+  let devTemplates = [];
+  const targetOs = (os || 'windows').toLowerCase();
+
+  if (targetOs === 'macos') {
+    const audioInG = h('_mac_mic_grp');
+    const audioOutG = h('_mac_spk_grp');
+    const videoG = h('_mac_cam_grp');
+    devTemplates = [
+      { deviceId: 'default', kind: 'audioinput', label: 'Default - MacBook Microphone (Built-in)', groupId: audioInG },
+      { deviceId: h('_mic_1'), kind: 'audioinput', label: 'MacBook Microphone (Built-in)', groupId: audioInG },
+      { deviceId: 'default', kind: 'audiooutput', label: 'Default - MacBook Speakers (Built-in)', groupId: audioOutG },
+      { deviceId: h('_spk_1'), kind: 'audiooutput', label: 'MacBook Speakers (Built-in)', groupId: audioOutG },
+      { deviceId: h('_cam_1'), kind: 'videoinput', label: 'FaceTime HD Camera', groupId: videoG }
+    ];
+  } else if (targetOs === 'android' || targetOs === 'ios') {
+    const audioG = h('_mob_aud_grp');
+    const vidFrontG = h('_mob_cam_f');
+    const vidBackG = h('_mob_cam_b');
+    devTemplates = [
+      { deviceId: 'default', kind: 'audioinput', label: 'Default - Internal Microphone', groupId: audioG },
+      { deviceId: h('_mic_1'), kind: 'audioinput', label: 'Internal Microphone', groupId: audioG },
+      { deviceId: 'default', kind: 'audiooutput', label: 'Default - Receiver/Speaker', groupId: audioG },
+      { deviceId: h('_spk_1'), kind: 'audiooutput', label: 'Internal Speaker', groupId: audioG },
+      { deviceId: h('_cam_back'), kind: 'videoinput', label: 'Back Camera', groupId: vidBackG },
+      { deviceId: h('_cam_front'), kind: 'videoinput', label: 'Front Camera', groupId: vidFrontG }
+    ];
+  } else {
+    // Windows / default
+    const audioInG = h('_win_mic_grp');
+    const audioOutG = h('_win_spk_grp');
+    const videoG = h('_win_cam_grp');
+    devTemplates = [
+      { deviceId: 'default', kind: 'audioinput', label: 'Default - Microphone (Realtek High Definition Audio)', groupId: audioInG },
+      { deviceId: 'communications', kind: 'audioinput', label: 'Communications - Microphone (Realtek High Definition Audio)', groupId: audioInG },
+      { deviceId: h('_mic_1'), kind: 'audioinput', label: 'Microphone (Realtek High Definition Audio)', groupId: audioInG },
+      { deviceId: 'default', kind: 'audiooutput', label: 'Default - Speakers (Realtek High Definition Audio)', groupId: audioOutG },
+      { deviceId: 'communications', kind: 'audiooutput', label: 'Communications - Speakers (Realtek High Definition Audio)', groupId: audioOutG },
+      { deviceId: h('_spk_1'), kind: 'audiooutput', label: 'Speakers (Realtek High Definition Audio)', groupId: audioOutG },
+      { deviceId: h('_cam_1'), kind: 'videoinput', label: 'Integrated Camera', groupId: videoG }
+    ];
+  }
+
+  // Realistic Media Devices content script directly in page execution context
   const contentJs = `(function() {
   try {
     if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
-    const fakeDevs = [
-      {
-        deviceId: "default",
-        kind: "audioinput",
-        label: "Default - Microphone (Realtek High Definition Audio)",
-        groupId: "group_audio_in"
-      },
-      {
-        deviceId: "audio_in_1",
-        kind: "audioinput",
-        label: "Microphone (Realtek High Definition Audio)",
-        groupId: "group_audio_in"
-      },
-      {
-        deviceId: "default",
-        kind: "audiooutput",
-        label: "Default - Speakers (Realtek High Definition Audio)",
-        groupId: "group_audio_out"
-      },
-      {
-        deviceId: "audio_out_1",
-        kind: "audiooutput",
-        label: "Speakers (Realtek High Definition Audio)",
-        groupId: "group_audio_out"
-      },
-      {
-        deviceId: "video_in_1",
-        kind: "videoinput",
-        label: "HD WebCam",
-        groupId: "group_video_in"
-      }
-    ];
+    const fakeDevs = ${JSON.stringify(devTemplates)};
+
     const origEnumerate = navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
-    navigator.mediaDevices.enumerateDevices = async function() {
+    const patchedEnumerate = async function enumerateDevices() {
       try {
         const real = await origEnumerate();
-        if (real && real.length > 0 && !real.some(d => d.label && (d.label.toLowerCase().includes('pulse') || d.label.toLowerCase().includes('alsa')))) {
+        // If real devices are present and not leaking Linux subsystem (pulse/alsa), allow real
+        if (real && real.length > 0 && !real.some(d => d.label && (d.label.toLowerCase().includes('pulse') || d.label.toLowerCase().includes('alsa') || d.label.toLowerCase().includes('pipewire')))) {
           return real;
         }
       } catch(e) {}
+
       return fakeDevs.map(d => ({
         deviceId: d.deviceId,
         kind: d.kind,
@@ -754,6 +773,13 @@ function ensureProfileHelperExtension(profileDir, user, pass) {
         }
       }));
     };
+
+    try {
+      Object.defineProperty(patchedEnumerate, 'name', { value: 'enumerateDevices' });
+      patchedEnumerate.toString = function toString() { return 'function enumerateDevices() { [native code] }'; };
+    } catch(e) {}
+
+    navigator.mediaDevices.enumerateDevices = patchedEnumerate;
   } catch(e) {}
 })();
 `;
@@ -878,7 +904,7 @@ async function startProfileProcess(id, customUrls = null) {
   // Always attach helper extension (media devices spoofing + proxy auth)
   const proxyUser = (p.proxy && p.proxy.enabled) ? p.proxy.user : null;
   const proxyPass = (p.proxy && p.proxy.enabled) ? p.proxy.pass : null;
-  const helperExt = ensureProfileHelperExtension(profileDir, proxyUser, proxyPass);
+  const helperExt = ensureProfileHelperExtension(profileDir, proxyUser, proxyPass, p.os || 'windows', id);
   if (helperExt) extPaths.push(helperExt);
 
   // Proxy & Authenticated Proxy Support
@@ -936,17 +962,64 @@ async function startProfileProcess(id, customUrls = null) {
   }
 
   // Isolated Fonts: Load application-packaged fonts without installing in host system
+  // Prevents leaking host Linux distribution fonts (Ubuntu, DejaVu, Liberation) when spoofing Windows/macOS
   const appFontsDir = path.join(__dirname, 'fonts');
   if (fs.existsSync(appFontsDir)) {
     const fontsConfPath = path.join(profileDir, 'fonts.conf');
     const fontsCacheDir = path.join(profileDir, 'fontconfig');
-    const fontsXml = `<?xml version="1.0"?>
+    const isHostLinuxProfile = (p.os === 'linux');
+
+    let fontsXml;
+    if (isHostLinuxProfile) {
+      fontsXml = `<?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
 <fontconfig>
   <include ignore_missing="yes">/etc/fonts/fonts.conf</include>
   <dir>${appFontsDir}</dir>
   <cachedir>${fontsCacheDir}</cachedir>
 </fontconfig>`;
+    } else {
+      // Sandboxed Windows/macOS profile: strictly isolated, zero host font leaks
+      fontsXml = `<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+<fontconfig>
+  <dir>${appFontsDir}</dir>
+  <cachedir>${fontsCacheDir}</cachedir>
+  <config>
+    <rescan>
+      <int>30</int>
+    </rescan>
+  </config>
+  <alias>
+    <family>sans-serif</family>
+    <prefer><family>Arial</family></prefer>
+  </alias>
+  <alias>
+    <family>serif</family>
+    <prefer><family>Times New Roman</family></prefer>
+  </alias>
+  <alias>
+    <family>monospace</family>
+    <prefer><family>Courier New</family></prefer>
+  </alias>
+  <alias>
+    <family>system-ui</family>
+    <prefer><family>Arial</family></prefer>
+  </alias>
+  <selectfont>
+    <rejectfont>
+      <glob>/usr/share/fonts/*</glob>
+    </rejectfont>
+    <rejectfont>
+      <glob>/usr/local/share/fonts/*</glob>
+    </rejectfont>
+    <rejectfont>
+      <glob>~/.local/share/fonts/*</glob>
+    </rejectfont>
+  </selectfont>
+</fontconfig>`;
+    }
+
     fs.writeFileSync(fontsConfPath, fontsXml, 'utf-8');
     spawnEnv.FONTCONFIG_FILE = fontsConfPath;
   }
