@@ -837,6 +837,9 @@ async function startProfileProcess(id, customUrls = null) {
     `--fingerprint-audio-seed=${fp.audio_noise ? (fp.audio_seed || 0.0003) : 0.0}`,
     `--fingerprint-screen-width=${fp.screen?.width || 1920}`,
     `--fingerprint-screen-height=${fp.screen?.height || 1080}`
+    // NOTE: --fingerprint-client-hints-* flags are NOT supported by the current
+    // Chromium patch (only the 9 flags above are implemented). Client Hints
+    // spoofing requires extending the patch to handle Sec-CH-UA headers.
   ];
 
   if (isMobile) {

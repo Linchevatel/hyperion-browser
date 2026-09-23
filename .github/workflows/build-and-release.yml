@@ -7,18 +7,17 @@ on:
         description: "Release tag (e.g. v1.0.0)"
         required: false
         default: ""
-      chromium_version:
-        description: "Chromium core version"
-        required: false
-        default: "auto"
   push:
     tags:
       - "v*"
 
 jobs:
-  build-linux-packages:
-    name: Build Linux Packages (.deb, .rpm, .AppImage)
-    runs-on: ubuntu-latest
+  # ── Linux: compile patched Chromium + package Hyperion ─────────────────
+  build-linux:
+    name: Build Hyperion Linux (.AppImage, .deb, .rpm)
+    runs-on: [self-hosted, linux, chromium-builder]
+    timeout-minutes: 600
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -29,35 +28,126 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install System Packaging Tools (rpm & fpm)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y rpm ruby ruby-dev rubygems libarchive-tools
-          sudo gem install --no-document fpm
-
       - name: Install NPM Dependencies
         run: npm install
 
-      - name: Download Bundled Chromium Core (Linux)
-        run: node scripts/download_engine.js --platform=linux64
+      # ── Compile Chromium from source with Hyperion patch ───────────────
+      - name: Resolve Chromium Version
+        id: chromium_ver
+        run: |
+          VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
+          SRC_VER="${VER%%-*}"
+          echo "full=$VER"    >> $GITHUB_OUTPUT
+          echo "src=$SRC_VER" >> $GITHUB_OUTPUT
+          echo "Building Chromium $SRC_VER for Hyperion..."
+
+      - name: Sync Chromium Source
+        run: |
+          CHROMIUM_SRC="${CHROMIUM_BUILD_DIR:-/build/chromium}/src"
+          cd "$(dirname $CHROMIUM_SRC)"
+          if [ ! -f "$CHROMIUM_SRC/DEPS" ]; then
+            fetch --nohooks chromium
+          fi
+          cd "$CHROMIUM_SRC"
+          gclient sync --with_branch_heads --reset --force \
+            --delete_unversioned_trees -r "src@${{ steps.chromium_ver.outputs.src }}"
+          gclient runhooks
+
+      - name: Apply Hyperion Fingerprint Patch
+        run: |
+          CHROMIUM_SRC="${CHROMIUM_BUILD_DIR:-/build/chromium}/src"
+          PATCH_FILE="${GITHUB_WORKSPACE}/patches/hyperion_core_fingerprint.patch"
+          cd "$CHROMIUM_SRC"
+          git checkout -- .
+          if ! git apply --check "$PATCH_FILE" 2>/dev/null; then
+            echo "::error::Patch does not apply cleanly to Chromium ${{ steps.chromium_ver.outputs.src }}"
+            exit 1
+          fi
+          git apply "$PATCH_FILE"
+          echo "Patch applied successfully."
+
+      - name: Configure GN Build
+        run: |
+          CHROMIUM_SRC="${CHROMIUM_BUILD_DIR:-/build/chromium}/src"
+          OUT_DIR="$CHROMIUM_SRC/out/HyperionRelease"
+          mkdir -p "$OUT_DIR"
+          cat > "$OUT_DIR/args.gn" << 'EOF'
+          is_official_build = true
+          is_debug = false
+          symbol_level = 0
+          enable_nacl = false
+          blink_symbol_level = 0
+          v8_symbol_level = 0
+          chrome_pgo_phase = 0
+          use_thin_lto = false
+          use_lld = true
+          is_chrome_branded = false
+          safe_browsing_mode = 0
+          enable_reporting = false
+          enable_background_mode = false
+          google_api_key = ""
+          google_default_client_id = ""
+          google_default_client_secret = ""
+          EOF
+          cd "$CHROMIUM_SRC"
+          gn gen "$OUT_DIR"
+
+      - name: Compile Chromium
+        run: |
+          OUT_DIR="${CHROMIUM_BUILD_DIR:-/build/chromium}/src/out/HyperionRelease"
+          autoninja -C "$OUT_DIR" chrome chrome_sandbox
+
+      # ── Copy compiled binary into Electron bundle dir ──────────────────
+      - name: Bundle Patched Chromium into Hyperion
+        run: |
+          OUT_DIR="${CHROMIUM_BUILD_DIR:-/build/chromium}/src/out/HyperionRelease"
+          BUNDLE_DIR="${GITHUB_WORKSPACE}/bundle/chrome"
+          mkdir -p "$BUNDLE_DIR"
+
+          COPY_FILES=(
+            chrome chrome_sandbox
+            chrome_100_percent.pak chrome_200_percent.pak resources.pak
+            icudtl.dat v8_context_snapshot.bin
+            libEGL.so libGLESv2.so libvk_swiftshader.so libvulkan.so.1
+            vk_swiftshader_icd.json
+          )
+          for f in "${COPY_FILES[@]}"; do
+            [ -f "$OUT_DIR/$f" ] && cp "$OUT_DIR/$f" "$BUNDLE_DIR/" || true
+          done
+          cp -r "$OUT_DIR/locales" "$BUNDLE_DIR/"
+          chmod +x "$BUNDLE_DIR/chrome"
+
+          echo "Bundled Chromium ${{ steps.chromium_ver.outputs.full }} → $BUNDLE_DIR"
+          ls -lh "$BUNDLE_DIR/chrome"
+
+      # ── Build Hyperion installer packages ─────────────────────────────
+      - name: Install System Packaging Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y rpm ruby ruby-dev rubygems libarchive-tools
+          sudo gem install --no-document fpm
 
       - name: Build Linux Installers (.AppImage, .deb, .rpm)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:linux
 
-      - name: Upload Linux Binaries
+      - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: hyperion-linux-binaries
+          name: hyperion-linux
+          retention-days: 1
           path: |
             dist/*.AppImage
             dist/*.deb
             dist/*.rpm
 
-  build-windows-packages:
-    name: Build Windows Packages (.exe NSIS & Portable)
-    runs-on: windows-latest
+  # ── Windows: compile patched Chromium + package Hyperion ───────────────
+  build-windows:
+    name: Build Hyperion Windows (.exe)
+    runs-on: [self-hosted, windows, chromium-builder]
+    timeout-minutes: 600
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -71,121 +161,165 @@ jobs:
       - name: Install NPM Dependencies
         run: npm install
 
-      - name: Download Bundled Chromium Core (Windows)
-        run: node scripts/download_engine.js --platform=win64
+      - name: Resolve Chromium Version
+        id: chromium_ver
+        shell: bash
+        run: |
+          VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
+          SRC_VER="${VER%%-*}"
+          echo "full=$VER"    >> $GITHUB_OUTPUT
+          echo "src=$SRC_VER" >> $GITHUB_OUTPUT
+
+      - name: Sync Chromium Source
+        shell: cmd
+        run: |
+          set CHROMIUM_SRC=%CHROMIUM_BUILD_DIR%\src
+          cd /d %CHROMIUM_BUILD_DIR%
+          if not exist "%CHROMIUM_SRC%\DEPS" fetch --nohooks chromium
+          cd /d %CHROMIUM_SRC%
+          gclient sync --with_branch_heads --reset --force --delete_unversioned_trees
+          gclient runhooks
+
+      - name: Apply Hyperion Fingerprint Patch
+        shell: bash
+        run: |
+          cd "${CHROMIUM_BUILD_DIR}/src"
+          git checkout -- .
+          git apply "${GITHUB_WORKSPACE}/patches/hyperion_core_fingerprint.patch"
+
+      - name: Configure and Compile
+        shell: cmd
+        run: |
+          set OUT=%CHROMIUM_BUILD_DIR%\src\out\HyperionRelease
+          mkdir %OUT%
+          (
+            echo is_official_build=true
+            echo is_debug=false
+            echo symbol_level=0
+            echo enable_nacl=false
+            echo is_chrome_branded=false
+            echo safe_browsing_mode=0
+            echo enable_reporting=false
+          ) > %OUT%\args.gn
+          cd /d %CHROMIUM_BUILD_DIR%\src
+          gn gen %OUT%
+          autoninja -C %OUT% chrome
+
+      - name: Bundle Patched Chromium into Hyperion
+        shell: bash
+        run: |
+          OUT="${CHROMIUM_BUILD_DIR}/src/out/HyperionRelease"
+          BUNDLE="${GITHUB_WORKSPACE}/bundle/chrome"
+          mkdir -p "$BUNDLE"
+          cp "$OUT/chrome.exe"              "$BUNDLE/"
+          cp "$OUT/"*.pak                   "$BUNDLE/"
+          cp "$OUT/icudtl.dat"              "$BUNDLE/"
+          cp "$OUT/v8_context_snapshot.bin" "$BUNDLE/"
+          cp -r "$OUT/locales"              "$BUNDLE/"
+          echo "Bundled Windows Chromium → $BUNDLE"
 
       - name: Build Windows Installers (.exe)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:win
 
-      - name: Upload Windows Binaries
+      - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: hyperion-windows-binaries
+          name: hyperion-windows
+          retention-days: 1
           path: dist/*.exe
 
-  build-core-package:
-    name: Package C++ Patches and Engine Fonts
+  # ── Patch archive (for transparency / open source) ─────────────────────
+  package-patches:
+    name: Package Patches Archive
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
 
-      - name: Validate Hyperion C++ Fingerprint Patches
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Patch File
         run: |
-          echo "Verifying patch integrity..."
-          if [ -f "patches/hyperion_core_fingerprint.patch" ]; then
-            echo "Patch valid: $(wc -l < patches/hyperion_core_fingerprint.patch) lines"
-          else
-            echo "Error: patches/hyperion_core_fingerprint.patch missing!"
+          if [ ! -f "patches/hyperion_core_fingerprint.patch" ]; then
+            echo "::error::patches/hyperion_core_fingerprint.patch is missing!"
             exit 1
           fi
+          echo "Patch OK: $(wc -l < patches/hyperion_core_fingerprint.patch) lines"
 
-      - name: Package Core Archive
+      - name: Create Patches Archive
         run: |
-          mkdir -p package_temp
-          cp -r fonts package_temp/
-          cp -r patches package_temp/
-          cp CHROMIUM_VERSION package_temp/
-          tar -czvf hyperion-browser-patches-and-fonts.tar.gz -C package_temp .
+          mkdir -p _pkg
+          cp -r fonts   _pkg/
+          cp -r patches _pkg/
+          cp CHROMIUM_VERSION _pkg/
+          tar -czvf hyperion-patches-and-fonts.tar.gz -C _pkg .
 
-      - name: Upload Core Assets
+      - name: Upload Patches Archive
         uses: actions/upload-artifact@v4
         with:
-          name: hyperion-core-assets
-          path: hyperion-browser-patches-and-fonts.tar.gz
+          name: hyperion-patches
+          retention-days: 1
+          path: hyperion-patches-and-fonts.tar.gz
 
+  # ── Publish final Hyperion GitHub Release ──────────────────────────────
   create-github-release:
-    name: Create GitHub Release
-    needs: [build-linux-packages, build-windows-packages, build-core-package]
+    name: Publish Hyperion Release
+    needs: [build-linux, build-windows, package-patches]
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Create Artifacts Directory
-        run: mkdir -p release-binaries
-
-      - name: Download Linux Binaries
+      - name: Download All Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: hyperion-linux-binaries
           path: release-binaries/
+          merge-multiple: true
 
-      - name: Download Windows Binaries
-        uses: actions/download-artifact@v4
-        with:
-          name: hyperion-windows-binaries
-          path: release-binaries/
-
-      - name: Download Core Assets
-        uses: actions/download-artifact@v4
-        with:
-          name: hyperion-core-assets
-          path: release-binaries/
-
-      - name: Generate Checksums (SHA-256)
+      - name: Generate SHA-256 Checksums
         run: |
           cd release-binaries
           sha256sum * > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
-      - name: Determine Release Tag
-        id: rel_tag
+      - name: Determine Release Tag and Chromium Version
+        id: meta
         run: |
-          CHROME_VER="152.0.7977.82"
-          if [ -f CHROMIUM_VERSION ]; then
-            CHROME_VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
-          fi
-          echo "chrome_ver=${CHROME_VER}" >> $GITHUB_OUTPUT
+          CHROME_VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
+          echo "chrome_ver=$CHROME_VER" >> $GITHUB_OUTPUT
 
-          if [ -n "${{ github.ref_name }}" ] && [[ "${{ github.ref_name }}" == v* ]]; then
+          if [[ "${{ github.ref_name }}" == v* ]]; then
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           elif [ -n "${{ inputs.release_tag }}" ]; then
             echo "tag=${{ inputs.release_tag }}" >> $GITHUB_OUTPUT
           else
             APP_VER=$(node -p "require('./package.json').version")
-            echo "tag=v${APP_VER:-1.0.0}" >> $GITHUB_OUTPUT
+            echo "tag=v${APP_VER}" >> $GITHUB_OUTPUT
           fi
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release-binaries/*
-          tag_name: ${{ steps.rel_tag.outputs.tag }}
-          name: "Hyperion Browser ${{ steps.rel_tag.outputs.tag }}"
-          body: |
-            ## Hyperion Anti-Detect Multibrowser Production Release (${{ steps.rel_tag.outputs.tag }})
-
-            - **Browser Engine**: Clean Chromium `${{ steps.rel_tag.outputs.chrome_ver }}`
-
-            ### 📦 Download Packages
-            - **Linux**: `.AppImage` (Universal Portable), `.deb` (Debian/Ubuntu/Mint), `.rpm` (Fedora/RHEL/CentOS)
-            - **Windows**: `Hyperion-Setup-*.exe` (NSIS Installer), `Hyperion-*.exe` (Portable)
-            - **Engine Patches**: `hyperion-browser-patches-and-fonts.tar.gz` (C++ source patches & isolated font bundles)
-            - **Integrity**: See `SHA256SUMS.txt` for cryptographic checksums.
-          draft: false
+          tag_name:   ${{ steps.meta.outputs.tag }}
+          name:       "Hyperion Browser ${{ steps.meta.outputs.tag }}"
+          files:      release-binaries/*
+          draft:      false
           prerelease: false
+          body: |
+            ## Hyperion Anti-Detect Browser ${{ steps.meta.outputs.tag }}
+
+            **Chromium Core**: `${{ steps.meta.outputs.chrome_ver }}` — compiled from source with Hyperion fingerprint patch
+
+            ### 📦 Packages
+            | File | Platform |
+            |------|----------|
+            | `*.AppImage` | Linux (Universal Portable) |
+            | `*.deb` | Debian / Ubuntu / Mint |
+            | `*.rpm` | Fedora / RHEL / CentOS |
+            | `*-Setup.exe` | Windows (NSIS Installer) |
+            | `*-Portable.exe` | Windows (Portable) |
+            | `hyperion-patches-and-fonts.tar.gz` | C++ source patches |
+
+            **Integrity**: `SHA256SUMS.txt` included.

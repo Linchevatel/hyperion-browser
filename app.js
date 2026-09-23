@@ -1,8 +1,31 @@
 
 // =========================================================================
+// CONSTANTS
+// =========================================================================
+const TOAST_DURATION_DEFAULT = 3500;
+const TOAST_DURATION_ERROR = 4500;
+const TOAST_FADE_OUT_DURATION = 220;
+const TAG_MAX_LENGTH = 10;
+const PROFILE_NAME_MAX_LENGTH = 30;
+const PROFILE_NOTES_MAX_LENGTH = 30;
+
+// =========================================================================
+// UTILITY: HTML ESCAPE
+// =========================================================================
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// =========================================================================
 // CUSTOM TOAST NOTIFICATIONS (HYPERION UI)
 // =========================================================================
-function showToast(message, type = 'info', duration = 3500) {
+function showToast(message, type = 'info', duration = TOAST_DURATION_DEFAULT) {
   let container = document.getElementById('toast-container');
   if (!container) {
     container = document.createElement('div');
@@ -26,13 +49,23 @@ function showToast(message, type = 'info', duration = 3500) {
     iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
   }
 
-  const safeMsg = String(message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+  const iconSpan = document.createElement('span');
+  iconSpan.className = 'toast-icon';
+  iconSpan.innerHTML = iconSvg;
 
-  toast.innerHTML = `
-    <span class="toast-icon">${iconSvg}</span>
-    <span class="toast-message">${safeMsg}</span>
-    <button type="button" class="toast-close" title="Закрыть">&times;</button>
-  `;
+  const messageSpan = document.createElement('span');
+  messageSpan.className = 'toast-message';
+  messageSpan.textContent = String(message || '');
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'toast-close';
+  closeBtn.title = 'Закрыть';
+  closeBtn.textContent = '×';
+
+  toast.appendChild(iconSpan);
+  toast.appendChild(messageSpan);
+  toast.appendChild(closeBtn);
 
   let closed = false;
   const closeToast = () => {
@@ -41,11 +74,10 @@ function showToast(message, type = 'info', duration = 3500) {
     toast.classList.add('toast-fade-out');
     setTimeout(() => {
       if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, 220);
+    }, TOAST_FADE_OUT_DURATION);
   };
 
-  const closeBtn = toast.querySelector('.toast-close');
-  if (closeBtn) closeBtn.addEventListener('click', closeToast);
+  closeBtn.addEventListener('click', closeToast);
   container.appendChild(toast);
 
   if (duration > 0) {
@@ -55,14 +87,14 @@ function showToast(message, type = 'info', duration = 3500) {
 }
 window.showToast = showToast;
 
-// Global override of alert() to use elegant Hyperion toasts
-window.alert = (msg) => {
+// Custom notification function (DO NOT override native alert)
+window.showNotification = (msg) => {
   const text = String(msg || '');
   const isErr = /ошибк|неверн|fault|fail|error|заполните|введите|укажите/i.test(text);
   const isWarn = /внимание|warning/i.test(text);
   const isSuccess = /успешн|сохранен|очищен|импортирован|установлен/i.test(text);
   const type = isErr ? 'error' : isWarn ? 'warning' : isSuccess ? 'success' : 'info';
-  showToast(text, type, isErr ? 4500 : 3500);
+  showToast(text, type, isErr ? TOAST_DURATION_ERROR : TOAST_DURATION_DEFAULT);
 };
 
 // =========================================================================
@@ -72,7 +104,8 @@ function showConfirmDialog({ title = 'Подтверждение', message, conf
   return new Promise((resolve) => {
     const modal = document.getElementById('confirm-modal');
     if (!modal) {
-      resolve(true);
+      console.error('Confirm modal element not found');
+      resolve(false);
       return;
     }
     const titleEl = document.getElementById('confirm-modal-title');
@@ -107,7 +140,8 @@ function showConfirmDialog({ title = 'Подтверждение', message, conf
       if (e.key === 'Escape') {
         e.preventDefault();
         cleanup(false);
-      } else if (e.key === 'Enter') {
+      } else if (e.key === 'Enter' && !isDanger) {
+        // Only auto-confirm on Enter for non-dangerous operations
         e.preventDefault();
         cleanup(true);
       }
@@ -177,8 +211,24 @@ function openPromptDialog({ title, label, placeholder, defaultValue = '', maxLen
   };
 }
 
+// =========================================================================
+// GLOBAL ERROR HANDLERS
+// =========================================================================
+window.addEventListener('error', (event) => {
+  console.error('Unhandled error:', event.error);
+  showToast('Произошла непредвиденная ошибка. Проверьте консоль для деталей.', 'error');
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled promise rejection:', event.reason);
+  showToast('Ошибка асинхронной операции. Проверьте консоль для деталей.', 'error');
+  event.preventDefault();
+});
+
+// =========================================================================
+// STATE
+// =========================================================================
 let ACTIVE_EXT_CAT = 'all';
-// State
 let PROFILES = [];
 let PROXIES = [];
 let EXTENSIONS = { installed: [], catalog: [] };
@@ -505,13 +555,13 @@ function renderProfiles() {
     const os = p.os || 'windows';
     const osIcon = getOsSvg(os);
     const fp = p.fingerprint || {};
-    const tagsHtml = (p.tags || []).map(t => `<span class="tag-badge">${escapeHtml(t)} <span class="tag-remove-x" onclick="removeTagFromProfile('${p.id}', '${escapeHtml(t)}', event)" title="Удалить тег">&times;</span></span>`).join('') + `<button class="btn-add-tag-inline" onclick="promptAddTag('${p.id}', event)" title="Добавить тег">+</button>`;
+  const tagsHtml = (p.tags || []).map(t => `<span class="tag-badge">${escapeHtml(t)} <span class="tag-remove-x" onclick="removeTagFromProfile('${escapeHtml(p.id)}', '${escapeHtml(t)}', event)" title="Удалить тег">&times;</span></span>`).join('') + `<button class="btn-add-tag-inline" onclick="promptAddTag('${escapeHtml(p.id)}', event)" title="Добавить тег">+</button>`;
 
     let proxyHtml = '<span class="proxy-direct">Прямое подключение</span>';
     if (p.proxy && p.proxy.enabled && p.proxy.host) {
       const geo = PROXY_GEO_CACHE.get(p.proxy.host);
       const geoFlag = geo && geo.countryCode ? getCountryFlag(geo.countryCode) + " " + geo.countryCode : "";
-      const rotateBtn = p.proxy.change_ip_url ? `<button class="btn-rotate" onclick="triggerProxyRotate('${p.id}', '${p.proxy.id || ''}', event)" title="Сменить IP">🔄 Сменить IP</button>` : '';
+      const rotateBtn = p.proxy.change_ip_url ? `<button class="btn-rotate" onclick="triggerProxyRotate('${escapeHtml(p.id)}', '${escapeHtml(p.proxy.id || '')}', event)" title="Сменить IP">🔄 Сменить IP</button>` : '';
       proxyHtml = `
         <div class="proxy-meta">
           <span class="proxy-host">${geoFlag ? geoFlag + " " : ""}${escapeHtml(p.proxy.host)}:${escapeHtml(p.proxy.port || '80')}</span>
@@ -525,7 +575,7 @@ function renderProfiles() {
     }
 
     const gpuShort = fp.webgl?.unmasked_renderer
-      ? fp.webgl.unmasked_renderer.replace(/ANGLE \(|Direct3D11.*|\(0x[0-9A-Fa-f]+\)/g, '').trim()
+      ? fp.webgl.unmasked_renderer.replace(/ANGLE \(|Direct3D11.*|\(0x[0-9A-Fa-f]+\)/g, '').trim().slice(0, 60)
       : 'Hardware GPU';
 
     const extCount = (p.extensions || []).length;
@@ -534,9 +584,9 @@ function renderProfiles() {
       : `<span style="color:var(--text-dim); font-size:12px;">—</span>`;
 
     return `
-      <tr data-id="${p.id}">
+      <tr data-id="${escapeHtml(p.id)}">
         <td>
-          <input type="checkbox" class="profile-row-check" value="${p.id}" ${SELECTED_PROFILE_IDS.has(p.id) ? 'checked' : ''} onchange="toggleProfileSelect('${p.id}', this.checked)">
+          <input type="checkbox" class="profile-row-check" value="${escapeHtml(p.id)}" ${SELECTED_PROFILE_IDS.has(p.id) ? 'checked' : ''} onchange="toggleProfileSelect('${escapeHtml(p.id)}', this.checked)">
         </td>
         <td>
           <span class="status-pill ${isRunning ? 'running' : 'stopped'}">
@@ -566,7 +616,7 @@ function renderProfiles() {
         </td>
         <td>
           <div class="fp-cell">
-            <span class="fp-gpu-name" title="${escapeHtml(fp.webgl?.unmasked_renderer || '')}">${escapeHtml(gpuShort)}</span>
+            <span class="fp-gpu-name" title="${escapeHtml(fp.webgl?.unmasked_renderer || 'Hardware GPU')}">${escapeHtml(gpuShort)}</span>
             <div class="fp-hw-badges">
               <span class="fp-pill">${fp.hardware?.concurrency || 8} Cores</span>
               <span class="fp-pill">${fp.hardware?.memory || 16} GB</span>
@@ -581,46 +631,46 @@ function renderProfiles() {
         <td>
           <div class="row-actions">
             ${isRunning ? `
-              <button class="btn btn-stop" onclick="stopProfile('${p.id}')">
+              <button class="btn btn-stop" onclick="stopProfile('${escapeHtml(p.id)}')">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
                 <span>Стоп</span>
               </button>
             ` : `
-              <button class="btn btn-start" onclick="startProfile('${p.id}')">
+              <button class="btn btn-start" onclick="startProfile('${escapeHtml(p.id)}')">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 <span>Старт</span>
               </button>
             `}
-            <button class="btn-icon" onclick="editProfile('${p.id}')" title="Настроить профиль">
+            <button class="btn-icon" onclick="editProfile('${escapeHtml(p.id)}')" title="Настроить профиль">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 20h9"/>
                 <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
               </svg>
             </button>
-            <button class="btn-icon" onclick="cloneProfile('${p.id}')" title="Клонировать профиль">
+            <button class="btn-icon" onclick="cloneProfile('${escapeHtml(p.id)}')" title="Клонировать профиль">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
             </button>
-            <button class="btn-icon" onclick="openProfileCookies('${p.id}')" title="Управление Cookies" style="font-size:14px;">
+            <button class="btn-icon" onclick="openProfileCookies('${escapeHtml(p.id)}')" title="Управление Cookies" style="font-size:14px;">
               🍪
             </button>
-            <button class="btn-icon" onclick="openWarmupRobot('${p.id}')" title="Cookie Robot (Прогрев)" style="color:var(--accent-amber);">
+            <button class="btn-icon" onclick="openWarmupRobot('${escapeHtml(p.id)}')" title="Cookie Robot (Прогрев)" style="color:var(--accent-amber);">
               🤖
             </button>
-            <button class="btn-icon" onclick="openQualityScorer('${p.id}')" title="🔍 Тест отпечатка" style="color:var(--accent-cyan);">
+            <button class="btn-icon" onclick="openQualityScorer('${escapeHtml(p.id)}')" title="🔍 Тест отпечатка" style="color:var(--accent-cyan);">
               🔍
             </button>
-            <button class="btn-icon" onclick="exportProfilePackage('${p.id}')" title="Экспорт в архив .hyperion">
+            <button class="btn-icon" onclick="exportProfilePackage('${escapeHtml(p.id)}')" title="Экспорт в архив .hyperion">
               📦
             </button>
-            <button class="btn-icon" onclick="openProfileFolder('${p.id}')" title="Открыть папку данных">
+            <button class="btn-icon" onclick="openProfileFolder('${escapeHtml(p.id)}')" title="Открыть папку данных">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
               </svg>
             </button>
-            <button class="btn-icon" onclick="deleteProfile('${p.id}')" title="Удалить" style="color: var(--accent-rose);">
+            <button class="btn-icon" onclick="deleteProfile('${escapeHtml(p.id)}')" title="Удалить" style="color: var(--accent-rose);">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -748,10 +798,10 @@ function renderProxies() {
         </td>
         <td>
           <div class="row-actions">
-            <button class="btn btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="testSingleProxy('${px.id}')">
+            <button class="btn btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="testSingleProxy('${escapeHtml(px.id)}')">
               Проверить
             </button>
-            <button class="btn-icon" onclick="deleteProxy('${px.id}')" title="Удалить" style="color:var(--accent-rose);">
+            <button class="btn-icon" onclick="deleteProxy('${escapeHtml(px.id)}')" title="Удалить" style="color:var(--accent-rose);">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -817,7 +867,7 @@ function renderTemplates() {
           <div style="display:flex; align-items:center; gap:6px;">
             <div class="os-badge">${getOsSvg(tpl.os)}</div>
             ${isCustom ? `
-              <button class="btn-icon" onclick="deleteCustomTemplate('${tpl.id}')" title="Удалить шаблон" style="color:var(--accent-rose);">
+              <button class="btn-icon" onclick="deleteCustomTemplate('${escapeHtml(tpl.id)}')" title="Удалить шаблон" style="color:var(--accent-rose);">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6"/>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -832,7 +882,7 @@ function renderTemplates() {
           <div class="tpl-spec-item">Разрешение: <strong>${tpl.res}</strong></div>
           ${tpl.tz ? `<div class="tpl-spec-item">Timezone: <strong>${tpl.tz}</strong></div>` : ''}
         </div>
-        <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="applyTemplateToNewProfile('${tpl.id}')">
+        <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="applyTemplateToNewProfile('${escapeHtml(tpl.id)}')">
           Создать профиль из шаблона
         </button>
       </div>
@@ -938,7 +988,7 @@ function renderExtensions() {
           </div>
           <p class="ext-desc">${escapeHtml(ext.description)}</p>
           <div class="ext-footer">
-            <button class="btn btn-secondary" style="color:var(--accent-rose); font-size:11.5px; padding:4px 10px;" onclick="deleteExtension('${ext.id}')">
+            <button class="btn btn-secondary" style="color:var(--accent-rose); font-size:11.5px; padding:4px 10px;" onclick="deleteExtension('${escapeHtml(ext.id)}')">
               Удалить
             </button>
           </div>
@@ -969,7 +1019,7 @@ function renderExtensions() {
                 ✓ Установлено
               </button>
             ` : `
-              <button class="btn btn-primary" id="btn-inst-${cat.id}" style="font-size:11.5px; padding:4px 12px;" onclick="installCatalogExtension('${cat.id}')">
+              <button class="btn btn-primary" id="btn-inst-${escapeHtml(cat.id)}" style="font-size:11.5px; padding:4px 12px;" onclick="installCatalogExtension('${escapeHtml(cat.id)}')">
                 Установить
               </button>
             `}
@@ -1447,14 +1497,14 @@ function initEventListeners() {
   });
 
   
-  // Live tag input limiter (max 10 chars per individual tag)
+  // Live tag input limiter (max TAG_MAX_LENGTH chars per individual tag)
   formTags.addEventListener('input', () => {
     const raw = formTags.value;
     const parts = raw.split(/([,\s]+)/); // preserve delimiters
     const constrained = parts.map((chunk, idx) => {
       // even indexes are tag text, odd are delimiters
       if (idx % 2 === 0) {
-        return chunk.slice(0, 10);
+        return chunk.slice(0, TAG_MAX_LENGTH);
       }
       return chunk;
     }).join('');
@@ -1465,17 +1515,17 @@ function initEventListeners() {
 
   // Save profile
   document.getElementById('btn-modal-save').addEventListener('click', async () => {
-    const name = formName.value.trim().slice(0, 30);
+    const name = formName.value.trim().slice(0, PROFILE_NAME_MAX_LENGTH);
     if (!name) {
-      alert('Введите название профиля (до 30 символов)');
+      alert(`Введите название профиля (до ${PROFILE_NAME_MAX_LENGTH} символов)`);
       return;
     }
 
     const os = document.querySelector('input[name="form-os"]:checked')?.value || 'windows';
     const tags = formTags.value.split(/[,\s]+/)
-      .map(t => t.trim().replace(/^#/, '').slice(0, 10))
+      .map(t => t.trim().replace(/^#/, '').slice(0, TAG_MAX_LENGTH))
       .filter(Boolean);
-    const notes = formNotes.value.trim().slice(0, 30);
+    const notes = formNotes.value.trim().slice(0, PROFILE_NOTES_MAX_LENGTH);
 
     let proxy = null;
     if (formProxyEnabled.checked) {
@@ -1837,11 +1887,6 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
-
-
-// ==========================================
-// BULK OPERATIONS
-// ==========================================
 window.toggleProfileSelect = (id, checked) => {
   if (checked) {
     SELECTED_PROFILE_IDS.add(id);
@@ -2198,11 +2243,14 @@ window.startWarmupSession = async () => {
   startBtn.disabled = true;
   startBtn.textContent = 'Прогрев идет...';
 
-  const unsub = window.hyperion.onWarmupProgress?.((data) => {
-    if (data && data.url) {
-      statusBox.textContent = `⏳ [${data.index}/${data.total}] Серфинг: ${data.url}...`;
-    }
-  });
+  let unsub = null;
+  if (window.hyperion.onWarmupProgress) {
+    unsub = window.hyperion.onWarmupProgress((data) => {
+      if (data && data.url) {
+        statusBox.textContent = `⏳ [${data.index}/${data.total}] Серфинг: ${data.url}...`;
+      }
+    });
+  }
 
   try {
     const res = await window.hyperion.warmupProfile(profileId, urls);
@@ -2242,6 +2290,9 @@ window.openQualityScorer = (profileId) => {
   const card = document.getElementById('scorer-summary-card');
   const hasProxy = p.proxy && p.proxy.enabled && p.proxy.host;
   const webrtcStatus = fp.webrtc_mode === 'proxy_only' ? 'Защищен (No-leak)' : (fp.webrtc_mode === 'disabled' ? 'Отключен' : 'Прямой');
+  
+  const gpuRenderer = fp.webgl?.unmasked_renderer || 'OK';
+  const gpuRendererShort = gpuRenderer.length > 50 ? gpuRenderer.slice(0, 47) + '...' : gpuRenderer;
 
   card.innerHTML = `
     <div class="score-metric">
@@ -2254,15 +2305,15 @@ window.openQualityScorer = (profileId) => {
     </div>
     <div class="score-metric">
       <span>WebGL Renderer</span>
-      <span class="score-badge pass">${escapeHtml(fp.webgl?.unmasked_renderer?.slice(0, 32) || 'OK')}</span>
+      <span class="score-badge pass" title="${escapeHtml(gpuRenderer)}">${escapeHtml(gpuRendererShort)}</span>
     </div>
     <div class="score-metric">
       <span>WebRTC IP Leak Protection</span>
-      <span class="score-badge pass">${webrtcStatus}</span>
+      <span class="score-badge pass">${escapeHtml(webrtcStatus)}</span>
     </div>
     <div class="score-metric">
       <span>Прокси и сетевая изоляция</span>
-      <span class="score-badge ${hasProxy ? 'pass' : 'warn'}">${hasProxy ? 'Активен (' + p.proxy.host + ')' : 'Прямой домашний IP'}</span>
+      <span class="score-badge ${hasProxy ? 'pass' : 'warn'}">${hasProxy ? 'Активен (' + escapeHtml(p.proxy.host) + ')' : 'Прямой домашний IP'}</span>
     </div>
     <div class="score-metric">
       <span>Canvas & Audio Шум</span>
@@ -2285,13 +2336,14 @@ window.launchVerifierTabs = async () => {
   const profileId = CURRENT_SCORER_PROFILE_ID;
   window.closeQualityScorer();
 
-  const verifierUrls = [
+  // Verifier URLs configuration
+  const VERIFIER_URLS = [
     'https://browserleaks.com/javascript',
     'https://pixelscan.net/'
   ];
 
   try {
-    const res = await window.hyperion.startProfile(profileId, verifierUrls);
+    const res = await window.hyperion.startProfile(profileId, VERIFIER_URLS);
     const p = PROFILES.find(x => x.id === profileId);
     if (p) {
       p.status = 'RUNNING';
@@ -2309,14 +2361,20 @@ window.promptAddTag = (profileId, event) => {
   if (event) event.stopPropagation();
   openPromptDialog({
     title: 'Добавить тег к профилю',
-    label: 'Название тега (до 10 символов):',
+    label: `Название тега (до ${TAG_MAX_LENGTH} символов):`,
     placeholder: 'Например: Crypto, KYC, Warmup...',
-    maxLength: 10,
+    maxLength: TAG_MAX_LENGTH,
     onConfirm: async (cleanTag) => {
       const p = PROFILES.find(x => x.id === profileId);
       if (!p) return;
-      const tagClean = cleanTag.replace(/^#/, '').trim().slice(0, 10);
-      if (!tagClean) return;
+      const tagRaw = cleanTag.replace(/^#/, '').trim();
+      if (!tagRaw) return;
+      const tagClean = tagRaw.slice(0, TAG_MAX_LENGTH);
+
+      if (tagRaw.length > TAG_MAX_LENGTH) {
+        showToast(`Тег обрезан до ${TAG_MAX_LENGTH} символов: "${tagClean}"`, 'warning');
+      }
+      
       const currentTags = Array.isArray(p.tags) ? [...p.tags] : [];
       if (!currentTags.includes(tagClean)) {
         currentTags.push(tagClean);

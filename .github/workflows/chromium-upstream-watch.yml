@@ -12,6 +12,9 @@ jobs:
     permissions:
       contents: write
       actions: write
+    outputs:
+      new_version_found: ${{ steps.check_version.outputs.new_version_found }}
+      upstream_version:  ${{ steps.check_version.outputs.upstream_version }}
 
     steps:
       - name: Checkout Repository
@@ -24,7 +27,7 @@ jobs:
         run: |
           # Check latest Clean Chromium release
           UNGOOGLED_VER=$(curl -s "https://api.github.com/repos/ungoogled-software/ungoogled-chromium-portablelinux/releases/latest" | jq -r '.tag_name // empty')
-          
+
           # Fallback to ChromiumDash stable if API rate-limited
           if [ -z "$UNGOOGLED_VER" ] || [ "$UNGOOGLED_VER" = "null" ]; then
             UNGOOGLED_VER=$(curl -s "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux" | jq -r '.[0].version // empty')
@@ -37,10 +40,10 @@ jobs:
           fi
           echo "Current Tracked Version: $CURRENT_VER"
           echo "upstream_version=$UNGOOGLED_VER" >> $GITHUB_OUTPUT
-          echo "current_version=$CURRENT_VER" >> $GITHUB_OUTPUT
-          
+          echo "current_version=$CURRENT_VER"    >> $GITHUB_OUTPUT
+
           if [ -n "$UNGOOGLED_VER" ] && [ "$UNGOOGLED_VER" != "null" ] && [ "$UNGOOGLED_VER" != "$CURRENT_VER" ]; then
-            echo "new_version_found=true" >> $GITHUB_OUTPUT
+            echo "new_version_found=true"  >> $GITHUB_OUTPUT
           else
             echo "new_version_found=false" >> $GITHUB_OUTPUT
           fi
@@ -60,8 +63,8 @@ jobs:
           echo "Bumping Hyperion to v$NEW_APP_VER with Clean Chromium $NEW_CHROMIUM_VER"
 
           # Update version display in index.html
-          sed -i "s/Hyperion v[0-9.]\+/Hyperion v$NEW_APP_VER/g" index.html
-          sed -i "s/settings-app-version\">v[0-9.]\+/settings-app-version\">v$NEW_APP_VER/g" index.html
+          sed -i "s/Hyperion v[0-9.]\\+/Hyperion v$NEW_APP_VER/g" index.html
+          sed -i "s/settings-app-version\">v[0-9.]\\+/settings-app-version\">v$NEW_APP_VER/g" index.html
 
           git add CHROMIUM_VERSION package.json package-lock.json index.html
           git commit -m "chore(release): bump Hyperion to v$NEW_APP_VER (Chromium core $NEW_CHROMIUM_VER)"

@@ -757,10 +757,19 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
   if (!GPU_PROFILES[osName]) osName = "windows";
 
   const seedStr = profileId || crypto.randomUUID();
-  const seedNum = parseInt(crypto.createHash('sha256').update(seedStr).digest('hex').slice(0, 8), 16);
+  // Use independent slices of SHA256 to avoid parameter correlation
+  const fullHash = crypto.createHash('sha256').update(seedStr).digest('hex');
+  const s0 = parseInt(fullHash.slice(0,  8), 16);  // gpu
+  const s1 = parseInt(fullHash.slice(8,  16), 16); // resolution / mobile res
+  const s2 = parseInt(fullHash.slice(16, 24), 16); // cores
+  const s3 = parseInt(fullHash.slice(24, 32), 16); // ram
+  const s4 = parseInt(fullHash.slice(32, 40), 16); // ua selection
+  const s5 = parseInt(fullHash.slice(40, 48), 16); // canvas seed
+  const s6 = parseInt(fullHash.slice(48, 56), 16); // audio seed
+  const s7 = parseInt(fullHash.slice(56, 64), 16); // misc (model, etc.)
 
   const gpus = GPU_PROFILES[osName];
-  const gpu = gpus[(seedNum >>> 0) % gpus.length];
+  const gpu = gpus[(s0 >>> 0) % gpus.length];
 
   let res;
   let cores;
@@ -776,22 +785,22 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
       { width: 360, height: 800, ratio: 2.0 },
       { width: 384, height: 854, ratio: 2.8125 }
     ];
-    const rObj = mobileRes[(seedNum >>> 0) % mobileRes.length];
+    const rObj = mobileRes[(s1 >>> 0) % mobileRes.length];
     res = { width: rObj.width, height: rObj.height };
     pixelRatio = rObj.ratio;
 
-    cores = [8, 8, 8, 8, 6][(seedNum >>> 0) % 5];
-    ram = [8, 12, 12, 16, 8][(seedNum >>> 2) % 5];
+    cores = [8, 8, 8, 8, 6][(s2 >>> 0) % 5];
+    ram   = [8, 12, 12, 16, 8][(s3 >>> 0) % 5];
 
-    platform = "Linux armv8l";
+    platform  = "Linux armv8l";
     chPlatform = "Android";
     chVersion = "14.0.0";
-    chArch = "arm";
+    chArch    = "arm";
     chBitness = "64";
-    isMobile = true;
+    isMobile  = true;
 
     if (gpu.id.includes("750")) {
-      chModel = ((seedNum >>> 0) % 2 === 0) ? "SM-S928B" : "23116PN5BC";
+      chModel = ((s7 >>> 0) % 2 === 0) ? "SM-S928B" : "23116PN5BC";
     } else if (gpu.id.includes("740")) {
       chModel = "SM-S918B";
     } else if (gpu.id.includes("mali_g715")) {
@@ -809,72 +818,88 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
       res = { width: 1024, height: 1366 };
       pixelRatio = 2.0;
       cores = 8;
-      ram = [8, 16][(seedNum >>> 0) % 2];
+      ram = [8, 16][(s3 >>> 0) % 2];
       platform = "iPad";
-      chModel = "iPad";
+      chModel  = "iPad";
     } else {
       const iosRes = [
         { width: 430, height: 932, ratio: 3.0 },
         { width: 393, height: 852, ratio: 3.0 },
         { width: 390, height: 844, ratio: 3.0 }
       ];
-      const rObj = iosRes[(seedNum >>> 0) % iosRes.length];
+      const rObj = iosRes[(s1 >>> 0) % iosRes.length];
       res = { width: rObj.width, height: rObj.height };
       pixelRatio = rObj.ratio;
       cores = 6;
-      ram = [6, 8][(seedNum >>> 0) % 2];
+      ram   = [6, 8][(s3 >>> 0) % 2];
       platform = "iPhone";
-      chModel = "iPhone";
+      chModel  = "iPhone";
     }
 
     chPlatform = "iOS";
-    chVersion = "17.5.0";
-    chArch = "arm";
-    chBitness = "64";
-    isMobile = true;
+    chVersion  = "17.5.0";
+    chArch     = "arm";
+    chBitness  = "64";
+    isMobile   = true;
   } else {
     // Desktop (windows, macos, linux)
-    res = RESOLUTIONS[(seedNum >>> 0) % RESOLUTIONS.length];
+    res = RESOLUTIONS[(s1 >>> 0) % RESOLUTIONS.length];
     const coresOptions = [4, 6, 8, 12, 16];
-    const ramOptions = [8, 16, 32, 64];
-    cores = coresOptions[(seedNum >>> 2) % coresOptions.length];
-    ram = ramOptions[(seedNum >>> 4) % ramOptions.length];
+    const ramOptions   = [8, 16, 32, 64];
+    cores    = coresOptions[(s2 >>> 0) % coresOptions.length];
+    ram      = ramOptions[(s3 >>> 0) % ramOptions.length];
     isMobile = false;
-    chModel = "";
-    chArch = "x86";
+    chModel  = "";
+    chArch   = "x86";
     chBitness = "64";
 
     if (osName === "windows") {
-      platform = "Win32";
+      platform   = "Win32";
       chPlatform = "Windows";
-      chVersion = "15.0.0";
+      chVersion  = "15.0.0";
       pixelRatio = 1.0;
     } else if (osName === "macos") {
-      platform = "MacIntel";
+      platform   = "MacIntel";
       chPlatform = "macOS";
-      chVersion = "14.5.0";
+      chVersion  = "14.5.0";
       pixelRatio = 2.0;
     } else {
-      platform = "Linux x86_64";
+      platform   = "Linux x86_64";
       chPlatform = "Linux";
-      chVersion = "6.8.0";
+      chVersion  = "6.8.0";
       pixelRatio = 1.0;
     }
   }
 
   const uas = UA_PRESETS[osName] || UA_PRESETS.windows;
-  let ua = uas[(seedNum >>> 0) % uas.length];
+  let ua = uas[(s4 >>> 0) % uas.length];
   if (osName === "android" && chModel) {
     ua = `Mozilla/5.0 (Linux; Android 14; ${chModel}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36`;
   }
 
-  const canvasSeed = ((seedNum >>> 0) % 10000) / 100000.0;
-  const audioSeed = ((seedNum >>> 3) % 10000) / 1000000.0;
+  // Independent canvas and audio seeds — no correlation with GPU or resolution
+  const canvasSeed = ((s5 >>> 0) % 100000) / 10000000.0; // range: ~0.000001 – 0.009999
+  const audioSeed  = ((s6 >>> 0) % 100000) / 100000000.0; // range: ~0.000000 – 0.000999
+
+  // avail_height is in logical (CSS) pixels — OS already handles DPI scaling,
+  // so pixelRatio must NOT be applied here.
+  let availHeightOffset;
+  if (isMobile) {
+    availHeightOffset = 0;
+  } else if (osName === "macos") {
+    availHeightOffset = 93; // menubar ~25px + dock ~68px (logical px)
+  } else {
+    availHeightOffset = 40; // taskbar on Windows/Linux (logical px, DPI-independent)
+  }
+
+  // Extract major Chrome version from UA for consistent Client Hints brands
+  const uaMajorMatch = ua.match(/Chrome\/(\d+)/);
+  const uaMajorVersion = uaMajorMatch ? uaMajorMatch[1] : browserVersion;
 
   const fp = {
     profile_id: seedStr,
     os: osName,
-    browser_version: browserVersion,
+    browser_version: uaMajorVersion,
     user_agent: ua,
     platform: platform,
     client_hints: {
@@ -885,38 +910,37 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
       model: chModel,
       mobile: isMobile,
       brands: [
-        { brand: "Chromium", version: browserVersion },
-        { brand: "Google Chrome", version: browserVersion },
-        { brand: "Not-A.Brand", version: "24" }
+        { brand: "Chromium",      version: uaMajorVersion },
+        { brand: "Google Chrome", version: uaMajorVersion },
+        { brand: "Not-A.Brand",   version: "24" }
       ]
     },
     screen: {
-      width: res.width,
-      height: res.height,
-      avail_width: res.width,
-      avail_height: isMobile ? res.height : (res.height - 40),
-      color_depth: 24,
-      pixel_ratio: pixelRatio
+      width:        res.width,
+      height:       res.height,
+      avail_width:  res.width,
+      avail_height: res.height - availHeightOffset,
+      color_depth:  24,
+      pixel_ratio:  pixelRatio
     },
     hardware: {
       concurrency: cores,
-      memory: ram
+      memory:      ram
     },
     webgl: {
-      unmasked_vendor: gpu.vendor,
+      unmasked_vendor:   gpu.vendor,
       unmasked_renderer: gpu.renderer,
-      vendor: gpu.gl_vendor,
-      renderer: gpu.gl_renderer
+      vendor:            gpu.gl_vendor,
+      renderer:          gpu.gl_renderer
     },
     canvas_noise: true,
-    canvas_seed: canvasSeed,
-    audio_noise: true,
-    audio_seed: audioSeed,
-    webrtc_mode: "proxy_only",
-    timezone: "auto",
-    locale: "ru-RU",
-    do_not_track: "1",
-    start_url: "https://google.com"
+    canvas_seed:  canvasSeed,
+    audio_noise:  true,
+    audio_seed:   audioSeed,
+    webrtc_mode:  "proxy_only",
+    timezone:     "auto",
+    locale:       "ru-RU",
+    start_url:    "https://google.com"
   };
 
   // Apply manual overrides

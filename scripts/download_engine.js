@@ -110,42 +110,72 @@ function findBinaryDir(dir, binName) {
 
 async function getDownloadUrl(platform) {
   const isWin = platform.startsWith('win');
+  const HYPERION_REPO = 'Linchevatel/hyperion-browser';
+
+  // ── 1. Try patched Hyperion Chromium binary first ──────────────────────
+  // These are published by build-patched-chromium.yml with tag chromium-core-*
+  try {
+    const releases = await fetchJson(
+      `https://api.github.com/repos/${HYPERION_REPO}/releases?per_page=20`
+    );
+    if (releases && Array.isArray(releases)) {
+      // Find the latest release tagged chromium-core-*
+      const coreRelease = releases.find(r =>
+        r.tag_name && r.tag_name.startsWith('chromium-core-') && !r.draft
+      );
+      if (coreRelease && coreRelease.assets) {
+        const suffix = isWin ? 'windows-x64.zip' : 'linux-x64.tar.xz';
+        const asset = coreRelease.assets.find(a => a.name && a.name.endsWith(suffix));
+        if (asset) {
+          console.log(`[Hyperion] Using patched Chromium binary: ${asset.name} (${coreRelease.tag_name})`);
+          return {
+            url:   asset.browser_download_url,
+            isTar: !isWin,
+            ext:   isWin ? '.zip' : '.tar.xz',
+            patched: true
+          };
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[Hyperion] Could not fetch patched binary release:', e.message);
+  }
+
+  // ── 2. Fallback: ungoogled-chromium (NO fingerprint patch!) ────────────
+  console.warn('[Hyperion] WARNING: Using unpatched ungoogled-chromium fallback!');
+  console.warn('[Hyperion] Fingerprint spoofing will NOT work correctly.');
+
   if (isWin) {
-    // Try GitHub API for Windows x64 Ungoogled Chromium
     try {
       const data = await fetchJson('https://api.github.com/repos/ungoogled-software/ungoogled-chromium-windows/releases/latest');
       if (data && data.assets) {
         const asset = data.assets.find(a => a.name && a.name.endsWith('windows_x64.zip'));
-        if (asset) return { url: asset.browser_download_url, isTar: false, ext: '.zip' };
+        if (asset) return { url: asset.browser_download_url, isTar: false, ext: '.zip', patched: false };
       }
     } catch (e) {}
-    // Reliable static fallback
     return {
       url: 'https://github.com/ungoogled-software/ungoogled-chromium-windows/releases/download/152.0.7977.82-1.1/ungoogled-chromium_152.0.7977.82-1.1_windows_x64.zip',
-      isTar: false,
-      ext: '.zip'
+      isTar: false, ext: '.zip', patched: false
     };
   } else {
-    // Linux x64
     try {
       const data = await fetchJson('https://api.github.com/repos/ungoogled-software/ungoogled-chromium-portablelinux/releases/latest');
       if (data && data.assets) {
         const asset = data.assets.find(a => a.name && a.name.endsWith('x86_64_linux.tar.xz'));
-        if (asset) return { url: asset.browser_download_url, isTar: true, ext: '.tar.xz' };
+        if (asset) return { url: asset.browser_download_url, isTar: true, ext: '.tar.xz', patched: false };
       }
     } catch (e) {}
-    // Reliable static fallback
     return {
       url: 'https://github.com/ungoogled-software/ungoogled-chromium-portablelinux/releases/download/152.0.7977.82-1/ungoogled-chromium-152.0.7977.82-1-x86_64_linux.tar.xz',
-      isTar: true,
-      ext: '.tar.xz'
+      isTar: true, ext: '.tar.xz', patched: false
     };
   }
 }
 
 async function main() {
-  const { url, isTar, ext } = await getDownloadUrl(targetPlatform);
-  console.log(`Source Clean Chromium: ${url}`);
+  const { url, isTar, ext, patched } = await getDownloadUrl(targetPlatform);
+  console.log(`Source Chromium: ${url}`);
+  console.log(`Patched binary:  ${patched ? '✓ YES — fingerprint spoofing active' : '✗ NO  — fallback to ungoogled (no fingerprint patch)'}`);
 
   const rootDir = path.resolve(__dirname, '..');
   const bundleDir = path.join(rootDir, 'bundle', 'chrome');

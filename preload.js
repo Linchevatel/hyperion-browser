@@ -82,7 +82,9 @@ const api = {
 
   // Events
   onProfileStopped: (cb) => {
-    ipcRenderer.on('profile-stopped', (event, id) => cb(id));
+    const handler = (event, id) => cb(id);
+    ipcRenderer.on('profile-stopped', handler);
+    return () => ipcRenderer.removeListener('profile-stopped', handler);
   }
 };
 
