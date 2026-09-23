@@ -68,10 +68,12 @@ jobs:
 
       - name: Configure GN Build
         run: |
+          export PATH="/opt/depot_tools:$PATH"
           CHROMIUM_SRC="${CHROMIUM_BUILD_DIR:-/build/chromium}/src"
-          OUT_DIR="$CHROMIUM_SRC/out/HyperionRelease"
-          mkdir -p "$OUT_DIR"
-          cat > "$OUT_DIR/args.gn" << 'EOF'
+          OUT_DIR="$CHROMIUM_SRC/out/Release"
+          if [ ! -f "$OUT_DIR/args.gn" ]; then
+            mkdir -p "$OUT_DIR"
+            cat > "$OUT_DIR/args.gn" << 'EOF'
           is_official_build = true
           is_debug = false
           symbol_level = 0
@@ -89,23 +91,26 @@ jobs:
           google_default_client_id = ""
           google_default_client_secret = ""
           EOF
-          cd "$CHROMIUM_SRC"
-          gn gen "$OUT_DIR"
+            cd "$CHROMIUM_SRC"
+            gn gen "$OUT_DIR"
+          fi
 
       - name: Compile Chromium
         run: |
-          OUT_DIR="${CHROMIUM_BUILD_DIR:-/build/chromium}/src/out/HyperionRelease"
-          autoninja -C "$OUT_DIR" chrome chrome_sandbox
+          export PATH="/opt/depot_tools:$PATH"
+          OUT_DIR="${CHROMIUM_BUILD_DIR:-/build/chromium}/src/out/Release"
+          cd "${CHROMIUM_BUILD_DIR:-/build/chromium}/src"
+          autoninja -C "$OUT_DIR" chrome
 
       # ── Copy compiled binary into Electron bundle dir ──────────────────
       - name: Bundle Patched Chromium into Hyperion
         run: |
-          OUT_DIR="${CHROMIUM_BUILD_DIR:-/build/chromium}/src/out/HyperionRelease"
+          OUT_DIR="${CHROMIUM_BUILD_DIR:-/build/chromium}/src/out/Release"
           BUNDLE_DIR="${GITHUB_WORKSPACE}/bundle/chrome"
           mkdir -p "$BUNDLE_DIR"
 
           COPY_FILES=(
-            chrome chrome_sandbox
+            chrome
             chrome_100_percent.pak chrome_200_percent.pak resources.pak
             icudtl.dat v8_context_snapshot.bin
             libEGL.so libGLESv2.so libvk_swiftshader.so libvulkan.so.1
@@ -123,9 +128,11 @@ jobs:
       # ── Build Hyperion installer packages ─────────────────────────────
       - name: Install System Packaging Tools
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y rpm ruby ruby-dev rubygems libarchive-tools
-          sudo gem install --no-document fpm
+          which rpm && which fpm || {
+            sudo apt-get update -qq
+            sudo apt-get install -y rpm ruby ruby-dev rubygems libarchive-tools
+            sudo gem install --no-document fpm
+          }
 
       - name: Build Linux Installers (.AppImage, .deb, .rpm)
         env:
@@ -142,11 +149,11 @@ jobs:
             dist/*.deb
             dist/*.rpm
 
-  # ── Windows: compile patched Chromium + package Hyperion ───────────────
+  # ── Windows: package Hyperion (.exe NSIS & Portable) ───────────────────
   build-windows:
     name: Build Hyperion Windows (.exe)
-    runs-on: [self-hosted, windows, chromium-builder]
-    timeout-minutes: 600
+    runs-on: windows-latest
+    timeout-minutes: 60
 
     steps:
       - name: Checkout Repository
@@ -161,62 +168,8 @@ jobs:
       - name: Install NPM Dependencies
         run: npm install
 
-      - name: Resolve Chromium Version
-        id: chromium_ver
-        shell: bash
-        run: |
-          VER=$(cat CHROMIUM_VERSION | tr -d '[:space:]')
-          SRC_VER="${VER%%-*}"
-          echo "full=$VER"    >> $GITHUB_OUTPUT
-          echo "src=$SRC_VER" >> $GITHUB_OUTPUT
-
-      - name: Sync Chromium Source
-        shell: cmd
-        run: |
-          set CHROMIUM_SRC=%CHROMIUM_BUILD_DIR%\src
-          cd /d %CHROMIUM_BUILD_DIR%
-          if not exist "%CHROMIUM_SRC%\DEPS" fetch --nohooks chromium
-          cd /d %CHROMIUM_SRC%
-          gclient sync --with_branch_heads --reset --force --delete_unversioned_trees
-          gclient runhooks
-
-      - name: Apply Hyperion Fingerprint Patch
-        shell: bash
-        run: |
-          cd "${CHROMIUM_BUILD_DIR}/src"
-          git checkout -- .
-          git apply "${GITHUB_WORKSPACE}/patches/hyperion_core_fingerprint.patch"
-
-      - name: Configure and Compile
-        shell: cmd
-        run: |
-          set OUT=%CHROMIUM_BUILD_DIR%\src\out\HyperionRelease
-          mkdir %OUT%
-          (
-            echo is_official_build=true
-            echo is_debug=false
-            echo symbol_level=0
-            echo enable_nacl=false
-            echo is_chrome_branded=false
-            echo safe_browsing_mode=0
-            echo enable_reporting=false
-          ) > %OUT%\args.gn
-          cd /d %CHROMIUM_BUILD_DIR%\src
-          gn gen %OUT%
-          autoninja -C %OUT% chrome
-
-      - name: Bundle Patched Chromium into Hyperion
-        shell: bash
-        run: |
-          OUT="${CHROMIUM_BUILD_DIR}/src/out/HyperionRelease"
-          BUNDLE="${GITHUB_WORKSPACE}/bundle/chrome"
-          mkdir -p "$BUNDLE"
-          cp "$OUT/chrome.exe"              "$BUNDLE/"
-          cp "$OUT/"*.pak                   "$BUNDLE/"
-          cp "$OUT/icudtl.dat"              "$BUNDLE/"
-          cp "$OUT/v8_context_snapshot.bin" "$BUNDLE/"
-          cp -r "$OUT/locales"              "$BUNDLE/"
-          echo "Bundled Windows Chromium → $BUNDLE"
+      - name: Download Bundled Chromium Core (Windows)
+        run: node scripts/download_engine.js --platform=win64
 
       - name: Build Windows Installers (.exe)
         env:
