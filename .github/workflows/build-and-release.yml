@@ -15,8 +15,11 @@ jobs:
   # ── Linux: compile patched Chromium + package Hyperion ─────────────────
   build-linux:
     name: Build Hyperion Linux (.AppImage, .deb, .rpm)
-    runs-on: [self-hosted, linux, chromium-builder]
+    runs-on: [self-hosted, Linux, chromium-builder]
     timeout-minutes: 600
+    env:
+      PATH: /opt/depot_tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      CHROMIUM_BUILD_DIR: /build/chromium
 
     steps:
       - name: Checkout Repository
@@ -49,16 +52,25 @@ jobs:
             fetch --nohooks chromium
           fi
           cd "$CHROMIUM_SRC"
-          gclient sync --with_branch_heads --reset --force \
-            --delete_unversioned_trees -r "src@${{ steps.chromium_ver.outputs.src }}"
-          gclient runhooks
+          LOCAL_MAJ=$(grep 'MAJOR=' chrome/VERSION 2>/dev/null | cut -d'=' -f2 || true)
+          TARGET_MAJ="${{ steps.chromium_ver.outputs.src }}"
+          TARGET_MAJ="${TARGET_MAJ%%.*}"
+          echo "Local Chromium major: $LOCAL_MAJ, Target major: $TARGET_MAJ"
+          if [ -n "$TARGET_MAJ" ] && [ "$LOCAL_MAJ" != "$TARGET_MAJ" ]; then
+            gclient sync --with_branch_heads --reset --force \
+              --delete_unversioned_trees -r "src@${{ steps.chromium_ver.outputs.src }}"
+            gclient runhooks
+          else
+            echo "Chromium source is already at target version ($LOCAL_MAJ)"
+          fi
 
       - name: Apply Hyperion Fingerprint Patch
         run: |
           CHROMIUM_SRC="${CHROMIUM_BUILD_DIR:-/build/chromium}/src"
           PATCH_FILE="${GITHUB_WORKSPACE}/patches/hyperion_core_fingerprint.patch"
           cd "$CHROMIUM_SRC"
-          git checkout -- .
+          # Reset any existing modifications before applying
+          git checkout -- . 2>/dev/null || true
           if ! git apply --check "$PATCH_FILE" 2>/dev/null; then
             echo "::error::Patch does not apply cleanly to Chromium ${{ steps.chromium_ver.outputs.src }}"
             exit 1
