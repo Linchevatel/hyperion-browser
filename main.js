@@ -38,10 +38,10 @@ function getPythonScriptPath(scriptName) {
 function getPythonCommand() {
   const isWin = process.platform === 'win32';
   if (isWin) {
-    const { execSync } = require('child_process');
+    const { execFileSync } = require('child_process');
     for (const cmd of ['python', 'py', 'python3']) {
       try {
-        execSync(`${cmd} --version`, { stdio: 'ignore' });
+        execFileSync(cmd, ['--version'], { stdio: 'ignore' });
         return cmd;
       } catch (e) {}
     }
@@ -392,7 +392,7 @@ ipcMain.handle('create-profile', async (event, data) => {
   const fp = data.fingerprint || generateFingerprint(data.os || 'windows', id, '155');
 
   const rawName = (data.name || `Профиль #${profiles.length + 1}`).trim().slice(0, 30);
-  const rawNotes = (data.notes || '').trim().slice(0, 30);
+  const rawNotes = (data.notes || '').trim().slice(0, 1000);
   const rawTags = (Array.isArray(data.tags) ? data.tags : ['Main'])
     .map(t => String(t).trim().replace(/^#/, '').slice(0, 10))
     .filter(Boolean);
@@ -423,7 +423,7 @@ ipcMain.handle('update-profile', async (event, id, data) => {
   if (idx !== -1) {
     const sanitized = { ...data };
     if (sanitized.name) sanitized.name = String(sanitized.name).trim().slice(0, 30);
-    if (sanitized.notes !== undefined) sanitized.notes = String(sanitized.notes).trim().slice(0, 30);
+    if (sanitized.notes !== undefined) sanitized.notes = String(sanitized.notes).trim().slice(0, 1000);
     if (Array.isArray(sanitized.tags)) {
       sanitized.tags = sanitized.tags.map(t => String(t).trim().replace(/^#/, '').slice(0, 10)).filter(Boolean);
     }
@@ -459,8 +459,8 @@ async function fullyTerminateAndPurgeProfile(id) {
 
   // Ensure no lingering background chrome processes for this profile
   try {
-    const { execSync } = require('child_process');
-    execSync(`pkill -9 -f "profile_${id}" 2>/dev/null || true`);
+    const { execFileSync } = require('child_process');
+    execFileSync('pkill', ['-9', '-f', `profile_${id}`], { stdio: 'ignore' });
   } catch (e) {}
 
   // Micro delay for OS file locks release
@@ -473,8 +473,8 @@ async function fullyTerminateAndPurgeProfile(id) {
       fs.rmSync(profileDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     } catch (e) {
       try {
-        const { execSync } = require('child_process');
-        execSync(`rm -rf "${profileDir}" 2>/dev/null || true`);
+        const { execFileSync } = require('child_process');
+        execFileSync('rm', ['-rf', profileDir], { stdio: 'ignore' });
       } catch (e2) {}
     }
   }
@@ -1067,8 +1067,8 @@ async function stopProfileProcess(id) {
     START_TIMES.delete(id);
   }
   try {
-    const { execSync } = require('child_process');
-    execSync(`pkill -9 -f "profile_${id}" 2>/dev/null || true`);
+    const { execFileSync } = require('child_process');
+    execFileSync('pkill', ['-9', '-f', `profile_${id}`], { stdio: 'ignore' });
   } catch (e) {}
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('profile-stopped', id);

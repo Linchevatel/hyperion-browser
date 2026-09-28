@@ -238,8 +238,8 @@
                 <th style="min-width: 60px;">Теги</th>
                 <th style="min-width: 110px;">Прокси</th>
                 <th style="min-width: 150px;">Цифровой отпечаток</th>
-                <th style="width: 70px;">Плагины</th>
-                <th style="width: 260px; min-width: 250px; text-align: right;">Действия</th>
+                <th style="width: 100px; min-width: 90px;">Плагины</th>
+                <th style="width: 190px; min-width: 180px; text-align: right;">Действия</th>
               </tr>
             </thead>
             <tbody id="profiles-tbody">
@@ -582,6 +582,64 @@
 
           <!-- TAB 1: GENERAL -->
           <div class="tab-pane active" id="pane-general">
+            <!-- QUICK PRESETS STRIP -->
+            <div class="quick-presets-section">
+              <div class="quick-presets-label">
+                <span>Аппаратные профили (Quick Setup)</span>
+                <span class="quick-presets-hint">Быстрая конфигурация отпечатка в 1 клик</span>
+              </div>
+              <div class="quick-presets-grid">
+                <button type="button" class="preset-card" data-preset="gaming" onclick="applyQuickPreset('gaming')">
+                  <div class="preset-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="3" width="20" height="14" rx="2"/>
+                      <line x1="8" y1="21" x2="16" y2="21"/>
+                      <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                  </div>
+                  <div class="preset-info">
+                    <div class="preset-title">Windows 11 High-End</div>
+                    <div class="preset-spec">RTX 4080 • 16C • 32GB • 2K</div>
+                  </div>
+                </button>
+                <button type="button" class="preset-card" data-preset="office" onclick="applyQuickPreset('office')">
+                  <div class="preset-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="12" rx="2"/>
+                      <line x1="2" y1="20" x2="22" y2="20"/>
+                    </svg>
+                  </div>
+                  <div class="preset-info">
+                    <div class="preset-title">Windows 10 Standard</div>
+                    <div class="preset-spec">Iris Xe • 8C • 16GB • FHD</div>
+                  </div>
+                </button>
+                <button type="button" class="preset-card" data-preset="macbook" onclick="applyQuickPreset('macbook')">
+                  <div class="preset-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.1.65-2.76 1.42-.58.67-1.08 1.74-1.02 2.81 1.06.08 2.15-.58 2.77-1.36z"/>
+                    </svg>
+                  </div>
+                  <div class="preset-info">
+                    <div class="preset-title">macOS Sonoma (M3)</div>
+                    <div class="preset-spec">Apple M3 Max • 12C • 32GB</div>
+                  </div>
+                </button>
+                <button type="button" class="preset-card" data-preset="mobile" onclick="applyQuickPreset('mobile')">
+                  <div class="preset-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="5" y="2" width="14" height="20" rx="3"/>
+                      <line x1="12" y1="18" x2="12.01" y2="18"/>
+                    </svg>
+                  </div>
+                  <div class="preset-info">
+                    <div class="preset-title">Android 14 (Mobile)</div>
+                    <div class="preset-spec">Adreno 750 • 8C • 12GB</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             <div class="form-group">
               <label for="form-name">Название профиля <span class="req">*</span></label>
               <input type="text" id="form-name" required maxlength="30" placeholder="Например: FB Ads #1, Crypto farming...">
@@ -663,7 +721,7 @@
 
             <div class="form-group">
               <label for="form-notes">Заметки к профилю</label>
-              <textarea id="form-notes" rows="2" maxlength="30" placeholder="Логины, назначения или заметки..."></textarea>
+              <textarea id="form-notes" rows="2" maxlength="1000" placeholder="Логины, назначения или заметки..."></textarea>
             </div>
           </div>
 
@@ -1197,6 +1255,141 @@ https://www.reddit.com</textarea>
       </div>
     </div>
   </div>
+
+  <!-- PROFILE QUICK INSPECTOR DRAWER -->
+  <div class="drawer-backdrop" id="inspector-backdrop" onclick="closeProfileInspector()"></div>
+  <aside class="inspector-drawer" id="profile-inspector-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <div class="drawer-os-icon" id="inspector-os-icon"></div>
+        <div>
+          <h3 id="inspector-name" class="drawer-profile-name">Имя профиля</h3>
+          <div class="drawer-status-line">
+            <span id="inspector-status-pill" class="status-pill stopped">
+              <span class="status-dot-mini"></span>
+              <span id="inspector-status-text">OFF</span>
+            </span>
+            <span id="inspector-uptime" class="drawer-uptime"></span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="drawer-close-btn" onclick="closeProfileInspector()" title="Закрыть">&times;</button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- QUICK ACTIONS -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">Действия с профилем</div>
+        <button type="button" class="btn btn-start btn-drawer-main" id="inspector-btn-start" onclick="inspectorToggleRun()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span id="inspector-btn-start-label">Запустить профиль</span>
+        </button>
+        <div class="drawer-actions-grid">
+          <button type="button" class="btn btn-secondary" onclick="inspectorEditProfile()" title="Настройки профиля и отпечатка">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>Настройки</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="inspectorOpenCookies()" title="Импорт, экспорт и просмотр cookies">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
+              <circle cx="15" cy="8" r="1" fill="currentColor"/>
+              <circle cx="10" cy="15" r="1" fill="currentColor"/>
+              <circle cx="16" cy="14" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>Cookies</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="inspectorOpenWarmupRobot()" title="Cookie Robot - автопрогрев сайтов">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="10" rx="2"/>
+              <circle cx="12" cy="5" r="2"/>
+              <path d="M12 7v4"/>
+              <line x1="8" y1="16" x2="8.01" y2="16"/>
+              <line x1="16" y1="16" x2="16.01" y2="16"/>
+            </svg>
+            <span>Прогрев (Robot)</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="inspectorCloneProfile()" title="Клонировать профиль">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Клонировать</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="inspectorExportProfile()" title="Экспортировать архив (.hyperion)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span>Экспорт</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="inspectorOpenFolder()" title="Открыть папку данных профиля">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Папка данных</span>
+          </button>
+        </div>
+        <div style="margin-top: 10px;">
+          <button type="button" class="btn btn-danger-outline" onclick="inspectorDeleteProfile()" title="Удалить профиль">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Удалить профиль</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- HARDWARE & FINGERPRINT SPECS -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">Аппаратный отпечаток</div>
+        <div class="drawer-spec-card">
+          <div class="drawer-spec-row">
+            <span class="drawer-spec-label">GPU</span>
+            <span class="drawer-spec-value" id="inspector-gpu" title="">—</span>
+          </div>
+          <div class="drawer-spec-row">
+            <span class="drawer-spec-label">CPU / RAM</span>
+            <span class="drawer-spec-value" id="inspector-cpu-ram">—</span>
+          </div>
+          <div class="drawer-spec-row">
+            <span class="drawer-spec-label">Экран</span>
+            <span class="drawer-spec-value" id="inspector-screen">—</span>
+          </div>
+          <div class="drawer-spec-row">
+            <span class="drawer-spec-label">Плагины</span>
+            <span class="drawer-spec-value" id="inspector-extensions">—</span>
+          </div>
+          <div class="drawer-spec-row">
+            <span class="drawer-spec-label">Защита</span>
+            <span class="drawer-spec-value" id="inspector-protection">Canvas, Audio, WebGL</span>
+          </div>
+          <div class="drawer-spec-row">
+            <span class="drawer-spec-label">User-Agent</span>
+            <span class="drawer-spec-value drawer-ua-mono" id="inspector-ua">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROXY & NETWORK SPECS -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">Сеть и Прокси</div>
+        <div class="drawer-spec-card">
+          <div class="drawer-proxy-header">
+            <div id="inspector-proxy-status">—</div>
+            <button type="button" class="btn btn-secondary btn-mini" id="inspector-btn-ping" onclick="inspectorPingProxy()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <span>Ping</span>
+            </button>
+          </div>
+          <div id="inspector-proxy-details" class="drawer-proxy-details"></div>
+        </div>
+      </div>
+
+      <!-- LIVE SCRATCHPAD & NOTES (AUTO-SAVE) -->
+      <div class="drawer-section">
+        <div class="drawer-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Быстрые заметки</span>
+          <span id="inspector-notes-status" class="drawer-saved-status">Автосохранение</span>
+        </div>
+        <textarea id="inspector-notes-input" class="drawer-notes-area" rows="4" maxlength="1000" placeholder="Заметки, логины, пароли, 2FA..."></textarea>
+      </div>
+    </div>
+  </aside>
 
   <!-- ================= TOAST CONTAINER ================= -->
   <div id="toast-container" class="toast-container"></div>

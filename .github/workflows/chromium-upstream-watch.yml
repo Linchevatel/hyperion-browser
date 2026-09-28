@@ -28,9 +28,18 @@ jobs:
           # Check latest Clean Chromium release
           UNGOOGLED_VER=$(curl -s "https://api.github.com/repos/ungoogled-software/ungoogled-chromium-portablelinux/releases/latest" | jq -r '.tag_name // empty')
 
-          # Fallback to ChromiumDash stable if API rate-limited
-          if [ -z "$UNGOOGLED_VER" ] || [ "$UNGOOGLED_VER" = "null" ]; then
-            UNGOOGLED_VER=$(curl -s "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux" | jq -r '.[0].version // empty')
+          # Fallback to ChromiumDash stable if API rate-limited or to ensure we always use Stable channel
+          STABLE_VER=$(curl -s "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Linux" | jq -r '.[0].version // empty')
+          
+          if [ -n "$STABLE_VER" ] && [ "$STABLE_VER" != "null" ]; then
+            # Compare versions and take the smaller one (to avoid dev channels in ungoogled-chromium releases)
+            # Since ungoogled might release 155 (Dev) while stable is 154.
+            if [ -z "$UNGOOGLED_VER" ] || [ "$UNGOOGLED_VER" = "null" ]; then
+              UNGOOGLED_VER=$STABLE_VER
+            else
+              LOWER_VER=$(echo -e "$UNGOOGLED_VER\n$STABLE_VER" | sort -V | head -n1)
+              UNGOOGLED_VER=$LOWER_VER
+            fi
           fi
 
           echo "Detected Upstream Chromium: $UNGOOGLED_VER"
@@ -50,6 +59,8 @@ jobs:
 
       - name: Bump Hyperion Version and Tag Release
         if: steps.check_version.outputs.new_version_found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           NEW_CHROMIUM_VER="${{ steps.check_version.outputs.upstream_version }}"
           echo "$NEW_CHROMIUM_VER" > CHROMIUM_VERSION
@@ -70,4 +81,7 @@ jobs:
           git commit -m "chore(release): bump Hyperion to v$NEW_APP_VER (Chromium core $NEW_CHROMIUM_VER)"
           git tag -a "v$NEW_APP_VER" -m "Hyperion Browser v$NEW_APP_VER (Clean Chromium $NEW_CHROMIUM_VER)"
           git push origin main --tags
+
+          echo "Triggering Build and Release workflow for v$NEW_APP_VER..."
+          gh workflow run build-and-release.yml -f release_tag="v$NEW_APP_VER"
 

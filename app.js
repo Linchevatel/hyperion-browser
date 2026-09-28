@@ -313,6 +313,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         p.startTime = null;
         renderProfiles();
         updateStats();
+        if (CURRENT_INSPECTOR_PROFILE_ID === id) {
+          refreshInspectorContent();
+        }
       }
     });
   }
@@ -499,6 +502,9 @@ function updateUptimes() {
     const s = diff % 60;
     el.textContent = `В сети: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   });
+  if (typeof updateInspectorUptime === 'function') {
+    updateInspectorUptime();
+  }
 }
 
 // =========================================================================
@@ -580,7 +586,7 @@ function renderProfiles() {
 
     const extCount = (p.extensions || []).length;
     const extHtml = extCount > 0
-      ? `<span class="tag-badge" style="color:#34d399; border-color:rgba(16,185,129,0.3);">🧩 ${extCount} плаг.</span>`
+      ? `<span class="ext-pill" title="Подключено расширений: ${extCount}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v4h1.5a2.5 2.5 0 0 1 0 5H2v4a2 2 0 0 0 2 2h4v-1.5a2.5 2.5 0 0 1 5 0V22h4a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/></svg><span>${extCount}&nbsp;плаг.</span></span>`
       : `<span style="color:var(--text-dim); font-size:12px;">—</span>`;
 
     return `
@@ -600,10 +606,10 @@ function renderProfiles() {
               ${osIcon}
             </div>
             <div class="profile-info">
-              <span class="profile-name">${escapeHtml(p.name)}</span>
+              <span class="profile-name clickable-title" onclick="openProfileInspector('${escapeHtml(p.id)}')" title="Открыть быстрый инспектор">${escapeHtml(p.name)}</span>
               ${isRunning
                 ? `<span class="profile-uptime" data-start-time="${p.startTime || Date.now()}">В сети: 00:00</span>`
-                : (p.notes ? `<span class="profile-notes-sub">${escapeHtml(p.notes.slice(0, 32))}...</span>` : '')
+                : (p.notes ? `<span class="profile-notes-sub" title="${escapeHtml(p.notes)}">${escapeHtml(p.notes.slice(0, 36))}...</span>` : '')
               }
             </div>
           </div>
@@ -641,37 +647,19 @@ function renderProfiles() {
                 <span>Старт</span>
               </button>
             `}
-            <button class="btn-icon" onclick="editProfile('${escapeHtml(p.id)}')" title="Настроить профиль">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 20h9"/>
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            <button class="btn-manage" onclick="openProfileInspector('${escapeHtml(p.id)}')" title="Открыть панель управления профилем">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="21" x2="4" y2="14"/>
+                <line x1="4" y1="10" x2="4" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12" y2="3"/>
+                <line x1="20" y1="21" x2="20" y2="16"/>
+                <line x1="20" y1="12" x2="20" y2="3"/>
+                <line x1="1" y1="14" x2="7" y2="14"/>
+                <line x1="9" y1="8" x2="15" y2="8"/>
+                <line x1="17" y1="16" x2="23" y2="16"/>
               </svg>
-            </button>
-            <button class="btn-icon" onclick="cloneProfile('${escapeHtml(p.id)}')" title="Клонировать профиль">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-            </button>
-            <button class="btn-icon" onclick="openProfileCookies('${escapeHtml(p.id)}')" title="Управление Cookies" style="font-size:14px;">
-              🍪
-            </button>
-            <button class="btn-icon" onclick="openWarmupRobot('${escapeHtml(p.id)}')" title="Cookie Robot (Прогрев)" style="color:var(--accent-amber);">
-              🤖
-            </button>
-            <button class="btn-icon" onclick="exportProfilePackage('${escapeHtml(p.id)}')" title="Экспорт в архив .hyperion">
-              📦
-            </button>
-            <button class="btn-icon" onclick="openProfileFolder('${escapeHtml(p.id)}')" title="Открыть папку данных">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-              </svg>
-            </button>
-            <button class="btn-icon" onclick="deleteProfile('${escapeHtml(p.id)}')" title="Удалить" style="color: var(--accent-rose);">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-              </svg>
+              <span>Управление</span>
             </button>
           </div>
         </td>
@@ -692,6 +680,9 @@ window.startProfile = async (id) => {
     }
     renderProfiles();
     updateStats();
+    if (CURRENT_INSPECTOR_PROFILE_ID === id) {
+      refreshInspectorContent();
+    }
   } catch (e) {
     alert('Ошибка запуска: ' + e.message);
   }
@@ -707,6 +698,9 @@ window.stopProfile = async (id) => {
     }
     renderProfiles();
     updateStats();
+    if (CURRENT_INSPECTOR_PROFILE_ID === id) {
+      refreshInspectorContent();
+    }
   } catch (e) {
     alert('Ошибка остановки: ' + e.message);
   }
@@ -745,10 +739,263 @@ window.deleteProfile = async (id) => {
   try {
     await window.hyperion.deleteProfile(id);
     PROFILES = PROFILES.filter(x => x.id !== id);
+    if (CURRENT_INSPECTOR_PROFILE_ID === id) {
+      closeProfileInspector();
+    }
     renderProfiles();
     updateStats();
   } catch (e) {
     alert('Ошибка удаления: ' + e.message);
+  }
+};
+
+// =========================================================================
+// FEATURE: QUICK INSPECTOR DRAWER CONTROLLER
+// =========================================================================
+let CURRENT_INSPECTOR_PROFILE_ID = null;
+let INSPECTOR_NOTES_SAVE_TIMEOUT = null;
+
+function updateInspectorUptime() {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const p = PROFILES.find(x => x.id === CURRENT_INSPECTOR_PROFILE_ID);
+  const uptimeEl = document.getElementById('inspector-uptime');
+  if (!uptimeEl) return;
+  if (p && p.status === 'RUNNING' && p.startTime) {
+    const diff = Math.floor((Date.now() - p.startTime) / 1000);
+    const m = Math.floor(diff / 60);
+    const s = diff % 60;
+    uptimeEl.textContent = `В сети: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  } else {
+    uptimeEl.textContent = '';
+  }
+}
+
+window.openProfileInspector = (profileId) => {
+  const p = PROFILES.find(x => x.id === profileId);
+  if (!p) return;
+
+  CURRENT_INSPECTOR_PROFILE_ID = profileId;
+  const drawer = document.getElementById('profile-inspector-drawer');
+  const backdrop = document.getElementById('inspector-backdrop');
+
+  refreshInspectorContent();
+
+  if (backdrop) backdrop.classList.add('active');
+  if (drawer) drawer.classList.add('open');
+};
+
+window.closeProfileInspector = () => {
+  CURRENT_INSPECTOR_PROFILE_ID = null;
+  const drawer = document.getElementById('profile-inspector-drawer');
+  const backdrop = document.getElementById('inspector-backdrop');
+  if (backdrop) backdrop.classList.remove('active');
+  if (drawer) drawer.classList.remove('open');
+};
+
+function refreshInspectorContent() {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const p = PROFILES.find(x => x.id === CURRENT_INSPECTOR_PROFILE_ID);
+  if (!p) return;
+
+  const isRunning = p.status === 'RUNNING';
+  const os = p.os || 'windows';
+  const fp = p.fingerprint || {};
+
+  // Header
+  const osIconEl = document.getElementById('inspector-os-icon');
+  if (osIconEl) osIconEl.innerHTML = getOsSvg(os);
+
+  const nameEl = document.getElementById('inspector-name');
+  if (nameEl) nameEl.textContent = p.name;
+
+  const statusPill = document.getElementById('inspector-status-pill');
+  const statusText = document.getElementById('inspector-status-text');
+  if (statusPill && statusText) {
+    statusPill.className = `status-pill ${isRunning ? 'running' : 'stopped'}`;
+    statusText.textContent = isRunning ? 'В СЕТИ' : 'OFF';
+  }
+
+  // Quick Action Button
+  const btnStart = document.getElementById('inspector-btn-start');
+  const btnStartLabel = document.getElementById('inspector-btn-start-label');
+  if (btnStart && btnStartLabel) {
+    if (isRunning) {
+      btnStart.className = 'btn btn-stop btn-drawer-main';
+      btnStartLabel.textContent = 'Остановить профиль';
+      btnStart.querySelector('svg').innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/>';
+    } else {
+      btnStart.className = 'btn btn-start btn-drawer-main';
+      btnStartLabel.textContent = 'Запустить профиль';
+      btnStart.querySelector('svg').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+    }
+  }
+
+  // Hardware Specs
+  const gpuShort = fp.webgl?.unmasked_renderer
+    ? fp.webgl.unmasked_renderer.replace(/ANGLE \(|Direct3D11.*|\(0x[0-9A-Fa-f]+\)/g, '').trim()
+    : 'Hardware GPU';
+  const gpuEl = document.getElementById('inspector-gpu');
+  if (gpuEl) {
+    gpuEl.textContent = gpuShort;
+    gpuEl.title = fp.webgl?.unmasked_renderer || '';
+  }
+
+  const cpuRamEl = document.getElementById('inspector-cpu-ram');
+  if (cpuRamEl) {
+    cpuRamEl.textContent = `${fp.hardware?.concurrency || 8} Cores • ${fp.hardware?.memory || 16} GB RAM`;
+  }
+
+  const screenEl = document.getElementById('inspector-screen');
+  if (screenEl) {
+    screenEl.textContent = `${fp.screen?.width || 1920} × ${fp.screen?.height || 1080}`;
+  }
+
+  const extEl = document.getElementById('inspector-extensions');
+  if (extEl) {
+    const extCount = (p.extensions || []).length;
+    extEl.textContent = extCount > 0 ? `${extCount} плаг.` : 'Нет';
+  }
+
+  const uaEl = document.getElementById('inspector-ua');
+  if (uaEl) {
+    uaEl.textContent = fp.user_agent || 'Default Chrome UA';
+    uaEl.title = fp.user_agent || '';
+  }
+
+  // Proxy Specs
+  const proxyStatusEl = document.getElementById('inspector-proxy-status');
+  const proxyDetailsEl = document.getElementById('inspector-proxy-details');
+  const btnPing = document.getElementById('inspector-btn-ping');
+
+  if (p.proxy && p.proxy.enabled && p.proxy.host) {
+    const geo = PROXY_GEO_CACHE.get(p.proxy.host);
+    const geoFlag = geo && geo.countryCode ? getCountryFlag(geo.countryCode) + ' ' + geo.countryCode : '';
+    if (proxyStatusEl) {
+      proxyStatusEl.innerHTML = `<span style="color:#34d399;">● ${(p.proxy.protocol || 'SOCKS5').toUpperCase()}</span> ${geoFlag ? '• ' + geoFlag : ''}`;
+    }
+    if (proxyDetailsEl) {
+      proxyDetailsEl.innerHTML = `
+        <div><strong>Хост:</strong> ${escapeHtml(p.proxy.host)}:${escapeHtml(p.proxy.port || '80')}</div>
+        ${p.proxy.change_ip_url ? `<div style="margin-top:4px;"><button class="btn-rotate" onclick="triggerProxyRotate('${escapeHtml(p.id)}', '${escapeHtml(p.proxy.id || '')}', event)">🔄 Сменить IP</button></div>` : ''}
+      `;
+    }
+    if (btnPing) {
+      btnPing.style.display = 'inline-flex';
+      btnPing.outerHTML = '<button type="button" class="btn btn-secondary btn-mini" id="inspector-btn-ping" onclick="inspectorPingProxy()">⚡ Тест Ping</button>';
+    }
+  } else {
+    if (proxyStatusEl) {
+      proxyStatusEl.innerHTML = '<span style="color:var(--text-dim);">● Прямое подключение</span>';
+    }
+    if (proxyDetailsEl) {
+      proxyDetailsEl.innerHTML = 'Прокси-сервер не настроен. Используется прямой IP адрес системы.';
+    }
+    if (btnPing) btnPing.style.display = 'none';
+  }
+
+  // Notes
+  const notesArea = document.getElementById('inspector-notes-input');
+  const notesStatus = document.getElementById('inspector-notes-status');
+  if (notesArea) {
+    notesArea.value = p.notes || '';
+  }
+  if (notesStatus) {
+    notesStatus.textContent = 'Автосохранение';
+    notesStatus.classList.remove('saved');
+  }
+
+  updateInspectorUptime();
+}
+
+window.inspectorToggleRun = async () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const p = PROFILES.find(x => x.id === CURRENT_INSPECTOR_PROFILE_ID);
+  if (!p) return;
+  if (p.status === 'RUNNING') {
+    await window.stopProfile(p.id);
+  } else {
+    await window.startProfile(p.id);
+  }
+  refreshInspectorContent();
+};
+
+window.inspectorEditProfile = () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const id = CURRENT_INSPECTOR_PROFILE_ID;
+  closeProfileInspector();
+  window.editProfile(id);
+};
+
+window.inspectorCloneProfile = () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const id = CURRENT_INSPECTOR_PROFILE_ID;
+  window.cloneProfile(id);
+};
+
+window.inspectorOpenCookies = () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const id = CURRENT_INSPECTOR_PROFILE_ID;
+  closeProfileInspector();
+  window.openProfileCookies(id);
+};
+
+window.inspectorOpenWarmupRobot = () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const id = CURRENT_INSPECTOR_PROFILE_ID;
+  closeProfileInspector();
+  window.openWarmupRobot(id);
+};
+
+window.inspectorExportProfile = () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  window.exportProfilePackage(CURRENT_INSPECTOR_PROFILE_ID);
+};
+
+window.inspectorOpenFolder = () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  window.openProfileFolder(CURRENT_INSPECTOR_PROFILE_ID);
+};
+
+window.inspectorDeleteProfile = () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const id = CURRENT_INSPECTOR_PROFILE_ID;
+  closeProfileInspector();
+  window.deleteProfile(id);
+};
+
+window.inspectorPingProxy = async () => {
+  if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+  const p = PROFILES.find(x => x.id === CURRENT_INSPECTOR_PROFILE_ID);
+  if (!p || !p.proxy || !p.proxy.host) return;
+
+  const btnPing = document.getElementById('inspector-btn-ping');
+  if (btnPing) {
+    btnPing.disabled = true;
+    btnPing.textContent = 'Проверка...';
+  }
+
+  try {
+    const res = await window.hyperion.testProxy({
+      host: p.proxy.host,
+      port: p.proxy.port
+    });
+
+    const currentBtn = document.getElementById('inspector-btn-ping');
+    if (currentBtn) {
+      if (res && res.success) {
+        const pingVal = parseInt(res.ping) || 0;
+        const pingClass = pingVal < 100 ? 'good' : pingVal < 300 ? 'medium' : 'bad';
+        currentBtn.outerHTML = `<span class="ping-badge ${pingClass}" id="inspector-btn-ping" onclick="inspectorPingProxy()" style="cursor:pointer;" title="Нажмите для повторного теста">⚡ ${pingVal}ms</span>`;
+      } else {
+        currentBtn.outerHTML = `<span class="ping-badge bad" id="inspector-btn-ping" onclick="inspectorPingProxy()" style="cursor:pointer;" title="${escapeHtml(res?.error || 'Ошибка')}">⚡ Ошибка</span>`;
+      }
+    }
+  } catch (err) {
+    const currentBtn = document.getElementById('inspector-btn-ping');
+    if (currentBtn) {
+      currentBtn.disabled = false;
+      currentBtn.textContent = '⚡ Тест Ping';
+    }
   }
 };
 
@@ -1067,9 +1314,106 @@ window.deleteExtension = async (extId) => {
 };
 
 // =========================================================================
+// FEATURE: QUICK PRESETS LOGIC
+// =========================================================================
+window.applyQuickPreset = async (presetKey) => {
+  document.querySelectorAll('.preset-card').forEach(c => {
+    c.classList.toggle('active', c.getAttribute('data-preset') === presetKey);
+  });
+
+  const PRESETS_MAP = {
+    gaming: {
+      os: 'windows',
+      cores: 16,
+      ram: 32,
+      res: '2560x1440',
+      gpuKeywords: ['RTX 4080', 'RTX 4090', 'RTX 4070', 'NVIDIA']
+    },
+    office: {
+      os: 'windows',
+      cores: 8,
+      ram: 16,
+      res: '1920x1080',
+      gpuKeywords: ['Iris', 'UHD', 'Intel']
+    },
+    macbook: {
+      os: 'macos',
+      cores: 12,
+      ram: 32,
+      res: '2560x1600',
+      gpuKeywords: ['Apple M3', 'Apple M2', 'Apple M1', 'Apple']
+    },
+    mobile: {
+      os: 'android',
+      cores: 8,
+      ram: 12,
+      res: '412x915',
+      gpuKeywords: ['Adreno', 'Mali', 'Qualcomm']
+    }
+  };
+
+  const preset = PRESETS_MAP[presetKey];
+  if (!preset) return;
+
+  // 1. Select OS radio
+  const osRadio = document.querySelector(`input[name="form-os"][value="${preset.os}"]`);
+  if (osRadio) {
+    osRadio.checked = true;
+  }
+  populateGpuDropdown(preset.os);
+
+  // 2. Fetch matched OS fingerprint preview baseline
+  CURRENT_FP = await window.hyperion.getPreviewFingerprint(preset.os);
+  applyFingerprintToDropdowns(CURRENT_FP);
+
+  // 3. Set Hardware specs
+  if (selFpCores) {
+    selFpCores.value = String(preset.cores);
+    if (!selFpCores.value) selFpCores.selectedIndex = 0;
+  }
+  if (selFpRam) {
+    selFpRam.value = String(preset.ram);
+    if (!selFpRam.value) selFpRam.selectedIndex = 0;
+  }
+  if (selFpRes) {
+    let foundRes = false;
+    for (const opt of selFpRes.options) {
+      if (opt.value === preset.res) {
+        selFpRes.value = preset.res;
+        foundRes = true;
+        break;
+      }
+    }
+    if (!foundRes && selFpRes.options.length > 0) {
+      selFpRes.selectedIndex = 0;
+    }
+  }
+
+  // 4. Match GPU
+  if (selFpGpu && selFpGpu.options.length > 0) {
+    let matched = false;
+    for (const kw of preset.gpuKeywords) {
+      for (const opt of selFpGpu.options) {
+        if (opt.textContent.toLowerCase().includes(kw.toLowerCase()) || opt.value.toLowerCase().includes(kw.toLowerCase())) {
+          selFpGpu.value = opt.value;
+          matched = true;
+          break;
+        }
+      }
+      if (matched) break;
+    }
+  }
+
+  // 5. Sync back to CURRENT_FP
+  syncFingerprintFromDropdowns();
+  showToast(`Применен пресет: ${presetKey.toUpperCase()}`, 'success');
+};
+
+// =========================================================================
 // PROFILE MODAL & MANUAL DROPDOWN LOGIC
 // =========================================================================
 function openCreateModal() {
+  document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
   editProfileId.value = '';
   modalHeading.textContent = 'Новый профиль';
   formName.value = `Профиль #${PROFILES.length + 1}`;
@@ -1109,6 +1453,7 @@ window.openProfileCookies = (id) => {
 };
 
 window.editProfile = (id) => {
+  document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
   const p = PROFILES.find(x => x.id === id);
   if (!p) return;
 
@@ -1284,6 +1629,62 @@ function switchTab(tabName) {
 // EVENT LISTENERS INITIALIZATION
 // =========================================================================
 function initEventListeners() {
+
+  // INSPECTOR DRAWER NOTES AUTO-SAVE
+  const notesArea = document.getElementById('inspector-notes-input');
+  if (notesArea) {
+    notesArea.addEventListener('input', () => {
+      if (!CURRENT_INSPECTOR_PROFILE_ID) return;
+      const profileId = CURRENT_INSPECTOR_PROFILE_ID;
+      const statusEl = document.getElementById('inspector-notes-status');
+      if (statusEl) {
+        statusEl.textContent = 'Сохранение...';
+        statusEl.classList.remove('saved');
+      }
+
+      clearTimeout(INSPECTOR_NOTES_SAVE_TIMEOUT);
+      INSPECTOR_NOTES_SAVE_TIMEOUT = setTimeout(async () => {
+        const p = PROFILES.find(x => x.id === profileId);
+        if (!p) return;
+        const newNotes = notesArea.value;
+        p.notes = newNotes;
+        try {
+          await window.hyperion.updateProfile(profileId, { notes: newNotes });
+          if (statusEl) {
+            statusEl.textContent = '✓ Сохранено';
+            statusEl.classList.add('saved');
+          }
+          const row = document.querySelector(`tr[data-id="${profileId}"]`);
+          if (row) {
+            let noteSub = row.querySelector('.profile-notes-sub');
+            if (!noteSub && newNotes) {
+              const infoBox = row.querySelector('.profile-info');
+              if (infoBox) {
+                noteSub = document.createElement('span');
+                noteSub.className = 'profile-notes-sub';
+                infoBox.appendChild(noteSub);
+              }
+            }
+            if (noteSub) {
+              noteSub.textContent = newNotes ? `${newNotes.slice(0, 36)}...` : '';
+              noteSub.title = newNotes;
+            }
+          }
+        } catch (e) {
+          if (statusEl) {
+            statusEl.textContent = 'Ошибка';
+          }
+        }
+      }, 400);
+    });
+  }
+
+  // Escape to close inspector
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && CURRENT_INSPECTOR_PROFILE_ID) {
+      window.closeProfileInspector();
+    }
+  });
 
   // FEATURE HOOKS
   document.getElementById('btn-add-folder')?.addEventListener('click', window.createNewFolder);
