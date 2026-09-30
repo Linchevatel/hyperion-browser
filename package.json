@@ -1,6 +1,6 @@
 {
   "name": "hyperion-desktop",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Hyperion Anti-detect Multibrowser Desktop Client",
   "main": "main.js",
   "scripts": {
