@@ -1860,8 +1860,9 @@ ipcMain.handle('get-settings', async () => {
 });
 
 ipcMain.handle('save-settings', async (event, newSettings) => {
-  writeJson(SETTINGS_FILE, newSettings);
-  return newSettings;
+  const merged = { ...readJson(SETTINGS_FILE, {}), ...newSettings };
+  writeJson(SETTINGS_FILE, merged);
+  return merged;
 });
 
 ipcMain.handle('clear-cache', async () => {

@@ -1419,7 +1419,8 @@ function openCreateModal() {
   formName.value = `Профиль #${PROFILES.length + 1}`;
   formTags.value = '';
   formNotes.value = '';
-  formStartUrl.value = SETTINGS.default_url || 'https://google.com';
+  formStartUrl.value = '';
+  formStartUrl.placeholder = SETTINGS.default_url || 'https://google.com';
 
   document.querySelector('input[name="form-os"][value="windows"]').checked = true;
   populateGpuDropdown('windows');
@@ -1462,7 +1463,8 @@ window.editProfile = (id) => {
   formName.value = p.name || '';
   formTags.value = (p.tags || []).join(', ');
   formNotes.value = p.notes || '';
-  formStartUrl.value = p.fingerprint?.start_url || SETTINGS.default_url || 'https://google.com';
+  formStartUrl.value = p.fingerprint?.start_url || '';
+  formStartUrl.placeholder = SETTINGS.default_url || 'https://google.com';
 
   const os = p.os || 'windows';
   const osRadio = document.querySelector(`input[name="form-os"][value="${os}"]`);
@@ -1603,7 +1605,7 @@ function syncFingerprintFromDropdowns() {
   CURRENT_FP.canvas_noise = fpToggleCanvas.checked;
   CURRENT_FP.audio_noise = fpToggleAudio.checked;
   CURRENT_FP.do_not_track = fpToggleDnt.checked ? '1' : '0';
-  CURRENT_FP.start_url = formStartUrl.value;
+  CURRENT_FP.start_url = formStartUrl.value.trim();
 }
 
 async function rerollCurrentFingerprint() {
@@ -1803,10 +1805,8 @@ function initEventListeners() {
     const dot = document.getElementById('sys-status-dot');
     const isMissing = dot && (dot.style.backgroundColor !== '');
     if (isMissing) {
-      const card = document.getElementById('settings-engine-card');
-      card?.scrollIntoView({ behavior: 'smooth' });
-      card?.style.setProperty('border-color', 'var(--accent-rose)');
-      setTimeout(() => card?.style.removeProperty('border-color'), 2500);
+      showToast('Ядро браузера не найдено. Проверьте установку или обновите программу.', 'error');
+      document.getElementById('settings-update-card')?.scrollIntoView({ behavior: 'smooth' });
     } else {
       document.getElementById('settings-update-card')?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -2178,36 +2178,15 @@ function initEventListeners() {
   });
 
   // SETTINGS CONTROLS
-  document.getElementById('btn-browse-chrome')?.addEventListener('click', async () => {
-    try {
-      const res = await window.hyperion.selectChromeBinary();
-      if (res && res.path) {
-        await checkSystemStatus();
-        showToast(`Браузер подключен: ${res.path}`, 'success');
-      }
-    } catch (e) {
-      showToast(`Ошибка выбора браузера: ${e.message}`, 'error');
-    }
-  });
-
-  document.getElementById('btn-rescan-chrome')?.addEventListener('click', async () => {
-    try {
-      const res = await window.hyperion.rescanChromeBinary();
-      await checkSystemStatus();
-      if (res && res.exists) {
-        showToast(`Браузер найден: ${res.path}`, 'success');
-      } else {
-        showToast('Браузер не найден автоматически в стандартных папках. Пожалуйста, укажите путь вручную.', 'error');
-      }
-    } catch (e) {
-      showToast(`Ошибка автопоиска: ${e.message}`, 'error');
-    }
-  });
-
   document.getElementById('btn-save-settings').addEventListener('click', async () => {
     const url = document.getElementById('settings-default-url').value.trim();
-    await window.hyperion.saveSettings({ default_url: url });
-    alert('Настройки сохранены');
+    try {
+      await window.hyperion.saveSettings({ default_url: url });
+      SETTINGS.default_url = url;
+      showToast('Настройки сохранены', 'success');
+    } catch (e) {
+      showToast(`Ошибка сохранения: ${e.message}`, 'error');
+    }
   });
 
   document.getElementById('btn-clear-cache').addEventListener('click', async () => {
