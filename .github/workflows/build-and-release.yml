@@ -54,16 +54,15 @@ jobs:
             fetch --nohooks chromium
           fi
           cd "$CHROMIUM_SRC"
-          LOCAL_MAJ=$(grep 'MAJOR=' chrome/VERSION 2>/dev/null | cut -d'=' -f2 || true)
-          TARGET_MAJ="${{ steps.chromium_ver.outputs.src }}"
-          TARGET_MAJ="${TARGET_MAJ%%.*}"
-          echo "Local Chromium major: $LOCAL_MAJ, Target major: $TARGET_MAJ"
-          if [ -n "$TARGET_MAJ" ] && [ "$LOCAL_MAJ" != "$TARGET_MAJ" ]; then
+          LOCAL_VER=$(grep -E '^(MAJOR|MINOR|BUILD|PATCH)=' chrome/VERSION 2>/dev/null | cut -d'=' -f2 | paste -sd. - || true)
+          TARGET_VER="${{ steps.chromium_ver.outputs.src }}"
+          echo "Local Chromium: $LOCAL_VER, Target: $TARGET_VER"
+          if [ -n "$TARGET_VER" ] && [ "$LOCAL_VER" != "$TARGET_VER" ]; then
             gclient sync --with_branch_heads --reset --force \
-              --delete_unversioned_trees -r "src@${{ steps.chromium_ver.outputs.src }}"
+              --delete_unversioned_trees -r "src@$TARGET_VER"
             gclient runhooks
           else
-            echo "Chromium source is already at target version ($LOCAL_MAJ)"
+            echo "Chromium source is already at target version ($LOCAL_VER)"
           fi
 
       - name: Apply Hyperion Fingerprint Patch
@@ -125,8 +124,9 @@ jobs:
 
           COPY_FILES=(
             chrome
+            chrome_crashpad_handler
             chrome_100_percent.pak chrome_200_percent.pak resources.pak
-            icudtl.dat v8_context_snapshot.bin
+            icudtl.dat v8_context_snapshot.bin snapshot_blob.bin
             libEGL.so libGLESv2.so libvk_swiftshader.so libvulkan.so.1
             vk_swiftshader_icd.json
           )

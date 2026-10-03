@@ -1,8 +1,8 @@
 diff --git a/components/embedder_support/user_agent_utils.cc b/components/embedder_support/user_agent_utils.cc
-index 3f87ec84fb..8e41cb6c7c 100644
+index 5d96c60405807..3e8bcdd8cccff 100644
 --- a/components/embedder_support/user_agent_utils.cc
 +++ b/components/embedder_support/user_agent_utils.cc
-@@ -583,6 +583,13 @@ bool GetMobileBitForUAMetadata() {
+@@ -599,6 +599,13 @@ bool GetMobileBitForUAMetadata() {
  }
  
  std::string GetPlatformVersion() {
@@ -16,7 +16,7 @@ index 3f87ec84fb..8e41cb6c7c 100644
  #if BUILDFLAG(IS_ANDROID)
    // For Android XR or desktop form factors, report a non-empty platform
    // version when kAndroidDesktopUAPlatform is enabled to follow the spec:
-@@ -614,6 +621,15 @@ std::string GetPlatformVersion() {
+@@ -630,6 +637,15 @@ std::string GetPlatformVersion() {
  }
  
  std::string GetPlatformForUAMetadata() {
@@ -33,10 +33,10 @@ index 3f87ec84fb..8e41cb6c7c 100644
    if (base::android::device_info::is_desktop() ||
        base::android::device_info::is_xr()) {
 diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
-index 710e3758ab..187d2a611e 100644
+index 0d96dedc4dfeb..8d44191da3c41 100644
 --- a/content/browser/renderer_host/render_process_host_impl.cc
 +++ b/content/browser/renderer_host/render_process_host_impl.cc
-@@ -4036,6 +4036,18 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
+@@ -4041,6 +4041,18 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
  #endif
    };
    renderer_cmd->CopySwitchesFrom(browser_cmd, kSwitchNames);
@@ -56,7 +56,7 @@ index 710e3758ab..187d2a611e 100644
    // Propagate WebNN switches needed by backends that run in the renderer.
    renderer_cmd->CopySwitchesFrom(
 diff --git a/third_party/blink/renderer/core/execution_context/navigator_base.cc b/third_party/blink/renderer/core/execution_context/navigator_base.cc
-index 83f427c5ec..74f8c7c877 100644
+index cccfafe8f93a0..d2bca578e4ed5 100644
 --- a/third_party/blink/renderer/core/execution_context/navigator_base.cc
 +++ b/third_party/blink/renderer/core/execution_context/navigator_base.cc
 @@ -3,6 +3,7 @@
@@ -67,7 +67,7 @@ index 83f427c5ec..74f8c7c877 100644
  
  #include "base/feature_list.h"
  #include "build/build_config.h"
-@@ -67,6 +68,11 @@ String NavigatorBase::userAgent() const {
+@@ -52,6 +53,11 @@ String NavigatorBase::userAgent() const {
  }
  
  String NavigatorBase::platform() const {
@@ -80,7 +80,7 @@ index 83f427c5ec..74f8c7c877 100644
    // We need to check the ReduceUserAgentMinorVersion feature flag for
    // Android WebView, which does not currently ship a reduced User-Agent.
 diff --git a/third_party/blink/renderer/core/frame/navigator.cc b/third_party/blink/renderer/core/frame/navigator.cc
-index 583f05f8dd..b18f4c5888 100644
+index 583f05f8dd5fb..c03e5bf940df7 100644
 --- a/third_party/blink/renderer/core/frame/navigator.cc
 +++ b/third_party/blink/renderer/core/frame/navigator.cc
 @@ -1,3 +1,4 @@
@@ -115,7 +115,7 @@ index 583f05f8dd..b18f4c5888 100644
  
  String Navigator::GetAcceptLanguages() {
 diff --git a/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc b/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc
-index f5c0db2d1b..64e8bb55ee 100644
+index f5c0db2d1b58d..127439c768fd0 100644
 --- a/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc
 +++ b/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc
 @@ -3,12 +3,22 @@
@@ -142,7 +142,7 @@ index f5c0db2d1b..64e8bb55ee 100644
  }
  
 diff --git a/third_party/blink/renderer/core/frame/navigator_device_memory.cc b/third_party/blink/renderer/core/frame/navigator_device_memory.cc
-index 05fa33e456..9004cc6bfd 100644
+index 05fa33e4568e8..7e3c61678733a 100644
 --- a/third_party/blink/renderer/core/frame/navigator_device_memory.cc
 +++ b/third_party/blink/renderer/core/frame/navigator_device_memory.cc
 @@ -3,6 +3,8 @@
@@ -170,7 +170,7 @@ index 05fa33e456..9004cc6bfd 100644
  }
  
 diff --git a/third_party/blink/renderer/core/frame/navigator_device_memory.idl b/third_party/blink/renderer/core/frame/navigator_device_memory.idl
-index 6a57f5507d..6305877490 100644
+index 6a57f5507df3c..6305877490e23 100644
 --- a/third_party/blink/renderer/core/frame/navigator_device_memory.idl
 +++ b/third_party/blink/renderer/core/frame/navigator_device_memory.idl
 @@ -5,6 +5,6 @@
@@ -182,7 +182,7 @@ index 6a57f5507d..6305877490 100644
      readonly attribute float deviceMemory;
  };
 diff --git a/third_party/blink/renderer/core/frame/navigator_id.cc b/third_party/blink/renderer/core/frame/navigator_id.cc
-index 22243ebf5e..7ad85f2092 100644
+index 22243ebf5e26f..fc7e7698b391e 100644
 --- a/third_party/blink/renderer/core/frame/navigator_id.cc
 +++ b/third_party/blink/renderer/core/frame/navigator_id.cc
 @@ -30,6 +30,7 @@
@@ -206,7 +206,7 @@ index 22243ebf5e..7ad85f2092 100644
    // Match Safari and Mozilla on Mac x86.
    return "MacIntel";
 diff --git a/third_party/blink/renderer/core/frame/navigator_ua_data.cc b/third_party/blink/renderer/core/frame/navigator_ua_data.cc
-index 73ad371b32..cade4794e3 100644
+index 73ad371b3237a..798416d1766fd 100644
 --- a/third_party/blink/renderer/core/frame/navigator_ua_data.cc
 +++ b/third_party/blink/renderer/core/frame/navigator_ua_data.cc
 @@ -1,3 +1,4 @@
@@ -282,7 +282,7 @@ index 73ad371b32..cade4794e3 100644
          values->setFullVersionList(full_version_list_);
        } else if (hint == "wow64") {
 diff --git a/third_party/blink/renderer/core/frame/screen.cc b/third_party/blink/renderer/core/frame/screen.cc
-index ed5028943e..f87d63882d 100644
+index ed5028943e3d7..f87d63882df8c 100644
 --- a/third_party/blink/renderer/core/frame/screen.cc
 +++ b/third_party/blink/renderer/core/frame/screen.cc
 @@ -27,6 +27,8 @@
@@ -341,7 +341,7 @@ index ed5028943e..f87d63882d 100644
      return 0;
    return GetRect(/*available=*/true).width();
 diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
-index df451afece..eea9b7ff1d 100644
+index 3d7a843995b4d..cfd9ee07b0190 100644
 --- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
 +++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
 @@ -3,6 +3,9 @@
@@ -389,7 +389,7 @@ index df451afece..eea9b7ff1d 100644
    }
  
 diff --git a/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc b/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
-index 4604be68ad..168ec81cec 100644
+index 4604be68adba4..98a23f531142c 100644
 --- a/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
 +++ b/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
 @@ -24,6 +24,9 @@
@@ -433,7 +433,7 @@ index 4604be68ad..168ec81cec 100644
      // promise too.
      DispatchEvent(*OfflineAudioCompletionEvent::Create(rendered_buffer));
 diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
-index b452298c24..b95f71b115 100644
+index 26c0a088cc1ab..6a717c53f4f33 100644
 --- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 +++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 @@ -24,6 +24,7 @@
@@ -444,7 +444,7 @@ index b452298c24..b95f71b115 100644
  
  #include <inttypes.h>
  
-@@ -4216,6 +4217,11 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -4200,6 +4201,11 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
        if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
@@ -456,7 +456,7 @@ index b452298c24..b95f71b115 100644
          return WebGLAny(script_state,
                          String(ContextGL()->GetString(GL_RENDERER)));
        }
-@@ -4225,6 +4231,11 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+@@ -4209,6 +4215,11 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedVendorWebgl:
        if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
@@ -469,7 +469,7 @@ index b452298c24..b95f71b115 100644
                          String(ContextGL()->GetString(GL_VENDOR)));
        }
 diff --git a/third_party/blink/renderer/platform/graphics/image_data_buffer.cc b/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
-index d05ea261a9..c744e4ed87 100644
+index c76f6553e1cec..c28906c2964c5 100644
 --- a/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
 +++ b/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
 @@ -31,6 +31,10 @@
@@ -482,22 +482,21 @@ index d05ea261a9..c744e4ed87 100644
 +#include <cmath>
  
  #include "base/compiler_specific.h"
- #include "base/logging.h"
-@@ -69,8 +73,12 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
-       ImageEncoderUtils::GetColorInfoForEncoder(paint_image_info.colorInfo(),
-                                                 image->GetHdrMetadata());
+ #include "base/memory/ptr_util.h"
+@@ -63,8 +67,11 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
+   }
+ #endif
  
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  bool has_canvas_seed = cmd && cmd->HasSwitch("fingerprint-canvas-seed");
 +
-   if (target_color_info != paint_image_info.colorInfo() ||
--      paint_image.IsTextureBacked() || paint_image.IsLazyGenerated()) {
-+      paint_image.IsTextureBacked() || paint_image.IsLazyGenerated() ||
-+      has_canvas_seed) {
+   if (paint_image.IsTextureBacked() || paint_image.IsLazyGenerated() ||
+-      paint_image_info.alphaType() != kUnpremul_SkAlphaType) {
++      paint_image_info.alphaType() != kUnpremul_SkAlphaType || has_canvas_seed) {
      // Unpremul is handled upfront, using readPixels, which will correctly clamp
      // premul color values that would otherwise cause overflows in the skia
      // encoder unpremul logic.
-@@ -88,6 +96,32 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
+@@ -88,6 +95,32 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
        pixmap_.reset();
        return;
      }

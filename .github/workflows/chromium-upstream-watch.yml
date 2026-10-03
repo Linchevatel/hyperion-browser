@@ -63,10 +63,28 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           NEW_CHROMIUM_VER="${{ steps.check_version.outputs.upstream_version }}"
-          echo "$NEW_CHROMIUM_VER" > CHROMIUM_VERSION
 
           git config user.name "Linchevatel"
           git config user.email "295051633+Linchevatel@users.noreply.github.com"
+
+          # Guard: if the latest tag has NO published GitHub Release, the previous
+          # build failed — do NOT inflate the app version. Retarget the pending
+          # tag to the new Chromium version and re-trigger the build instead.
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$LATEST_TAG" ] && ! gh release view "$LATEST_TAG" >/dev/null 2>&1; then
+            echo "Tag $LATEST_TAG has no published release (previous build failed). Retargeting without version bump."
+            echo "$NEW_CHROMIUM_VER" > CHROMIUM_VERSION
+            git add CHROMIUM_VERSION
+            git commit -m "chore: retarget pending $LATEST_TAG to Chromium core $NEW_CHROMIUM_VER"
+            git push origin main
+            git tag -f -a "$LATEST_TAG" -m "Hyperion Browser $LATEST_TAG (Clean Chromium $NEW_CHROMIUM_VER)"
+            git push -f origin "$LATEST_TAG"
+            echo "Re-triggering Build and Release workflow for $LATEST_TAG..."
+            gh workflow run build-and-release.yml -f release_tag="$LATEST_TAG"
+            exit 0
+          fi
+
+          echo "$NEW_CHROMIUM_VER" > CHROMIUM_VERSION
 
           # Increment Hyperion desktop patch version (e.g. 1.0.8 -> 1.0.9)
           npm version patch --no-git-tag-version
