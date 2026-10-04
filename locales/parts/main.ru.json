@@ -1,0 +1,71 @@
+{
+  "dialog": {
+    "pickExtensionFolder": "Выберите распакованную папку расширения",
+    "selectChromeTitle": "Выберите исполняемый файл Chrome / Chromium",
+    "filterExe": "Исполняемые файлы (*.exe)",
+    "filterAll": "Все файлы",
+    "filterExecutables": "Исполняемые файлы"
+  },
+  "err": {
+    "profileNotFound": "Профиль не найден",
+    "chromeNotFound": "Исполняемый файл браузера ({binName}) не найден.\nУкажите путь к Chrome в разделе «Настройки» или установите Google Chrome.",
+    "extInstall": "Ошибка установки расширения",
+    "extInstallerUnknown": "Неизвестный ответ установщика расширений",
+    "manifestNotFound": "Выбранная папка не содержит manifest.json",
+    "invalidManifest": "Некорректный manifest.json",
+    "invalidProfileArchive": "Некорректный формат архива .hyperion",
+    "invalidBackupFile": "Некорректный файл резервной копии"
+  },
+  "proxy": {
+    "specifyHostPort": "Укажите хост и порт",
+    "timeout": "Таймаут",
+    "rotateUrlNotSet": "Ссылка смены IP не указана",
+    "rotateTimeout": "Таймаут смены IP",
+    "geoFailed": "Не удалось получить геоданные через прокси"
+  },
+  "export": {
+    "saveTitle": "Экспорт профиля \"{name}\" в .hyperion",
+    "openTitle": "Выберите архив профиля .hyperion",
+    "importedName": "{name} (Импорт)"
+  },
+  "backup": {
+    "exportTitle": "Экспорт резервной копии Hyperion",
+    "importTitle": "Выберите файл резервной копии Hyperion (JSON)"
+  },
+  "update": {
+    "noDownloadUrl": "Отсутствует URL для скачивания обновления",
+    "downloadErrorHttp": "Ошибка скачивания: HTTP {status}",
+    "fileNotFound": "Файл обновления не найден или не был загружен."
+  },
+  "profile": {
+    "defaultName": "Профиль #{num}",
+    "clonedName": "{name} (Копия)",
+    "defaultBaseName": "Профиль",
+    "bulkCreatedNote": "Массово создан ({date})"
+  },
+  "ext": {
+    "customExtension": "Пользовательское расширение",
+    "unpackedExtension": "Распакованное локальное расширение",
+    "desc": {
+      "cookieEditor": "Просмотр, экспорт и импорт cookies сессий (Netscape/JSON)",
+      "clearCache": "Очистка кэша, истории и хранилища сессии в 1 клик",
+      "dontCareCookies": "Автоматическое скрытие и согласие с GDPR cookie плашками",
+      "metamask": "Ведущий криптокошелек Ethereum / EVM сетей",
+      "phantom": "Криптокошелек для сетей Solana, Bitcoin и Polygon",
+      "rabby": "Лучший Web3 кошелек для мультиаккаунтинга",
+      "okx": "Универсальный криптокошелек с поддержкой 100+ блокчейнов",
+      "trustWallet": "Официальный кошелек Binance для криптоактивов",
+      "keplr": "Главный кошелек экосистемы Cosmos, Osmosis, Celestia",
+      "sui": "Официальный Web3 кошелек для сети Sui Network",
+      "coinbase": "Безопасный криптокошелек и Web3 браузер от Coinbase",
+      "tronLink": "Ведущий кошелек для сети TRON (TRX, TRC-20, USDT)",
+      "ublockOriginLite": "Быстрая блокировка рекламы и трекеров нового поколения (Manifest V3)",
+      "adguard": "Эффективный блокировщик всплывающих окон и баннеров",
+      "authenticator": "Генератор 2FA кодов подтверждения прямо в браузере",
+      "metaPixelHelper": "Проверка работы пикселей конверсий Facebook / Meta Ads",
+      "foxyproxy": "Классический инструмент управления списками прокси-серверов",
+      "tampermonkey": "Самый популярный менеджер пользовательских скриптов (Userscripts)",
+      "violentmonkey": "Быстрый менеджер скриптов автоматизации с открытым кодом"
+    }
+  }
+}

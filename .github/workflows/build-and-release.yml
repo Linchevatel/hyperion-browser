@@ -68,16 +68,22 @@ jobs:
       - name: Apply Hyperion Fingerprint Patch
         run: |
           CHROMIUM_SRC="${CHROMIUM_BUILD_DIR:-/build/chromium}/src"
-          PATCH_FILE="${GITHUB_WORKSPACE}/patches/hyperion_core_fingerprint.patch"
           cd "$CHROMIUM_SRC"
           # Reset any existing modifications before applying
           git checkout -- . 2>/dev/null || true
-          if ! git apply --check "$PATCH_FILE" 2>/dev/null; then
-            echo "::error::Patch does not apply cleanly to Chromium ${{ steps.chromium_ver.outputs.src }}"
-            exit 1
-          fi
-          git apply "$PATCH_FILE"
-          echo "Patch applied successfully."
+          # Patches apply sequentially: core first, then WebGL presets layer
+          for PATCH_FILE in \
+            "${GITHUB_WORKSPACE}/patches/hyperion_core_fingerprint.patch" \
+            "${GITHUB_WORKSPACE}/patches/hyperion_webgl_presets.patch"; do
+            [ -f "$PATCH_FILE" ] || continue
+            if ! git apply --check "$PATCH_FILE" 2>/dev/null; then
+              echo "::error::$(basename $PATCH_FILE) does not apply cleanly to Chromium ${{ steps.chromium_ver.outputs.src }}"
+              exit 1
+            fi
+            git apply "$PATCH_FILE"
+            echo "Applied: $(basename $PATCH_FILE)"
+          done
+          echo "All patches applied successfully."
 
       - name: Configure GN Build
         run: |

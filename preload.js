@@ -23,6 +23,10 @@ const api = {
 
   // Cookie Robot Warm-up
   warmupProfile: (profileId, urls) => ipcRenderer.invoke('warmup-profile', profileId, urls),
+
+  // i18n
+  getLocales: () => ipcRenderer.invoke('get-locales'),
+  setLanguage: (lang) => ipcRenderer.invoke('set-language', lang),
   onWarmupProgress: (callback) => {
     const handler = (event, data) => callback(data);
     ipcRenderer.on('warmup-progress', handler);

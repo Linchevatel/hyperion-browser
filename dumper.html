@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hyperion Fingerprint Dumper</title>
+  <style>
+    :root {
+      --bg-primary: #0e1117;
+      --bg-secondary: #161b22;
+      --bg-card: #1f242d;
+      --bg-card-hover: #262c37;
+      --border-color: #30363d;
+      --text-primary: #f0f6fc;
+      --text-secondary: #8b949e;
+      --text-muted: #586069;
+      --accent-cyan: #00d2ff;
+      --accent-blue: #388bfd;
+      --accent-emerald: #238636;
+      --accent-emerald-hover: #2ea043;
+      --accent-purple: #8957e5;
+      --accent-amber: #d29922;
+      --accent-rose: #f85149;
+      --radius: 8px;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand svg {
+      width: 32px;
+      height: 32px;
+      fill: var(--accent-cyan);
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: rgba(0, 210, 255, 0.1);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+    }
+
+    .info-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+    }
+
+    .info-card h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--accent-cyan);
+    }
+
+    .info-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .info-card ul {
+      margin-left: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .info-card li {
+      margin-bottom: 4px;
+    }
+
+    .action-panel {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background-color: #1f6feb;
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: #388bfd;
+    }
+
+    .btn-success {
+      background-color: var(--accent-emerald);
+      color: #fff;
+    }
+    .btn-success:hover:not(:disabled) {
+      background-color: var(--accent-emerald-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background-color: var(--bg-card-hover);
+      border-color: #8b949e;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .progress-box {
+      flex: 1;
+      min-width: 250px;
+      display: none;
+    }
+
+    .progress-track {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+      transition: width 0.3s ease;
+    }
+
+    .progress-status {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .preset-id-box {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .preset-id-box label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .preset-id-box input {
+      flex: 1;
+      min-width: 250px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      color: var(--accent-cyan);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+    }
+
+    .preset-id-box input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .validation-alert {
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 24px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .validation-alert.success {
+      background: rgba(35, 134, 54, 0.15);
+      border: 1px solid var(--accent-emerald);
+      color: #3fb950;
+      display: flex;
+    }
+
+    .validation-alert.error {
+      background: rgba(248, 81, 73, 0.15);
+      border: 1px solid var(--accent-rose);
+      color: var(--accent-rose);
+      display: flex;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
+    }
+
+    .tab-content {
+      display: none;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 16px;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .search-bar {
+      margin-bottom: 12px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .search-bar input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    table.data-table th,
+    table.data-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.data-table th {
+      background-color: var(--bg-card);
+      color: var(--text-secondary);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    table.data-table tr:hover {
+      background-color: var(--bg-card-hover);
+    }
+
+    .type-pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .type-int { background: #1e3a5f; color: #58a6ff; }
+    .type-uint { background: #3b2e58; color: #bc8cff; }
+    .type-float { background: #1b4737; color: #3fb950; }
+    .type-number { background: #4d3800; color: #d29922; }
+    .type-bool { background: #4c2830; color: #f85149; }
+    .type-string { background: #263850; color: #79c0ff; }
+    .type-intvec, .type-uintvec, .type-floatvec, .type-boolvec { background: #2e3548; color: #a5d6ff; }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+    }
+
+    pre.json-view {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #c9d1d9;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="brand">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+        </svg>
+        <h1>Hyperion Fingerprint Dumper</h1>
+      </div>
+      <div class="badge">Chromium Preset Collector</div>
+    </header>
+
+    <div class="info-card">
+      <h2>Сбор реального WebGL-фингерпринта для базы пресетов Hyperion</h2>
+      <p>
+        Эта страница извлекает полный аппаратный слепок WebGL на <strong>реальной машине в Chrome</strong>
+        для пополнения каталога <code>data/webgl_presets/</code>.
+      </p>
+      <ul>
+        <li><strong>WebGL 1.0 &amp; WebGL 2.0:</strong> Все спецификационные GLenum параметры с сохранением нормативных типов C++ патча (<code>int</code>, <code>uint</code>, <code>float</code>, <code>number</code>, <code>bool</code>, <code>string</code>, <code>*vec</code>).</li>
+        <li><strong>Extensions:</strong> Полный канонический список поддерживаемых расширений GPU.</li>
+        <li><strong>Shader Precision:</strong> Матрицы точности IEEE-754 для вершинных и фрагментных шейдеров (все 12 комбинаций).</li>
+        <li><strong>Метаданные (_meta):</strong> Экран, ядра CPU, RAM, UserAgent, unmasked vendor/renderer и голоса Web Speech API (для генерации hardware kits).</li>
+      </ul>
+    </div>
+
+    <div class="action-panel">
+      <button id="btnDump" class="btn btn-primary">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+        Собрать дамп
+      </button>
+
+      <div id="progressBox" class="progress-box">
+        <div class="progress-track">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div id="progressStatus" class="progress-status">Подготовка...</div>
+      </div>
+
+      <button id="btnDownload" class="btn btn-success hidden">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+        </svg>
+        Скачать JSON
+      </button>
+
+      <button id="btnCopy" class="btn btn-secondary hidden">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+        </svg>
+        Копировать JSON
+      </button>
+    </div>
+
+    <div id="validationAlert" class="validation-alert"></div>
+
+    <div id="resultsSection" class="hidden">
+      <div class="preset-id-box">
+        <label for="presetIdInput">Preset ID:</label>
+        <input type="text" id="presetIdInput" spellcheck="false" title="Имя файла и уникальный идентификатор пресета">
+        <span class="stat-sub">Формат: [vendor_gpu_os] (можно отредактировать перед скачиванием)</span>
+      </div>
+
+      <div class="summary-grid">
+        <div class="stat-card">
+          <div class="stat-label">GPU Renderer</div>
+          <div id="statRenderer" class="stat-value" style="font-size: 14px; word-break: break-all;">-</div>
+          <div id="statVendor" class="stat-sub">-</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">WebGL 1.0</div>
+          <div id="statWgl1Params" class="stat-value">0</div>
+          <div id="statWgl1Exts" class="stat-sub">0 расширений • 12 precisions</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">WebGL 2.0</div>
+          <div id="statWgl2Params" class="stat-value">0</div>
+          <div id="statWgl2Exts" class="stat-sub">0 расширений • 12 precisions</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">System / _meta</div>
+          <div id="statHardware" class="stat-value" style="font-size: 14px;">-</div>
+          <div id="statVoices" class="stat-sub">0 TTS голосов</div>
+        </div>
+      </div>
+
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tabWgl1">WebGL 1 Parameters</button>
+        <button class="tab-btn" data-tab="tabWgl2">WebGL 2 Parameters</button>
+        <button class="tab-btn" data-tab="tabExts">Extensions</button>
+        <button class="tab-btn" data-tab="tabPrecision">Shader Precision</button>
+        <button class="tab-btn" data-tab="tabMeta">Meta Info</button>
+        <button class="tab-btn" data-tab="tabJson">Raw JSON</button>
+      </div>
+
+      <div id="tabWgl1" class="tab-content active">
+        <div class="search-bar">
+          <input type="text" id="searchWgl1" placeholder="Поиск параметра по имени, enum или значению...">
+        </div>
+        <table class="data-table" id="tableWgl1">
+          <thead>
+            <tr>
+              <th style="width: 90px;">GLenum</th>
+              <th>Константа</th>
+              <th style="width: 100px;">Тип</th>
+              <th>Значение</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="tabWgl2" class="tab-content">
+        <div class="search-bar">
+          <input type="text" id="searchWgl2" placeholder="Поиск параметра по имени, enum или значению...">
+        </div>
+        <table class="data-table" id="tableWgl2">
+          <thead>
+            <tr>
+              <th style="width: 90px;">GLenum</th>
+              <th>Константа</th>
+              <th style="width: 100px;">Тип</th>
+              <th>Значение</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="tabExts" class="tab-content">
+        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--accent-cyan);">WebGL 1.0 Extensions (<span id="countExt1">0</span>)</h3>
+        <div class="tag-cloud" id="extCloud1" style="margin-bottom: 20px;"></div>
+        <h3 style="font-size: 14px; margin-bottom: 8px; color: var(--accent-cyan);">WebGL 2.0 Extensions (<span id="countExt2">0</span>)</h3>
+        <div class="tag-cloud" id="extCloud2"></div>
+      </div>
+
+      <div id="tabPrecision" class="tab-content">
+        <table class="data-table" id="tablePrecision">
+          <thead>
+            <tr>
+              <th>Shader</th>
+              <th>Precision Type</th>
+              <th>Key</th>
+              <th>rangeMin</th>
+              <th>rangeMax</th>
+              <th>precision</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="tabMeta" class="tab-content">
+        <table class="data-table" id="tableMeta">
+          <thead>
+            <tr>
+              <th style="width: 220px;">Поле</th>
+              <th>Значение</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="tabJson" class="tab-content">
+        <pre class="json-view" id="jsonPreview"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dictionary of all GLenums recognised by Hyperion converter & preset engine
+    const GL_ENUM_TO_NAME = {
+      "2849": "LINE_WIDTH",
+      "2884": "CULL_FACE",
+      "2885": "CULL_FACE_MODE",
+      "2886": "FRONT_FACE",
+      "2928": "DEPTH_RANGE",
+      "2929": "DEPTH_TEST",
+      "2930": "DEPTH_WRITEMASK",
+      "2931": "DEPTH_CLEAR_VALUE",
+      "2932": "DEPTH_FUNC",
+      "2960": "STENCIL_TEST",
+      "2961": "STENCIL_CLEAR_VALUE",
+      "2962": "STENCIL_FUNC",
+      "2963": "STENCIL_VALUE_MASK",
+      "2964": "STENCIL_FAIL",
+      "2965": "STENCIL_PASS_DEPTH_FAIL",
+      "2966": "STENCIL_PASS_DEPTH_PASS",
+      "2967": "STENCIL_REF",
+      "2968": "STENCIL_WRITEMASK",
+      "2978": "VIEWPORT",
+      "3024": "DITHER",
+      "3042": "BLEND",
+      "3074": "READ_BUFFER",
+      "3088": "SCISSOR_BOX",
+      "3089": "SCISSOR_TEST",
+      "3106": "COLOR_CLEAR_VALUE",
+      "3107": "COLOR_WRITEMASK",
+      "3314": "UNPACK_ROW_LENGTH",
+      "3315": "UNPACK_SKIP_ROWS",
+      "3316": "UNPACK_SKIP_PIXELS",
+      "3317": "UNPACK_ALIGNMENT",
+      "3330": "PACK_ROW_LENGTH",
+      "3331": "PACK_SKIP_ROWS",
+      "3332": "PACK_SKIP_PIXELS",
+      "3333": "PACK_ALIGNMENT",
+      "3379": "MAX_TEXTURE_SIZE",
+      "3386": "MAX_VIEWPORT_DIMS",
+      "3408": "SUBPIXEL_BITS",
+      "3410": "RED_BITS",
+      "3411": "GREEN_BITS",
+      "3412": "BLUE_BITS",
+      "3413": "ALPHA_BITS",
+      "3414": "DEPTH_BITS",
+      "3415": "STENCIL_BITS",
+      "7936": "VENDOR",
+      "7937": "RENDERER",
+      "7938": "VERSION",
+      "10752": "POLYGON_OFFSET_UNITS",
+      "32773": "BLEND_COLOR",
+      "32777": "BLEND_EQUATION_RGB",
+      "32823": "POLYGON_OFFSET_FILL",
+      "32824": "POLYGON_OFFSET_FACTOR",
+      "32877": "UNPACK_SKIP_IMAGES",
+      "32878": "UNPACK_IMAGE_HEIGHT",
+      "32883": "MAX_3D_TEXTURE_SIZE",
+      "32926": "SAMPLE_COVERAGE_INVERT",
+      "32928": "SAMPLE_ALPHA_TO_COVERAGE",
+      "32936": "SAMPLE_BUFFERS",
+      "32937": "SAMPLES",
+      "32938": "SAMPLE_COVERAGE_VALUE",
+      "32939": "SAMPLE_COVERAGE",
+      "32968": "BLEND_DST_RGB",
+      "32969": "BLEND_SRC_RGB",
+      "32970": "BLEND_DST_ALPHA",
+      "32971": "BLEND_SRC_ALPHA",
+      "33000": "MAX_ELEMENTS_VERTICES",
+      "33001": "MAX_ELEMENTS_INDICES",
+      "33170": "GENERATE_MIPMAP_HINT",
+      "33901": "ALIASED_POINT_SIZE_RANGE",
+      "33902": "ALIASED_LINE_WIDTH_RANGE",
+      "34016": "ACTIVE_TEXTURE",
+      "34024": "MAX_RENDERBUFFER_SIZE",
+      "34045": "MAX_TEXTURE_LOD_BIAS",
+      "34047": "MAX_TEXTURE_MAX_ANISOTROPY_EXT",
+      "34076": "MAX_CUBE_MAP_TEXTURE_SIZE",
+      "34467": "COMPRESSED_TEXTURE_FORMATS",
+      "34816": "STENCIL_BACK_FUNC",
+      "34817": "STENCIL_BACK_FAIL",
+      "34818": "STENCIL_BACK_PASS_DEPTH_FAIL",
+      "34819": "STENCIL_BACK_PASS_DEPTH_PASS",
+      "34852": "MAX_DRAW_BUFFERS",
+      "34853": "DRAW_BUFFER0",
+      "34854": "DRAW_BUFFER1",
+      "34855": "DRAW_BUFFER2",
+      "34856": "DRAW_BUFFER3",
+      "34857": "DRAW_BUFFER4",
+      "34858": "DRAW_BUFFER5",
+      "34859": "DRAW_BUFFER6",
+      "34860": "DRAW_BUFFER7",
+      "34877": "BLEND_EQUATION_ALPHA",
+      "34921": "MAX_VERTEX_ATTRIBS",
+      "34930": "MAX_TEXTURE_IMAGE_UNITS",
+      "35071": "MAX_ARRAY_TEXTURE_LAYERS",
+      "35076": "MIN_PROGRAM_TEXEL_OFFSET",
+      "35077": "MAX_PROGRAM_TEXEL_OFFSET",
+      "35371": "MAX_VERTEX_UNIFORM_BLOCKS",
+      "35373": "MAX_FRAGMENT_UNIFORM_BLOCKS",
+      "35374": "MAX_COMBINED_UNIFORM_BLOCKS",
+      "35375": "MAX_UNIFORM_BUFFER_BINDINGS",
+      "35376": "MAX_UNIFORM_BLOCK_SIZE",
+      "35377": "MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS",
+      "35379": "MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS",
+      "35380": "UNIFORM_BUFFER_OFFSET_ALIGNMENT",
+      "35657": "MAX_VERTEX_UNIFORM_COMPONENTS",
+      "35658": "MAX_FRAGMENT_UNIFORM_COMPONENTS",
+      "35659": "MAX_VARYING_COMPONENTS",
+      "35660": "MAX_VERTEX_TEXTURE_IMAGE_UNITS",
+      "35661": "MAX_COMBINED_TEXTURE_IMAGE_UNITS",
+      "35723": "IMPLEMENTATION_COLOR_READ_FORMAT",
+      "35724": "SHADING_LANGUAGE_VERSION",
+      "35738": "IMPLEMENTATION_COLOR_READ_TYPE_OES",
+      "35739": "IMPLEMENTATION_COLOR_READ_FORMAT_OES",
+      "35968": "MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS",
+      "35977": "RASTERIZER_DISCARD",
+      "35978": "MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS",
+      "35979": "MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS",
+      "36003": "STENCIL_BACK_REF",
+      "36004": "STENCIL_BACK_VALUE_MASK",
+      "36005": "STENCIL_BACK_WRITEMASK",
+      "36063": "MAX_COLOR_ATTACHMENTS",
+      "36183": "MAX_SAMPLES",
+      "36203": "MAX_ELEMENT_INDEX",
+      "36347": "MAX_VERTEX_UNIFORM_VECTORS",
+      "36348": "MAX_VARYING_VECTORS",
+      "36349": "MAX_FRAGMENT_UNIFORM_VECTORS",
+      "36387": "TRANSFORM_FEEDBACK_PAUSED",
+      "36388": "TRANSFORM_FEEDBACK_ACTIVE",
+      "37137": "MAX_SERVER_WAIT_TIMEOUT",
+      "37154": "MAX_VERTEX_OUTPUT_COMPONENTS",
+      "37157": "MAX_FRAGMENT_INPUT_COMPONENTS",
+      "37440": "UNPACK_FLIP_Y_WEBGL",
+      "37441": "UNPACK_PREMULTIPLY_ALPHA_WEBGL",
+      "37443": "UNPACK_COLORSPACE_CONVERSION_WEBGL",
+      "37444": "BROWSER_DEFAULT_WEBGL",
+      "37445": "UNMASKED_VENDOR_WEBGL",
+      "37446": "UNMASKED_RENDERER_WEBGL",
+      "37447": "MAX_CLIENT_WAIT_TIMEOUT_WEBGL"
+    };
+
+    // Strict normative types from convert_webgl_presets.py and C++ patch draft
+    const SPECIFIC_TYPES = {
+      "3107": "boolvec",   // COLOR_WRITEMASK (4 bools)
+      "2978": "intvec",    // VIEWPORT
+      "3088": "intvec",    // SCISSOR_BOX
+      "3386": "intvec",    // MAX_VIEWPORT_DIMS
+      "2928": "floatvec",  // DEPTH_RANGE
+      "3106": "floatvec",  // COLOR_CLEAR_VALUE
+      "32773": "floatvec", // BLEND_COLOR
+      "33901": "floatvec", // ALIASED_POINT_SIZE_RANGE
+      "33902": "floatvec", // ALIASED_LINE_WIDTH_RANGE
+      "2849": "float",     // LINE_WIDTH
+      "2931": "float",     // DEPTH_CLEAR_VALUE
+      "10752": "float",    // POLYGON_OFFSET_UNITS
+      "32824": "float",    // POLYGON_OFFSET_FACTOR
+      "32938": "float",    // SAMPLE_COVERAGE_VALUE
+      "34045": "float",    // MAX_TEXTURE_LOD_BIAS
+      "2963": "uint",      // STENCIL_VALUE_MASK
+      "2968": "uint",      // STENCIL_WRITEMASK
+      "36004": "uint",     // STENCIL_BACK_VALUE_MASK
+      "36005": "uint",     // STENCIL_BACK_WRITEMASK
+      "36203": "uint",     // MAX_ELEMENT_INDEX
+      "34467": "uintvec",  // COMPRESSED_TEXTURE_FORMATS
+      "37137": "number",   // MAX_SERVER_WAIT_TIMEOUT
+      "37447": "number",   // MAX_CLIENT_WAIT_TIMEOUT_WEBGL
+      "7936": "string",    // VENDOR
+      "7937": "string",    // RENDERER
+      "7938": "string",    // VERSION
+      "35724": "string",   // SHADING_LANGUAGE_VERSION
+      "37445": "string",   // UNMASKED_VENDOR_WEBGL
+      "37446": "string",   // UNMASKED_RENDERER_WEBGL
+      "2884": "bool",      // CULL_FACE
+      "2929": "bool",      // DEPTH_TEST
+      "2930": "bool",      // DEPTH_WRITEMASK
+      "2960": "bool",      // STENCIL_TEST
+      "3024": "bool",      // DITHER
+      "3042": "bool",      // BLEND
+      "3089": "bool",      // SCISSOR_TEST
+      "32823": "bool",     // POLYGON_OFFSET_FILL
+      "32926": "bool",     // SAMPLE_COVERAGE_INVERT
+      "32928": "bool",     // SAMPLE_ALPHA_TO_COVERAGE
+      "32939": "bool",     // SAMPLE_COVERAGE
+      "35977": "bool",     // RASTERIZER_DISCARD
+      "36387": "bool",     // TRANSFORM_FEEDBACK_PAUSED
+      "36388": "bool",     // TRANSFORM_FEEDBACK_ACTIVE
+      "37440": "bool",     // UNPACK_FLIP_Y_WEBGL
+      "37441": "bool"      // UNPACK_PREMULTIPLY_ALPHA_WEBGL
+    };
+
+    const VALID_TYPES = new Set([
+      "int", "uint", "float", "number", "bool", "string",
+      "intvec", "uintvec", "floatvec", "boolvec"
+    ]);
+
+    let currentPreset = null;
+
+    /**
+     * Classifies parameter value into target type and formats { type, value }
+     */
+    function classifyAndCastParam(pname, rawValue) {
+      if (rawValue === null || rawValue === undefined) {
+        return null;
+      }
+
+      // Skip WebGL object bindings (Buffer, Framebuffer, Program, Texture, Renderbuffer etc.)
+      if (typeof rawValue === "object" &&
+          !(rawValue instanceof Int32Array) &&
+          !(rawValue instanceof Uint32Array) &&
+          !(rawValue instanceof Float32Array) &&
+          !Array.isArray(rawValue)) {
+        return null;
+      }
+
+      const pnameStr = String(pname);
+      let targetType = SPECIFIC_TYPES[pnameStr];
+
+      if (!targetType) {
+        if (typeof rawValue === "boolean") {
+          targetType = "bool";
+        } else if (typeof rawValue === "string") {
+          targetType = "string";
+        } else if (typeof rawValue === "number") {
+          if (rawValue === 4294967295) {
+            targetType = "uint";
+          } else if (Number.isInteger(rawValue)) {
+            targetType = "int";
+          } else {
+            targetType = "float";
+          }
+        } else if (rawValue instanceof Float32Array) {
+          targetType = "floatvec";
+        } else if (rawValue instanceof Int32Array) {
+          targetType = "intvec";
+        } else if (rawValue instanceof Uint32Array) {
+          targetType = "uintvec";
+        } else if (Array.isArray(rawValue)) {
+          if (rawValue.length === 4 && rawValue.every(x => typeof x === "boolean")) {
+            targetType = "boolvec";
+          } else if (rawValue.every(x => typeof x === "number" && Number.isInteger(x))) {
+            targetType = "intvec";
+          } else if (rawValue.every(x => typeof x === "number")) {
+            targetType = "floatvec";
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }
+      }
+
+      try {
+        if (targetType === "int") {
+          const val = Math.trunc(rawValue);
+          if (!Number.isFinite(val) || val < -2147483648 || val > 2147483647) return null;
+          return { type: "int", value: val };
+        } else if (targetType === "uint") {
+          const val = Math.trunc(rawValue);
+          if (!Number.isFinite(val) || val < 0 || val > 4294967295) return null;
+          return { type: "uint", value: val };
+        } else if (targetType === "float") {
+          const val = Number(rawValue);
+          if (!Number.isFinite(val)) return null;
+          return { type: "float", value: val };
+        } else if (targetType === "number") {
+          const val = Number(rawValue);
+          if (!Number.isFinite(val)) return null;
+          return { type: "number", value: val };
+        } else if (targetType === "bool") {
+          return { type: "bool", value: Boolean(rawValue) };
+        } else if (targetType === "string") {
+          return { type: "string", value: String(rawValue) };
+        } else if (targetType === "intvec") {
+          const arr = Array.from(rawValue, x => Math.trunc(x));
+          if (!arr.every(x => Number.isFinite(x) && x >= -2147483648 && x <= 2147483647)) return null;
+          return { type: "intvec", value: arr };
+        } else if (targetType === "uintvec") {
+          const arr = Array.from(rawValue, x => Math.trunc(x));
+          if (!arr.every(x => Number.isFinite(x) && x >= 0 && x <= 4294967295)) return null;
+          return { type: "uintvec", value: arr };
+        } else if (targetType === "floatvec") {
+          const arr = Array.from(rawValue, x => Number(x));
+          if (!arr.every(x => Number.isFinite(x))) return null;
+          return { type: "floatvec", value: arr };
+        } else if (targetType === "boolvec") {
+          const arr = Array.from(rawValue, x => Boolean(x));
+          if (arr.length !== 4) return null;
+          return { type: "boolvec", value: arr };
+        }
+      } catch (e) {
+        return null;
+      }
+      return null;
+    }
+
+    /**
+     * Collects parameters, extensions, and shader precision from a WebGL context
+     */
+    function collectContextData(gl) {
+      if (!gl) {
+        return { parameters: {}, extensions: [], shader_precision: {} };
+      }
+
+      // 1. Get supported extensions
+      const rawExts = gl.getSupportedExtensions() || [];
+      const extensions = Array.from(new Set(
+        rawExts.filter(e => typeof e === "string" && e.trim().length > 0)
+      )).sort();
+
+      // 2. Enable supported extensions so their parameters (e.g. UNMASKED_*, ANISOTROPY) become queryable
+      for (const extName of extensions) {
+        try {
+          gl.getExtension(extName);
+        } catch (e) {
+          // ignore extension init failure
+        }
+      }
+
+      // 3. Query all specification GLenums
+      const parameters = {};
+      const sortedEnums = Object.keys(GL_ENUM_TO_NAME).map(Number).sort((a, b) => a - b);
+
+      for (const pname of sortedEnums) {
+        try {
+          const raw = gl.getParameter(pname);
+          if (raw === null || raw === undefined) continue;
+          const entry = classifyAndCastParam(pname, raw);
+          if (entry !== null) {
+            parameters[String(pname)] = entry;
+          }
+        } catch (e) {
+          // parameter unsupported on this context/hardware
+        }
+      }
+
+      // 4. Shader precision (12 combinations)
+      // VERTEX_SHADER (35633), FRAGMENT_SHADER (35632)
+      // LOW_FLOAT(36336), MEDIUM_FLOAT(36337), HIGH_FLOAT(36338), LOW_INT(36339), MEDIUM_INT(36340), HIGH_INT(36341)
+      const shaderTypes = [35633, 35632];
+      const precisionTypes = [36336, 36337, 36338, 36339, 36340, 36341];
+      const shaderPrecision = {};
+
+      for (const st of shaderTypes) {
+        for (const pt of precisionTypes) {
+          try {
+            const fmt = gl.getShaderPrecisionFormat(st, pt);
+            if (fmt) {
+              shaderPrecision[`${st}_${pt}`] = {
+                rangeMin: fmt.rangeMin,
+                rangeMax: fmt.rangeMax,
+                precision: fmt.precision
+              };
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+      }
+
+      return {
+        parameters,
+        extensions,
+        shader_precision: shaderPrecision
+      };
+    }
+
+    /**
+     * Resolves Web Speech synthesis voices asynchronously
+     */
+    function getSpeechVoicesAsync() {
+      return new Promise((resolve) => {
+        if (!window.speechSynthesis) {
+          resolve([]);
+          return;
+        }
+        let voices = window.speechSynthesis.getVoices() || [];
+        if (voices.length > 0) {
+          resolve(voices);
+          return;
+        }
+        const handler = () => {
+          voices = window.speechSynthesis.getVoices() || [];
+          resolve(voices);
+        };
+        window.speechSynthesis.onvoiceschanged = handler;
+        setTimeout(() => {
+          resolve(window.speechSynthesis.getVoices() || []);
+        }, 500);
+      });
+    }
+
+    /**
+     * Generates a clean URL-safe slug ID based on vendor, renderer and platform
+     */
+    function generatePresetSlug(unmaskedVendor, unmaskedRenderer, platform) {
+      const combined = `${unmaskedVendor || ""} ${unmaskedRenderer || ""}`.trim();
+      if (!combined) {
+        return `preset_${Date.now()}`;
+      }
+
+      let platStr = (platform || (typeof navigator !== "undefined" ? navigator.platform : "") || "").toLowerCase();
+      let osSuffix = "pc";
+      if (platStr.includes("win")) osSuffix = "win";
+      else if (platStr.includes("linux")) osSuffix = "linux";
+      else if (platStr.includes("mac") || platStr.includes("darwin")) osSuffix = "mac";
+
+      let clean = combined
+        .toLowerCase()
+        .replace(/google inc\.?\s*/g, "")
+        .replace(/direct3d11.*$/g, "")
+        .replace(/vs_\d+_\d+.*$/g, "")
+        .replace(/d3d11.*$/g, "")
+        .replace(/opengl.*$/g, "")
+        .replace(/\(r\)|\(tm\)/g, "")
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .replace(/_+/g, "_");
+
+      const parts = clean.split("_");
+      const deduped = [];
+      for (const p of parts) {
+        if (deduped.length === 0 || deduped[deduped.length - 1] !== p) {
+          deduped.push(p);
+        }
+      }
+      clean = deduped.join("_");
+
+      if (!clean) clean = "webgl_gpu";
+
+      if (!clean.endsWith(osSuffix)) {
+        clean = `${clean}_${osSuffix}`;
+      }
+
+      if (clean.length > 50) {
+        clean = clean.substring(0, 50).replace(/_+$/, "");
+      }
+
+      return clean;
+    }
+
+    /**
+     * Strict schema validator matching convert_webgl_presets.py validate_preset()
+     */
+    function validatePreset(preset) {
+      const errors = [];
+      if (!preset || typeof preset !== "object") {
+        return ["Preset must be a valid object"];
+      }
+
+      if (!preset.id || typeof preset.id !== "string") {
+        errors.append("Preset must have a non-empty string 'id'");
+      }
+
+      for (const ctx of ["webgl1", "webgl2"]) {
+        if (!preset[ctx] || typeof preset[ctx] !== "object") {
+          errors.push(`Missing section '${ctx}'`);
+          continue;
+        }
+        const section = preset[ctx];
+
+        // Parameters
+        const params = section.parameters;
+        if (!params || typeof params !== "object") {
+          errors.push(`Section '${ctx}.parameters' must be a dictionary`);
+        } else {
+          for (const [k, entry] of Object.entries(params)) {
+            if (!/^\d+$/.test(k)) {
+              errors.push(`${ctx}.parameters key '${k}' must be decimal number string`);
+            }
+            if (!entry || typeof entry !== "object") {
+              errors.push(`${ctx}.parameters['${k}'] must be a dictionary`);
+              continue;
+            }
+            const { type, value } = entry;
+            if (!VALID_TYPES.has(type)) {
+              errors.push(`${ctx}.parameters['${k}'] invalid type '${type}'`);
+              continue;
+            }
+
+            if (type === "int") {
+              if (typeof value !== "number" || !Number.isInteger(value) || value < -2147483648 || value > 2147483647) {
+                errors.push(`${ctx}.parameters['${k}'] int out of range: ${value}`);
+              }
+            } else if (type === "uint") {
+              if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > 4294967295) {
+                errors.push(`${ctx}.parameters['${k}'] uint out of range: ${value}`);
+              }
+            } else if (type === "float" || type === "number") {
+              if (typeof value !== "number" || !Number.isFinite(value)) {
+                errors.push(`${ctx}.parameters['${k}'] ${type} invalid: ${value}`);
+              }
+            } else if (type === "bool") {
+              if (typeof value !== "boolean") {
+                errors.push(`${ctx}.parameters['${k}'] bool invalid: ${value}`);
+              }
+            } else if (type === "string") {
+              if (typeof value !== "string") {
+                errors.push(`${ctx}.parameters['${k}'] string invalid: ${value}`);
+              }
+            } else if (type === "intvec") {
+              if (!Array.isArray(value) || !value.every(x => typeof x === "number" && Number.isInteger(x) && x >= -2147483648 && x <= 2147483647)) {
+                errors.push(`${ctx}.parameters['${k}'] intvec invalid`);
+              }
+            } else if (type === "uintvec") {
+              if (!Array.isArray(value) || !value.every(x => typeof x === "number" && Number.isInteger(x) && x >= 0 && x <= 4294967295)) {
+                errors.push(`${ctx}.parameters['${k}'] uintvec invalid`);
+              }
+            } else if (type === "floatvec") {
+              if (!Array.isArray(value) || !value.every(x => typeof x === "number" && Number.isFinite(x))) {
+                errors.push(`${ctx}.parameters['${k}'] floatvec invalid`);
+              }
+            } else if (type === "boolvec") {
+              if (!Array.isArray(value) || value.length !== 4 || !value.every(x => typeof x === "boolean")) {
+                errors.push(`${ctx}.parameters['${k}'] boolvec must have 4 booleans`);
+              }
+            }
+          }
+        }
+
+        // Extensions
+        const exts = section.extensions;
+        if (!Array.isArray(exts)) {
+          errors.push(`Section '${ctx}.extensions' must be an array`);
+        } else {
+          for (const e of exts) {
+            if (typeof e !== "string" || !e || /[^\x20-\x7E]/.test(e)) {
+              errors.push(`${ctx}.extensions contains non-ASCII or empty string`);
+            }
+          }
+        }
+
+        // Shader precision
+        const prec = section.shader_precision;
+        if (!prec || typeof prec !== "object") {
+          errors.push(`Section '${ctx}.shader_precision' must be a dictionary`);
+        } else {
+          for (const [pk, pv] of Object.entries(prec)) {
+            const parts = pk.split("_");
+            if (parts.length !== 2 || !/^\d+$/.test(parts[0]) || !/^\d+$/.test(parts[1])) {
+              errors.push(`${ctx}.shader_precision key '${pk}' must be '<shader>_<precision>'`);
+            }
+            if (!pv || typeof pv !== "object") {
+              errors.push(`${ctx}.shader_precision['${pk}'] must be a dictionary`);
+            } else {
+              for (const field of ["rangeMin", "rangeMax", "precision"]) {
+                if (typeof pv[field] !== "number" || !Number.isInteger(pv[field]) || pv[field] < 0) {
+                  errors.push(`${ctx}.shader_precision['${pk}'].${field} must be non-negative integer`);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return errors;
+    }
+
+    /**
+     * UI helper: update progress bar
+     */
+    function updateProgress(percent, message) {
+      const box = document.getElementById("progressBox");
+      const fill = document.getElementById("progressFill");
+      const status = document.getElementById("progressStatus");
+      box.style.display = "block";
+      fill.style.width = `${percent}%`;
+      status.textContent = message;
+    }
+
+    /**
+     * Main dump collector entry point
+     */
+    async function runDumper() {
+      const btnDump = document.getElementById("btnDump");
+      btnDump.disabled = true;
+
+      try {
+        updateProgress(10, "Инициализация WebGL контекстов...");
+        await new Promise(r => setTimeout(r, 60));
+
+        // Create canvas contexts
+        const canvas1 = document.createElement("canvas");
+        canvas1.width = 1;
+        canvas1.height = 1;
+        const gl1 = canvas1.getContext("webgl") || canvas1.getContext("experimental-webgl");
+
+        const canvas2 = document.createElement("canvas");
+        canvas2.width = 1;
+        canvas2.height = 1;
+        const gl2 = canvas2.getContext("webgl2");
+
+        updateProgress(35, "Сканирование WebGL 1.0 параметров и расширений...");
+        await new Promise(r => setTimeout(r, 80));
+        const wgl1Data = collectContextData(gl1);
+
+        updateProgress(65, "Сканирование WebGL 2.0 параметров и расширений...");
+        await new Promise(r => setTimeout(r, 80));
+        const wgl2Data = collectContextData(gl2);
+
+        updateProgress(85, "Сбор системных метаданных и синтеза речи...");
+        const voices = await getSpeechVoicesAsync();
+
+        // Extract unmasked vendor/renderer from WebGL1 or WebGL2
+        let unmaskedVendor = "";
+        let unmaskedRenderer = "";
+        if (wgl1Data.parameters["37445"]) unmaskedVendor = wgl1Data.parameters["37445"].value;
+        else if (wgl2Data.parameters["37445"]) unmaskedVendor = wgl2Data.parameters["37445"].value;
+
+        if (wgl1Data.parameters["37446"]) unmaskedRenderer = wgl1Data.parameters["37446"].value;
+        else if (wgl2Data.parameters["37446"]) unmaskedRenderer = wgl2Data.parameters["37446"].value;
+
+        const platform = navigator.platform || "";
+        const slug = generatePresetSlug(unmaskedVendor, unmaskedRenderer, platform);
+
+        // Build _meta
+        const meta = {
+          userAgent: navigator.userAgent || "",
+          platform: platform,
+          screen: {
+            width: window.screen ? window.screen.width : 0,
+            height: window.screen ? window.screen.height : 0,
+            availWidth: window.screen ? window.screen.availWidth : 0,
+            availHeight: window.screen ? window.screen.availHeight : 0,
+            devicePixelRatio: window.devicePixelRatio || 1,
+            colorDepth: window.screen ? window.screen.colorDepth : 24
+          },
+          hardwareConcurrency: navigator.hardwareConcurrency || null,
+          deviceMemory: navigator.deviceMemory || null,
+          unmaskedVendor: unmaskedVendor,
+          unmaskedRenderer: unmaskedRenderer,
+          voices: voices.map(v => ({
+            name: v.name,
+            lang: v.lang,
+            localService: Boolean(v.localService)
+          }))
+        };
+
+        const presetObj = {
+          id: slug,
+          collected_at: new Date().toISOString(),
+          webgl1: wgl1Data,
+          webgl2: wgl2Data,
+          _meta: meta
+        };
+
+        updateProgress(95, "Валидация схемы и round-trip проверка...");
+        await new Promise(r => setTimeout(r, 50));
+
+        // JSON round-trip validation
+        const jsonStr = JSON.stringify(presetObj);
+        const parsed = JSON.parse(jsonStr);
+
+        // Schema validation
+        const valErrors = validatePreset(parsed);
+        const alertEl = document.getElementById("validationAlert");
+
+        if (valErrors.length === 0) {
+          alertEl.className = "validation-alert success";
+          alertEl.innerHTML = `<strong>✓ Валидация успешна:</strong> Пресет полностью соответствует требованиям C++ патча Hyperion (${Object.keys(wgl1Data.parameters).length} WGL1, ${Object.keys(wgl2Data.parameters).length} WGL2 параметров, ${wgl1Data.extensions.length}/${wgl2Data.extensions.length} расширений).`;
+        } else {
+          alertEl.className = "validation-alert error";
+          alertEl.innerHTML = `<strong>Внимание:</strong> Обнаружены ошибки схемы (${valErrors.length}):<br>${valErrors.slice(0, 5).join("<br>")}`;
+        }
+        alertEl.style.display = "flex";
+
+        currentPreset = presetObj;
+
+        // Render UI
+        renderResults(presetObj);
+
+        updateProgress(100, "Дамп успешно собран!");
+        document.getElementById("btnDownload").classList.remove("hidden");
+        document.getElementById("btnCopy").classList.remove("hidden");
+
+      } catch (err) {
+        console.error(err);
+        const alertEl = document.getElementById("validationAlert");
+        alertEl.className = "validation-alert error";
+        alertEl.textContent = `Ошибка сбора дампа: ${err.message}`;
+        alertEl.style.display = "flex";
+      } finally {
+        btnDump.disabled = false;
+      }
+    }
+
+    /**
+     * Renders UI tables and tabs
+     */
+    function renderResults(preset) {
+      document.getElementById("resultsSection").classList.remove("hidden");
+
+      // ID input
+      const idInput = document.getElementById("presetIdInput");
+      idInput.value = preset.id;
+      idInput.oninput = (e) => {
+        preset.id = e.target.value.trim();
+      };
+
+      // Summary stats
+      const renderer = preset._meta.unmaskedRenderer || preset.webgl1.parameters["7937"]?.value || "Unknown";
+      const vendor = preset._meta.unmaskedVendor || preset.webgl1.parameters["7936"]?.value || "Unknown";
+      document.getElementById("statRenderer").textContent = renderer;
+      document.getElementById("statVendor").textContent = vendor;
+
+      const w1Count = Object.keys(preset.webgl1.parameters).length;
+      const w1ExtCount = preset.webgl1.extensions.length;
+      document.getElementById("statWgl1Params").textContent = `${w1Count} параметров`;
+      document.getElementById("statWgl1Exts").textContent = `${w1ExtCount} расширений • ${Object.keys(preset.webgl1.shader_precision).length} precisions`;
+
+      const w2Count = Object.keys(preset.webgl2.parameters).length;
+      const w2ExtCount = preset.webgl2.extensions.length;
+      document.getElementById("statWgl2Params").textContent = `${w2Count} параметров`;
+      document.getElementById("statWgl2Exts").textContent = `${w2ExtCount} расширений • ${Object.keys(preset.webgl2.shader_precision).length} precisions`;
+
+      const cores = preset._meta.hardwareConcurrency ? `${preset._meta.hardwareConcurrency} cores` : "";
+      const mem = preset._meta.deviceMemory ? `${preset._meta.deviceMemory} GB RAM` : "";
+      const scr = `${preset._meta.screen.width}x${preset._meta.screen.height}@${preset._meta.screen.devicePixelRatio}x`;
+      document.getElementById("statHardware").textContent = `${preset._meta.platform} • ${cores} ${mem}`;
+      document.getElementById("statVoices").textContent = `${scr} • ${preset._meta.voices.length} TTS голосов`;
+
+      // Fill tables
+      fillParamsTable("tableWgl1", preset.webgl1.parameters);
+      fillParamsTable("tableWgl2", preset.webgl2.parameters);
+
+      // Extensions
+      document.getElementById("countExt1").textContent = w1ExtCount;
+      document.getElementById("countExt2").textContent = w2ExtCount;
+      fillExtensionCloud("extCloud1", preset.webgl1.extensions);
+      fillExtensionCloud("extCloud2", preset.webgl2.extensions);
+
+      // Shader precision
+      fillPrecisionTable("tablePrecision", preset.webgl2.shader_precision || preset.webgl1.shader_precision);
+
+      // Meta
+      fillMetaTable("tableMeta", preset._meta);
+
+      // JSON preview
+      document.getElementById("jsonPreview").textContent = JSON.stringify(preset, null, 2);
+    }
+
+    function fillParamsTable(tableId, params) {
+      const tbody = document.querySelector(`#${tableId} tbody`);
+      tbody.innerHTML = "";
+      const rows = [];
+
+      for (const [pname, entry] of Object.entries(params)) {
+        const name = GL_ENUM_TO_NAME[pname] || `0x${Number(pname).toString(16).toUpperCase()}`;
+        const valStr = JSON.stringify(entry.value);
+        rows.push({
+          pname,
+          name,
+          type: entry.type,
+          valStr
+        });
+      }
+
+      rows.sort((a, b) => Number(a.pname) - Number(b.pname));
+
+      for (const r of rows) {
+        const tr = document.createElement("tr");
+        tr.dataset.search = `${r.pname} ${r.name} ${r.type} ${r.valStr}`.toLowerCase();
+        tr.innerHTML = `
+          <td>${r.pname}</td>
+          <td style="color: var(--text-primary); font-weight: 500;">${r.name}</td>
+          <td><span class="type-pill type-${r.type}">${r.type}</span></td>
+          <td style="color: var(--accent-cyan);">${escapeHtml(r.valStr)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function fillExtensionCloud(containerId, extensions) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      for (const ext of extensions) {
+        const span = document.createElement("span");
+        span.className = "tag";
+        span.textContent = ext;
+        container.appendChild(span);
+      }
+    }
+
+    function fillPrecisionTable(tableId, precisionObj) {
+      const tbody = document.querySelector(`#${tableId} tbody`);
+      tbody.innerHTML = "";
+
+      const shaderNames = { "35633": "VERTEX_SHADER", "35632": "FRAGMENT_SHADER" };
+      const precNames = {
+        "36336": "LOW_FLOAT",
+        "36337": "MEDIUM_FLOAT",
+        "36338": "HIGH_FLOAT",
+        "36339": "LOW_INT",
+        "36340": "MEDIUM_INT",
+        "36341": "HIGH_INT"
+      };
+
+      for (const [key, val] of Object.entries(precisionObj)) {
+        const [st, pt] = key.split("_");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${shaderNames[st] || st}</td>
+          <td>${precNames[pt] || pt}</td>
+          <td><code>${key}</code></td>
+          <td style="color: var(--accent-cyan);">${val.rangeMin}</td>
+          <td style="color: var(--accent-cyan);">${val.rangeMax}</td>
+          <td style="color: var(--accent-cyan);">${val.precision}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function fillMetaTable(tableId, meta) {
+      const tbody = document.querySelector(`#${tableId} tbody`);
+      tbody.innerHTML = "";
+
+      const addRow = (k, v) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="color: var(--text-secondary); font-weight: 500;">${escapeHtml(k)}</td>
+          <td style="color: var(--accent-cyan);">${escapeHtml(typeof v === "object" ? JSON.stringify(v, null, 2) : String(v))}</td>
+        `;
+        tbody.appendChild(tr);
+      };
+
+      addRow("userAgent", meta.userAgent);
+      addRow("platform", meta.platform);
+      addRow("unmaskedVendor", meta.unmaskedVendor);
+      addRow("unmaskedRenderer", meta.unmaskedRenderer);
+      addRow("hardwareConcurrency", meta.hardwareConcurrency);
+      addRow("deviceMemory", meta.deviceMemory ? `${meta.deviceMemory} GB` : "n/a");
+      addRow("screen", meta.screen);
+      addRow("speechSynthesis voices", `${meta.voices.length} voices loaded`);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Search filters
+    document.getElementById("searchWgl1").addEventListener("input", (e) => {
+      filterTable("tableWgl1", e.target.value.toLowerCase());
+    });
+
+    document.getElementById("searchWgl2").addEventListener("input", (e) => {
+      filterTable("tableWgl2", e.target.value.toLowerCase());
+    });
+
+    function filterTable(tableId, query) {
+      const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+      for (const row of rows) {
+        if (!query || row.dataset.search.includes(query)) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      }
+    }
+
+    // Tabs navigation
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        btn.classList.add("active");
+        const tabId = btn.dataset.tab;
+        document.getElementById(tabId).classList.add("active");
+      });
+    });
+
+    // Download JSON
+    document.getElementById("btnDownload").addEventListener("click", () => {
+      if (!currentPreset) return;
+      const idInput = document.getElementById("presetIdInput");
+      currentPreset.id = idInput.value.trim() || currentPreset.id;
+      const jsonStr = JSON.stringify(currentPreset, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${currentPreset.id}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // Copy JSON
+    document.getElementById("btnCopy").addEventListener("click", async () => {
+      if (!currentPreset) return;
+      const idInput = document.getElementById("presetIdInput");
+      currentPreset.id = idInput.value.trim() || currentPreset.id;
+      const jsonStr = JSON.stringify(currentPreset, null, 2);
+
+      try {
+        await navigator.clipboard.writeText(jsonStr);
+        const btn = document.getElementById("btnCopy");
+        const origText = btn.innerHTML;
+        btn.textContent = "Скопировано!";
+        setTimeout(() => { btn.innerHTML = origText; }, 1800);
+      } catch (e) {
+        alert("Не удалось скопировать в буфер. Используйте вкладку Raw JSON.");
+      }
+    });
+
+    // Dump button
+    document.getElementById("btnDump").addEventListener("click", runDumper);
+  </script>
+</body>
+</html>

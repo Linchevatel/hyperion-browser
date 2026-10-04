@@ -1,0 +1,251 @@
+{
+  "nav": {
+    "profiles": "Профили",
+    "proxies": "Прокси",
+    "fingerprints": "Отпечатки",
+    "extensions": "Расширения",
+    "settings": "Настройки"
+  },
+  "sidebar": {
+    "updateAvailable": "Доступно обновление",
+    "updateCenter": "Открыть центр обновлений"
+  },
+  "topbar": {
+    "searchPh": "Поиск профилей, тегов, прокси...",
+    "filterAll": "Все",
+    "filterRunning": "Активные",
+    "filterStopped": "Остановленные",
+    "filterAllOs": "Все ОС",
+    "newProfile": "Новый профиль",
+    "moreOptions": "Другие варианты"
+  },
+  "menu": {
+    "createNew": "Создать новый профиль",
+    "importFile": "Импортировать профиль из файла",
+    "bulkCreate": "Массовое создание профилей"
+  },
+  "folders": {
+    "addTitle": "Создать новую папку"
+  },
+  "stats": {
+    "totalProfiles": "Всего профилей",
+    "runningSessions": "Запущенных сессий",
+    "connectedProxies": "Подключенных прокси"
+  },
+  "bulk": {
+    "selectedLabel": "Выбрано профилей:",
+    "startSelected": "Запустить выбранные",
+    "stopSelected": "Остановить выбранные",
+    "deleteSelected": "Удалить выбранные"
+  },
+  "table": {
+    "status": "Статус",
+    "profile": "Профиль",
+    "tags": "Теги",
+    "proxy": "Прокси",
+    "fingerprint": "Цифровой отпечаток",
+    "plugins": "Плагины",
+    "actions": "Действия"
+  },
+  "empty": {
+    "noProfiles": "Нет созданных профилей",
+    "noProfilesDesc": "Создайте свой первый антидетект-профиль с уникальным аппаратным отпечатком прямо сейчас.",
+    "createProfile": "Создать профиль"
+  },
+  "proxies": {
+    "title": "Менеджер прокси",
+    "desc": "Управление SOCKS5 / HTTP прокси-серверами",
+    "importList": "Импорт списком",
+    "addProxy": "Добавить прокси",
+    "thProto": "Протокол",
+    "thHost": "Хост / IP",
+    "thPort": "Порт",
+    "thAuth": "Авторизация",
+    "thPing": "Пинг / Статус",
+    "thActions": "Действия",
+    "emptyTitle": "Список прокси пуст",
+    "emptyDesc": "Добавьте SOCKS5 или HTTP прокси для привязки к сессиям браузера.",
+    "emptyBtn": "Добавить прокси"
+  },
+  "fpview": {
+    "title": "Библиотека аппаратных профилей",
+    "desc": "Готовые эталонные комбинации видеокарт, ядер процессора и разрешений",
+    "createTemplate": "Создать шаблон"
+  },
+  "extview": {
+    "title": "Каталог и менеджер расширений",
+    "desc": "Установка плагинов в профили из Web Store или распакованных папок",
+    "loadUnpacked": "Загрузить из папки (Unpacked)",
+    "inputPh": "Вставьте ссылку на расширение из Chrome Web Store или 32-значный ID...",
+    "installByLink": "Установить по ссылке/ID",
+    "installedTitle": "Установленные расширения",
+    "installedCount": "0 установлено",
+    "catalogTitle": "Каталог проверенных плагинов (24 расширения)",
+    "catalogDesc": "Автоматическая загрузка из Web Store и привязка к профилям",
+    "catAll": "Все (24)",
+    "catUtility": "Утилиты / Cookies",
+    "catCrypto": "Web3 / Крипта",
+    "catSecurity": "Безопасность / Капча",
+    "catTraffic": "Трафик / Арбитраж"
+  },
+  "settings": {
+    "title": "Настройки",
+    "desc": "Конфигурация Hyperion Anti-Detect Multibrowser",
+    "globalTitle": "Глобальные настройки сессий",
+    "defaultUrlLabel": "Стартовая страница по умолчанию:",
+    "saveBtn": "Сохранить настройки",
+    "updateTitle": "Обновление программы",
+    "upToDate": "Установлена актуальная версия. Проверка выполняется автоматически.",
+    "checkNow": "Проверить сейчас",
+    "installUpdate": "Установить обновление",
+    "downloadUpdate": "Скачать и обновить",
+    "restartApply": "Перезапустить и применить",
+    "progressLabel": "Загрузка компонентов...",
+    "maintenanceTitle": "Обслуживание и резервные копии",
+    "clearCache": "Очистить кэш всех сессий",
+    "exportBackup": "Экспорт резервной копии (JSON)",
+    "importBackup": "Импорт резервной копии (JSON)",
+    "bannerTitleDflt": "Доступно обновление Hyperion",
+    "bannerNotesDflt": "Новая версия готова к автоматической установке.",
+    "sizeInfo": "0 МБ / 0 МБ",
+    "speedInfo": "0 МБ/с",
+    "langTitle": "Язык интерфейса",
+    "langLabel": "Язык интерфейса приложения:"
+  },
+  "common": {
+    "osLabel": "Операционная система",
+    "cancel": "Отмена",
+    "close": "Закрыть"
+  },
+  "modal": {
+    "titleNew": "Новый профиль",
+    "subtitle": "Настройка параметров изоляции, отпечатка и расширений",
+    "tabGeneral": "Основное",
+    "tabProxy": "Прокси",
+    "tabFingerprint": "Аппаратный отпечаток (Hardware)",
+    "tabExtensions": "Расширения",
+    "quickPresets": "Аппаратные профили (Quick Setup)",
+    "quickPresetsHint": "Быстрая конфигурация отпечатка в 1 клик",
+    "nameLabel": "Название профиля <span class=\"req\">*</span>",
+    "namePh": "Например: FB Ads #1, Crypto farming...",
+    "folderLabel": "Папка / Группа",
+    "tagsLabel": "Теги (через запятую)",
+    "startUrlLabel": "Стартовые вкладки сессии (URL через запятую; пусто = глобальная настройка)",
+    "notesLabel": "Заметки к профилю",
+    "notesPh": "Логины, назначения или заметки...",
+    "proxyToggle": "Использовать прокси-сервер",
+    "savedProxyLabel": "Выбрать из сохраненных прокси",
+    "manualOption": "— Ввести вручную —",
+    "protoLabel": "Протокол",
+    "hostLabel": "Хост / IP",
+    "hostPh": "192.168.1.1 или proxy.domain.com",
+    "portLabel": "Порт",
+    "userLabel": "Логин (опционально)",
+    "userPh": "Логин",
+    "passLabel": "Пароль (опционально)",
+    "passPh": "Пароль",
+    "testConn": "Проверить соединение",
+    "fpTitle": "Конфигуратор цифрового отпечатка",
+    "fpDesc": "Выбирайте видеокарту, процессор и параметры вручную из списков или генерируйте случайно",
+    "randomFp": "Случайный отпечаток",
+    "gpuLabel": "Видеокарта (WebGL Renderer) <span class=\"badge-mini\">Blink Spoof</span>",
+    "coresLabel": "Процессор (Ядра CPU)",
+    "ramLabel": "Память (RAM GB)",
+    "resLabel": "Разрешение экрана",
+    "tzLabel": "Часовой пояс (Timezone)",
+    "localeLabel": "Язык браузера (Locale)",
+    "webrtcLabel": "Режим WebRTC",
+    "canvasNoise": "Аппаратный шум Canvas",
+    "audioNoise": "Аппаратный шум AudioContext",
+    "extPick": "Отметьте расширения, которые должны загружаться при запуске этого профиля:",
+    "cookiesTitle": "Управление Cookies сессии",
+    "cookiesDesc": "Прямой импорт и экспорт в SQLite базу данных профиля (JSON / Netscape)",
+    "exportBtn": "Экспорт",
+    "importBtn": "Импортировать в базу",
+    "cookiesLabel": "Вставьте cookies (JSON массив или строки Netscape):",
+    "saveProfile": "Сохранить профиль",
+    "cookiesHint": "Поддерживается стандартный экспорт из расширений Cookie-Editor и EditThisCookie"
+  },
+  "proxymodal": {
+    "title": "Добавить прокси",
+    "protoLabel": "Протокол",
+    "hostLabel": "Хост / IP <span class=\"req\">*</span>",
+    "portLabel": "Порт <span class=\"req\">*</span>",
+    "rotateLabel": "Ссылка смены IP (для мобильных прокси / Rotate URL)",
+    "userLabel": "Логин",
+    "userPh": "Пользователь",
+    "passLabel": "Пароль",
+    "passPh": "Пароль",
+    "save": "Сохранить прокси"
+  },
+  "importmodal": {
+    "title": "Импорт списка прокси",
+    "hint": "Вставьте каждую строку в формате <code>ip:port:user:pass</code> или <code>protocol://user:pass@ip:port</code>",
+    "submit": "Импортировать"
+  },
+  "tplmodal": {
+    "title": "Создать шаблон отпечатка",
+    "subtitle": "Сохранение эталонной аппаратной конфигурации для быстрого создания профилей",
+    "nameLabel": "Название шаблона <span class=\"req\">*</span>",
+    "namePh": "Например: RTX 4080 Gaming Rig, MacBook M3 Max Dev",
+    "gpuLabel": "Видеокарта (WebGL Renderer)",
+    "coresLabel": "Ядра CPU",
+    "ramLabel": "Память RAM",
+    "resLabel": "Разрешение экрана",
+    "tzLabel": "Часовой пояс (Timezone)",
+    "localeLabel": "Локаль (Язык)",
+    "save": "Сохранить шаблон"
+  },
+  "bulkmodal": {
+    "title": "Массовое создание профилей",
+    "subtitle": "Генерация N уникальных профилей с валидным железом в 1 клик",
+    "baseName": "Базовое название",
+    "countLabel": "Количество (1 - 50)",
+    "folderLabel": "Папка назначения",
+    "startTabs": "Стартовые вкладки (через запятую)",
+    "submit": "Сгенерировать профили"
+  },
+  "warmup": {
+    "title": "Cookie Robot (Автопрогрев профиля)",
+    "subtitle": "Фоновый серфинг по сайтам для сбора истории и доверенных куки",
+    "desc": "Робот запустит сессию в скрытом режиме и поочередно зайдет на каждый сайт с паузами, накапливая кэш и куки:",
+    "urlLabel": "Список URL для прогрева (по одному на строку):",
+    "progress": "⏳ Идет фоновый серфинг... Пожалуйста, подождите.",
+    "start": "Запустить прогрев"
+  },
+  "prompt": {
+    "title": "Добавление",
+    "label": "Название:",
+    "confirm": "Добавить"
+  },
+  "confirm": {
+    "title": "Подтверждение",
+    "confirm": "Подтвердить"
+  },
+  "inspector": {
+    "name": "Имя профиля",
+    "actionsTitle": "Действия с профилем",
+    "startProfile": "Запустить профиль",
+    "settingsTitle": "Настройки профиля и отпечатка",
+    "settings": "Настройки",
+    "cookiesTitle": "Импорт, экспорт и просмотр cookies",
+    "warmupTitle": "Cookie Robot - автопрогрев сайтов",
+    "warmup": "Прогрев (Robot)",
+    "cloneTitle": "Клонировать профиль",
+    "clone": "Клонировать",
+    "exportTitle": "Экспортировать архив (.hyperion)",
+    "export": "Экспорт",
+    "folderTitle": "Открыть папку данных профиля",
+    "folder": "Папка данных",
+    "deleteTitle": "Удалить профиль",
+    "delete": "Удалить профиль",
+    "fpTitle": "Аппаратный отпечаток",
+    "screen": "Экран",
+    "plugins": "Плагины",
+    "protection": "Защита",
+    "netTitle": "Сеть и Прокси",
+    "quickNotes": "Быстрые заметки",
+    "autosave": "Автосохранение",
+    "notesPh": "Заметки, логины, пароли, 2FA..."
+  }
+}

@@ -1,0 +1,1468 @@
+[
+  {
+    "id": "win_laptop_intel_hd_graphics_1080p",
+    "os": "windows",
+    "category": "laptop",
+    "weight": 30.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (Intel)",
+      "renderer": "ANGLE (Intel, Intel(R) HD Graphics Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 1280,
+        "height": 720,
+        "availWidth": 1280,
+        "availHeight": 680,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 11.5
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 816,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 9.4
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1032,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 7
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 824,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 6.9
+      },
+      {
+        "width": 1920,
+        "height": 1200,
+        "availWidth": 1920,
+        "availHeight": 1152,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 4.7
+      },
+      {
+        "width": 1706,
+        "height": 1066,
+        "availWidth": 1706,
+        "availHeight": 1018,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 4.7
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 720,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 4.7
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "availWidth": 1280,
+        "availHeight": 672,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 4.7
+      },
+      {
+        "width": 3440,
+        "height": 1440,
+        "availWidth": 3440,
+        "availHeight": 1392,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 2928,
+        "height": 824,
+        "availWidth": 2928,
+        "availHeight": 784,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1400,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1392,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 2560,
+        "height": 1080,
+        "availWidth": 2560,
+        "availHeight": 1040,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 2048,
+        "height": 1152,
+        "availWidth": 2048,
+        "availHeight": 1104,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1706,
+        "height": 960,
+        "availWidth": 1706,
+        "availHeight": 912,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "availWidth": 1600,
+        "availHeight": 952,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1600,
+        "height": 900,
+        "availWidth": 1600,
+        "availHeight": 860,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1536,
+        "height": 1024,
+        "availWidth": 1536,
+        "availHeight": 984,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1536,
+        "height": 960,
+        "availWidth": 1536,
+        "availHeight": 920,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1536,
+        "height": 960,
+        "availWidth": 1536,
+        "availHeight": 912,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1536,
+        "height": 960,
+        "availWidth": 1536,
+        "availHeight": 904,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1464,
+        "height": 916,
+        "availWidth": 1464,
+        "availHeight": 876,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1440,
+        "height": 900,
+        "availWidth": 1440,
+        "availHeight": 860,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 728,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1288,
+        "height": 860,
+        "availWidth": 1288,
+        "availHeight": 812,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1280,
+        "height": 800,
+        "availWidth": 1280,
+        "availHeight": 752,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1280,
+        "height": 800,
+        "availWidth": 1280,
+        "availHeight": 752,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 2.3
+      },
+      {
+        "width": 1092,
+        "height": 616,
+        "availWidth": 1092,
+        "availHeight": 576,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.3
+      }
+    ],
+    "speechVoices": [
+      "Microsoft David - English (United States):en-US:local",
+      "Microsoft Mark - English (United States):en-US:local",
+      "Microsoft Zira - English (United States):en-US:local",
+      "Microsoft David Desktop - English (United States):en-US:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  },
+  {
+    "id": "win_desktop_nvidia_gtx980_1080p",
+    "os": "windows",
+    "category": "desktop",
+    "weight": 25.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        6,
+        12
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      16,
+      32
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (NVIDIA)",
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 824,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 9.9
+      },
+      {
+        "width": 3840,
+        "height": 1080,
+        "availWidth": 3840,
+        "availHeight": 1032,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 6.7
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1392,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 6.7
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1032,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 6.7
+      },
+      {
+        "width": 1920,
+        "height": 1200,
+        "availWidth": 1920,
+        "availHeight": 1160,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 6.6
+      },
+      {
+        "width": 5120,
+        "height": 1440,
+        "availWidth": 5120,
+        "availHeight": 1392,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 3440,
+        "height": 1440,
+        "availWidth": 3440,
+        "availHeight": 1400,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 3440,
+        "height": 1440,
+        "availWidth": 3440,
+        "availHeight": 1387,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 2560,
+        "height": 1080,
+        "availWidth": 2560,
+        "availHeight": 1032,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 2196,
+        "height": 1236,
+        "availWidth": 2196,
+        "availHeight": 1196,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1920,
+        "height": 1440,
+        "availWidth": 1920,
+        "availHeight": 1392,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1040,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1023,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1706,
+        "height": 1066,
+        "availWidth": 1706,
+        "availHeight": 1026,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1706,
+        "height": 960,
+        "availWidth": 1706,
+        "availHeight": 920,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1706,
+        "height": 960,
+        "availWidth": 1706,
+        "availHeight": 912,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1680,
+        "height": 1050,
+        "availWidth": 1680,
+        "availHeight": 1010,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1600,
+        "height": 1200,
+        "availWidth": 1600,
+        "availHeight": 1152,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1600,
+        "height": 900,
+        "availWidth": 1600,
+        "availHeight": 860,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 816,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1440,
+        "height": 900,
+        "availWidth": 1440,
+        "availHeight": 860,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 720,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1360,
+        "height": 768,
+        "availWidth": 1360,
+        "availHeight": 720,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 3.3
+      },
+      {
+        "width": 1280,
+        "height": 800,
+        "availWidth": 1280,
+        "availHeight": 760,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 3.3
+      }
+    ],
+    "speechVoices": [
+      "Microsoft David - English (United States):en-US:local",
+      "Microsoft Mark - English (United States):en-US:local",
+      "Microsoft Zira - English (United States):en-US:local",
+      "Microsoft David Desktop - English (United States):en-US:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  },
+  {
+    "id": "win_laptop_intel_hd400_768p",
+    "os": "windows",
+    "category": "laptop",
+    "weight": 15.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (Intel)",
+      "renderer": "ANGLE (Intel, Intel(R) HD Graphics 400 Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 816,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 8.8
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 728,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 8.8
+      },
+      {
+        "width": 1280,
+        "height": 1024,
+        "availWidth": 1280,
+        "availHeight": 984,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 5.9
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "availWidth": 1280,
+        "availHeight": 672,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 5.9
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1040,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 5.8
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1032,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 5.8
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 720,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 5.8
+      },
+      {
+        "width": 3440,
+        "height": 1440,
+        "availWidth": 3440,
+        "availHeight": 1392,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 2294,
+        "height": 960,
+        "availWidth": 2294,
+        "availHeight": 912,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 2048,
+        "height": 1152,
+        "availWidth": 2048,
+        "availHeight": 1120,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1920,
+        "height": 1200,
+        "availWidth": 1920,
+        "availHeight": 1152,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1706,
+        "height": 1066,
+        "availWidth": 1706,
+        "availHeight": 1018,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1706,
+        "height": 960,
+        "availWidth": 1706,
+        "availHeight": 920,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1680,
+        "height": 1050,
+        "availWidth": 1680,
+        "availHeight": 1002,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 832,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 824,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 808,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1504,
+        "height": 1002,
+        "availWidth": 1504,
+        "availHeight": 962,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1500,
+        "height": 1000,
+        "availWidth": 1500,
+        "availHeight": 952,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 738,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1280,
+        "height": 854,
+        "availWidth": 1280,
+        "availHeight": 806,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1096,
+        "height": 616,
+        "availWidth": 1096,
+        "availHeight": 576,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1096,
+        "height": 616,
+        "availWidth": 1096,
+        "availHeight": 568,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1092,
+        "height": 616,
+        "availWidth": 1092,
+        "availHeight": 568,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.9
+      },
+      {
+        "width": 1088,
+        "height": 616,
+        "availWidth": 1088,
+        "availHeight": 568,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 2.9
+      }
+    ],
+    "speechVoices": [
+      "Microsoft David - English (United States):en-US:local",
+      "Microsoft Mark - English (United States):en-US:local",
+      "Microsoft Zira - English (United States):en-US:local",
+      "Microsoft David Desktop - English (United States):en-US:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  },
+  {
+    "id": "win_desktop_amd_r9_200_1440p",
+    "os": "windows",
+    "category": "desktop",
+    "weight": 10.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        6,
+        12
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      16,
+      32
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (AMD)",
+      "renderer": "ANGLE (AMD, Radeon R9 200 Series Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 2048,
+        "height": 1152,
+        "availWidth": 2048,
+        "availHeight": 1112,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 8.7
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1032,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 8.7
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 816,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 8.7
+      },
+      {
+        "width": 1440,
+        "height": 900,
+        "availWidth": 1440,
+        "availHeight": 852,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 8.7
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "availWidth": 1280,
+        "availHeight": 672,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 8.7
+      },
+      {
+        "width": 5120,
+        "height": 1440,
+        "availWidth": 5120,
+        "availHeight": 1400,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 3840,
+        "height": 1600,
+        "availWidth": 3840,
+        "availHeight": 1552,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 3440,
+        "height": 1440,
+        "availWidth": 3440,
+        "availHeight": 1392,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1400,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1392,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 2304,
+        "height": 1440,
+        "availWidth": 2304,
+        "availHeight": 1400,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 1706,
+        "height": 960,
+        "availWidth": 1706,
+        "availHeight": 912,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 1536,
+        "height": 960,
+        "availWidth": 1536,
+        "availHeight": 912,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 1536,
+        "height": 960,
+        "availWidth": 1536,
+        "availHeight": 904,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 728,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 1280,
+        "height": 800,
+        "availWidth": 1280,
+        "availHeight": 752,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 1280,
+        "height": 800,
+        "availWidth": 1280,
+        "availHeight": 752,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 4.3
+      },
+      {
+        "width": 1096,
+        "height": 616,
+        "availWidth": 1096,
+        "availHeight": 584,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 4.3
+      }
+    ],
+    "speechVoices": [
+      "Microsoft David - English (United States):en-US:local",
+      "Microsoft Mark - English (United States):en-US:local",
+      "Microsoft Zira - English (United States):en-US:local",
+      "Microsoft David Desktop - English (United States):en-US:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  },
+  {
+    "id": "win_laptop_amd_hd3200_768p",
+    "os": "windows",
+    "category": "laptop",
+    "weight": 6.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (AMD)",
+      "renderer": "ANGLE (AMD, Radeon HD 3200 Graphics Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 824,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 11.2
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 728,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 11.2
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1032,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 816,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "availWidth": 1280,
+        "availHeight": 672,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1400,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 5.6
+      },
+      {
+        "width": 2196,
+        "height": 1236,
+        "availWidth": 2196,
+        "availHeight": 1184,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 5.6
+      },
+      {
+        "width": 1920,
+        "height": 1200,
+        "availWidth": 1920,
+        "availHeight": 1170,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 5.6
+      },
+      {
+        "width": 1706,
+        "height": 1066,
+        "availWidth": 1706,
+        "availHeight": 1018,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 5.6
+      },
+      {
+        "width": 1536,
+        "height": 960,
+        "availWidth": 1536,
+        "availHeight": 912,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 5.6
+      },
+      {
+        "width": 1504,
+        "height": 1002,
+        "availWidth": 1504,
+        "availHeight": 962,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 5.6
+      },
+      {
+        "width": 1440,
+        "height": 900,
+        "availWidth": 1440,
+        "availHeight": 852,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 5.6
+      },
+      {
+        "width": 1280,
+        "height": 800,
+        "availWidth": 1280,
+        "availHeight": 752,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 5.6
+      }
+    ],
+    "speechVoices": [
+      "Microsoft David - English (United States):en-US:local",
+      "Microsoft Mark - English (United States):en-US:local",
+      "Microsoft Zira - English (United States):en-US:local",
+      "Microsoft David Desktop - English (United States):en-US:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  },
+  {
+    "id": "win_desktop_intel_arc_a750_900p",
+    "os": "windows",
+    "category": "desktop",
+    "weight": 5.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        8,
+        16
+      ],
+      "maxTouchPoints": 10
+    },
+    "ram_gb": [
+      16,
+      32
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (Intel)",
+      "renderer": "ANGLE (Intel, Intel(R) Arc(TM) A750 Graphics Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 1440,
+        "height": 900,
+        "availWidth": 1440,
+        "availHeight": 852,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 22.2
+      },
+      {
+        "width": 1280,
+        "height": 800,
+        "availWidth": 1280,
+        "availHeight": 752,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 22.2
+      },
+      {
+        "width": 2294,
+        "height": 960,
+        "availWidth": 2294,
+        "availHeight": 912,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1706,
+        "height": 1066,
+        "availWidth": 1706,
+        "availHeight": 1018,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1600,
+        "height": 1000,
+        "availWidth": 1600,
+        "availHeight": 952,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1464,
+        "height": 916,
+        "availWidth": 1464,
+        "availHeight": 868,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1440,
+        "height": 900,
+        "availWidth": 1440,
+        "availHeight": 860,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 11.1
+      }
+    ],
+    "speechVoices": [
+      "Microsoft David - English (United States):en-US:local",
+      "Microsoft Mark - English (United States):en-US:local",
+      "Microsoft Zira - English (United States):en-US:local",
+      "Microsoft David Desktop - English (United States):en-US:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  },
+  {
+    "id": "win_desktop_basic_render_driver_768p",
+    "os": "windows",
+    "category": "desktop",
+    "weight": 3.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (Microsoft)",
+      "renderer": "ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 3456,
+        "height": 1440,
+        "availWidth": 3456,
+        "availHeight": 1392,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 20
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1040,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 20
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 720,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 20
+      },
+      {
+        "width": 1360,
+        "height": 768,
+        "availWidth": 1360,
+        "availHeight": 728,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 20
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "availWidth": 1280,
+        "availHeight": 672,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 20
+      }
+    ],
+    "speechVoices": [
+      "Microsoft David - English (United States):en-US:local",
+      "Microsoft Mark - English (United States):en-US:local",
+      "Microsoft Zira - English (United States):en-US:local",
+      "Microsoft David Desktop - English (United States):en-US:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  },
+  {
+    "id": "win_desktop_nvidia_gtx480_1080p",
+    "os": "windows",
+    "category": "desktop",
+    "weight": 2.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (NVIDIA)",
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 480 Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 1920,
+        "height": 1200,
+        "availWidth": 1920,
+        "availHeight": 1152,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 25
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1040,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 25
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1032,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 25
+      },
+      {
+        "width": 1680,
+        "height": 1050,
+        "availWidth": 1680,
+        "availHeight": 1010,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 25
+      }
+    ],
+    "speechVoices": [
+      "Microsoft Hedda - German (Germany):de-DE:local",
+      "Microsoft Katja - German (Germany):de-DE:local",
+      "Microsoft Stefan - German (Germany):de-DE:local",
+      "Microsoft Hedda Desktop - German:de-DE:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  },
+  {
+    "id": "win_desktop_amd_hd5850_768p",
+    "os": "windows",
+    "category": "desktop",
+    "weight": 1.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (AMD)",
+      "renderer": "ANGLE (AMD, Radeon HD 5850 Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 728,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 100
+      }
+    ],
+    "speechVoices": [
+      "Microsoft Helena - Spanish (Spain):es-ES:local",
+      "Microsoft Laura - Spanish (Spain):es-ES:local",
+      "Microsoft Pablo - Spanish (Spain):es-ES:local",
+      "Microsoft Raul - Spanish (Mexico):es-MX:local",
+      "Microsoft Sabina - Spanish (Mexico):es-MX:local",
+      "Microsoft Helena Desktop - Spanish (Spain):es-ES:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local",
+      "Microsoft Sabina Desktop - Spanish (Mexico):es-MX:local"
+    ]
+  },
+  {
+    "id": "win_desktop_nvidia_8800gtx_960p",
+    "os": "windows",
+    "category": "desktop",
+    "weight": 1.0,
+    "navigator": {
+      "platform": "Win32",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Google Inc. (NVIDIA)",
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce 8800 GTX Direct3D11 vs_5_0 ps_5_0)",
+      "preset": "windows_generic_angle"
+    },
+    "displays": [
+      {
+        "width": 1536,
+        "height": 960,
+        "availWidth": 1536,
+        "availHeight": 920,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 100
+      }
+    ],
+    "speechVoices": [
+      "Microsoft Raul - Spanish (Mexico):es-MX:local",
+      "Microsoft Sabina - Spanish (Mexico):es-MX:local",
+      "Microsoft Sabina Desktop - Spanish (Mexico):es-MX:local",
+      "Microsoft Zira Desktop - English (United States):en-US:local"
+    ]
+  }
+]

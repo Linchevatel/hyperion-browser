@@ -8,6 +8,8 @@ const https = require('https');
 const http = require('http');
 const {
   generateFingerprint,
+  approxDeviceMemory,
+  getKitDictionaries,
   GPU_PROFILES,
   RESOLUTIONS,
   CPU_CORES_LIST,
@@ -17,6 +19,7 @@ const {
   WEBRTC_MODES
 } = require('./fingerprint');
 const updater = require('./updater');
+const i18nMain = require('./i18n-main');
 
 function getPythonScriptPath(scriptName) {
   // 1. Check unpacked asar path
@@ -59,6 +62,15 @@ const PROXIES_FILE = path.join(CONFIG_DIR, 'proxies.json');
 const EXTENSIONS_FILE = path.join(CONFIG_DIR, 'extensions.json');
 const TEMPLATES_FILE = path.join(CONFIG_DIR, 'templates.json');
 const SETTINGS_FILE = path.join(CONFIG_DIR, 'settings.json');
+
+// i18n: загрузка словарей, IPC get-locales/set-language, персист языка в settings.json
+i18nMain.init(ipcMain, {
+  readSettings: () => readJson(SETTINGS_FILE, {}),
+  writeSettings: (patch) => {
+    const cur = readJson(SETTINGS_FILE, {});
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify({ ...cur, ...patch }, null, 2));
+  }
+});
 const PROFILES_DATA_DIR = path.join(CONFIG_DIR, 'profiles_data');
 const EXTENSIONS_DIR = path.join(CONFIG_DIR, 'extensions');
 function getChromeBinary() {
@@ -135,6 +147,14 @@ function getChromeBinary() {
   return { path: defaultPath, exists: false };
 }
 
+// Real bundled engine major version (for UA consistency)
+function getEngineMajorVersion() {
+  try {
+    const ver = fs.readFileSync(path.join(__dirname, 'CHROMIUM_VERSION'), 'utf8').trim();
+    return (ver.split('.')[0] || '154');
+  } catch (e) { return '154'; }
+}
+
 if (!fs.existsSync(CONFIG_DIR)) fs.mkdirSync(CONFIG_DIR, { recursive: true });
 if (!fs.existsSync(PROFILES_DATA_DIR)) fs.mkdirSync(PROFILES_DATA_DIR, { recursive: true });
 if (!fs.existsSync(EXTENSIONS_DIR)) fs.mkdirSync(EXTENSIONS_DIR, { recursive: true });
@@ -188,21 +208,21 @@ const POPULAR_EXTENSIONS = [
   {
     id: "hlkenndednhfkekhgcdicdfddnkalmdm",
     name: "Cookie-Editor",
-    description: "Просмотр, экспорт и импорт cookies сессий (Netscape/JSON)",
+    get description() { return i18nMain.t('ext.desc.cookieEditor'); },
     category: "Utility",
     icon: "🍪"
   },
   {
     id: "cppjkneekbjaeellbfkmgnhonkkjfpdn",
     name: "Clear Cache",
-    description: "Очистка кэша, истории и хранилища сессии в 1 клик",
+    get description() { return i18nMain.t('ext.desc.clearCache'); },
     category: "Utility",
     icon: "🧹"
   },
   {
     id: "fihnjjcciajhdojfnbdddfaoknhalnja",
     name: "I don't care about cookies",
-    description: "Автоматическое скрытие и согласие с GDPR cookie плашками",
+    get description() { return i18nMain.t('ext.desc.dontCareCookies'); },
     category: "Utility",
     icon: "🍪"
   },
@@ -211,63 +231,63 @@ const POPULAR_EXTENSIONS = [
   {
     id: "nkbihfbeogaeaoehlefnkodbefgpgknn",
     name: "MetaMask",
-    description: "Ведущий криптокошелек Ethereum / EVM сетей",
+    get description() { return i18nMain.t('ext.desc.metamask'); },
     category: "Crypto",
     icon: "🦊"
   },
   {
     id: "bfnaelmomeimhlpmgjnjophhpkkoljpa",
     name: "Phantom",
-    description: "Криптокошелек для сетей Solana, Bitcoin и Polygon",
+    get description() { return i18nMain.t('ext.desc.phantom'); },
     category: "Crypto",
     icon: "👻"
   },
   {
     id: "acmacodkjbdgmoleebolmdjonilkdbch",
     name: "Rabby Wallet",
-    description: "Лучший Web3 кошелек для мультиаккаунтинга",
+    get description() { return i18nMain.t('ext.desc.rabby'); },
     category: "Crypto",
     icon: "🐰"
   },
   {
     id: "mcohilncbfahbmgdjkbpemcciiolgcge",
     name: "OKX Wallet",
-    description: "Универсальный криптокошелек с поддержкой 100+ блокчейнов",
+    get description() { return i18nMain.t('ext.desc.okx'); },
     category: "Crypto",
     icon: "🪙"
   },
   {
     id: "egjidjbpglichdcondbcbdnbeeppgdph",
     name: "Trust Wallet",
-    description: "Официальный кошелек Binance для криптоактивов",
+    get description() { return i18nMain.t('ext.desc.trustWallet'); },
     category: "Crypto",
     icon: "🛡️"
   },
   {
     id: "dmkamcknogkgcdfhhbddcghachkejeap",
     name: "Keplr Wallet",
-    description: "Главный кошелек экосистемы Cosmos, Osmosis, Celestia",
+    get description() { return i18nMain.t('ext.desc.keplr'); },
     category: "Crypto",
     icon: "🪐"
   },
   {
     id: "opcgpfmipidbgpenhmajoajpbobppdil",
     name: "Sui Wallet",
-    description: "Официальный Web3 кошелек для сети Sui Network",
+    get description() { return i18nMain.t('ext.desc.sui'); },
     category: "Crypto",
     icon: "💧"
   },
   {
     id: "hnfanknocfeofbddgcijnmhnfnkdnaad",
     name: "Coinbase Wallet",
-    description: "Безопасный криптокошелек и Web3 браузер от Coinbase",
+    get description() { return i18nMain.t('ext.desc.coinbase'); },
     category: "Crypto",
     icon: "🔵"
   },
   {
     id: "ibnejdfjmmkpcnlpebklmnkoeoihofec",
     name: "TronLink",
-    description: "Ведущий кошелек для сети TRON (TRX, TRC-20, USDT)",
+    get description() { return i18nMain.t('ext.desc.tronLink'); },
     category: "Crypto",
     icon: "⚡"
   },
@@ -276,21 +296,21 @@ const POPULAR_EXTENSIONS = [
   {
     id: "ddkjiahejlhfcafbddmgiahcphecmpfh",
     name: "uBlock Origin Lite",
-    description: "Быстрая блокировка рекламы и трекеров нового поколения (Manifest V3)",
+    get description() { return i18nMain.t('ext.desc.ublockOriginLite'); },
     category: "Security",
     icon: "🛡️"
   },
   {
     id: "bgnkhhnnamicmpeenaelnjfhikgbkllg",
     name: "AdGuard AdBlocker",
-    description: "Эффективный блокировщик всплывающих окон и баннеров",
+    get description() { return i18nMain.t('ext.desc.adguard'); },
     category: "Security",
     icon: "🟢"
   },
   {
     id: "bhghoamapcdpbohphigoooaddinpkbai",
     name: "Authenticator (2FA)",
-    description: "Генератор 2FA кодов подтверждения прямо в браузере",
+    get description() { return i18nMain.t('ext.desc.authenticator'); },
     category: "Security",
     icon: "🔑"
   },
@@ -299,28 +319,28 @@ const POPULAR_EXTENSIONS = [
   {
     id: "fdgfkebogiimcoedlicjlajpkdmockpc",
     name: "Meta Pixel Helper",
-    description: "Проверка работы пикселей конверсий Facebook / Meta Ads",
+    get description() { return i18nMain.t('ext.desc.metaPixelHelper'); },
     category: "Traffic",
     icon: "📊"
   },
   {
     id: "gcknhkkoolaabfmlnjonogaaifnjlfnp",
     name: "FoxyProxy Standard",
-    description: "Классический инструмент управления списками прокси-серверов",
+    get description() { return i18nMain.t('ext.desc.foxyproxy'); },
     category: "Traffic",
     icon: "🦊"
   },
   {
     id: "dhdgffkkebhmkfjojejmpbldmpobfkfo",
     name: "Tampermonkey",
-    description: "Самый популярный менеджер пользовательских скриптов (Userscripts)",
+    get description() { return i18nMain.t('ext.desc.tampermonkey'); },
     category: "Traffic",
     icon: "🐵"
   },
   {
     id: "jinjaccalgkegednnccohejagnlnfdag",
     name: "Violentmonkey",
-    description: "Быстрый менеджер скриптов автоматизации с открытым кодом",
+    get description() { return i18nMain.t('ext.desc.violentmonkey'); },
     category: "Traffic",
     icon: "🐒"
   }
@@ -389,9 +409,9 @@ ipcMain.handle('create-profile', async (event, data) => {
   const raw = readJson(PROFILES_FILE, []);
   const profiles = Array.isArray(raw) ? raw : [];
   const id = require('crypto').randomUUID();
-  const fp = data.fingerprint || generateFingerprint(data.os || 'windows', id, '155');
+  const fp = data.fingerprint || generateFingerprint(data.os || 'windows', id, getEngineMajorVersion());
 
-  const rawName = (data.name || `Профиль #${profiles.length + 1}`).trim().slice(0, 30);
+  const rawName = (data.name || i18nMain.t('profile.defaultName', { num: profiles.length + 1 })).trim().slice(0, 30);
   const rawNotes = (data.notes || '').trim().slice(0, 1000);
   const rawTags = (Array.isArray(data.tags) ? data.tags : ['Main'])
     .map(t => String(t).trim().replace(/^#/, '').slice(0, 10))
@@ -401,7 +421,7 @@ ipcMain.handle('create-profile', async (event, data) => {
     id,
     name: rawName,
     os: data.os || 'windows',
-    browser_version: '155',
+    browser_version: getEngineMajorVersion(),
     tags: rawTags,
     notes: rawNotes,
     proxy: data.proxy || null,
@@ -431,7 +451,7 @@ ipcMain.handle('update-profile', async (event, id, data) => {
     writeJson(PROFILES_FILE, profiles);
     return profiles[idx];
   }
-  throw new Error('Профиль не найден');
+  throw new Error(i18nMain.t('err.profileNotFound'));
 });
 
 
@@ -490,14 +510,14 @@ ipcMain.handle('delete-profile', async (event, id) => {
 ipcMain.handle('clone-profile', async (event, id) => {
   const profiles = readJson(PROFILES_FILE, []);
   const source = profiles.find(p => p.id === id);
-  if (!source) throw new Error('Профиль не найден');
+  if (!source) throw new Error(i18nMain.t('err.profileNotFound'));
 
   const newId = require('crypto').randomUUID();
   const cloned = JSON.parse(JSON.stringify(source));
   cloned.id = newId;
-  cloned.name = `${source.name} (Копия)`;
+  cloned.name = i18nMain.t('profile.clonedName', { name: source.name });
   cloned.createdAt = Date.now();
-  cloned.fingerprint = generateFingerprint(cloned.os || 'windows', newId, '155', cloned.fingerprint);
+  cloned.fingerprint = generateFingerprint(cloned.os || 'windows', newId, getEngineMajorVersion(), cloned.fingerprint);
 
   profiles.unshift(cloned);
   writeJson(PROFILES_FILE, profiles);
@@ -508,7 +528,7 @@ ipcMain.handle('open-profile-folder', async (event, id) => {
   const chromeInfo = getChromeBinary();
   if (!chromeInfo.exists) {
     const binName = process.platform === 'win32' ? 'chrome.exe' : 'chrome';
-    throw new Error(`Исполняемый файл браузера (${binName}) не найден.\nУкажите путь к Chrome в разделе «Настройки» или установите Google Chrome.`);
+    throw new Error(i18nMain.t('err.chromeNotFound', { binName }));
   }
   const CHROME_BIN = chromeInfo.path;
 
@@ -653,7 +673,7 @@ function createSocks5Bridge(remoteHost, remotePort, user, pass) {
   });
 }
 
-function ensureProfileHelperExtension(profileDir, user, pass, os = 'windows', profileId = '') {
+function ensureProfileHelperExtension(profileDir, user, pass, os = 'windows', profileId = '', speechVoices = []) {
   const extDir = path.join(profileDir, 'profile_helper_ext');
   if (!fs.existsSync(extDir)) fs.mkdirSync(extDir, { recursive: true });
 
@@ -747,6 +767,12 @@ function ensureProfileHelperExtension(profileDir, user, pass, os = 'windows', pr
     ];
   }
 
+  // Parse "name:lang:scope" voice definitions from hardware kit
+  const parsedVoices = (speechVoices || []).map(v => {
+    const parts = String(v).split(':');
+    return { name: parts[0] || '', lang: parts[1] || 'en-US', local: parts[2] !== 'remote' };
+  }).filter(v => v.name);
+
   // Realistic Media Devices content script directly in page execution context
   const contentJs = `(function() {
   try {
@@ -781,6 +807,32 @@ function ensureProfileHelperExtension(profileDir, user, pass, os = 'windows', pr
 
     navigator.mediaDevices.enumerateDevices = patchedEnumerate;
   } catch(e) {}
+
+  // ── Speech voices spoofing (OS-realistic voice list from hardware kit) ──
+  try {
+    const voiceDefs = ${JSON.stringify(parsedVoices)};
+    if (voiceDefs.length > 0 && 'speechSynthesis' in window && typeof SpeechSynthesisVoice !== 'undefined') {
+      const synth = window.speechSynthesis;
+      const fakeVoices = voiceDefs.map((v, i) => {
+        const voice = {
+          voiceURI: v.name,
+          name: v.name,
+          lang: v.lang,
+          default: i === 0,
+          localService: v.local !== false
+        };
+        // Own data properties shadow prototype accessors; instanceof passes
+        try { Object.setPrototypeOf(voice, SpeechSynthesisVoice.prototype); } catch(e) {}
+        return voice;
+      });
+      const nativeGetVoices = function getVoices() { return fakeVoices.slice(); };
+      try {
+        Object.defineProperty(nativeGetVoices, 'name', { value: 'getVoices' });
+        nativeGetVoices.toString = function toString() { return 'function getVoices() { [native code] }'; };
+      } catch(e) {}
+      Object.defineProperty(synth, 'getVoices', { value: nativeGetVoices, configurable: true, writable: true });
+    }
+  } catch(e) {}
 })();
 `;
 
@@ -793,12 +845,12 @@ function ensureProfileHelperExtension(profileDir, user, pass, os = 'windows', pr
 async function startProfileProcess(id, customUrls = null) {
   const profiles = readJson(PROFILES_FILE, []);
   const p = profiles.find(x => x.id === id);
-  if (!p) throw new Error('Профиль не найден');
+  if (!p) throw new Error(i18nMain.t('err.profileNotFound'));
 
   const chromeInfo = getChromeBinary();
   if (!chromeInfo.exists) {
     const binName = process.platform === 'win32' ? 'chrome.exe' : 'chrome';
-    throw new Error(`Исполняемый файл браузера (${binName}) не найден.\nУкажите путь к Chrome в разделе «Настройки» или установите Google Chrome.`);
+    throw new Error(i18nMain.t('err.chromeNotFound', { binName }));
   }
   const CHROME_BIN = chromeInfo.path;
 
@@ -831,7 +883,7 @@ async function startProfileProcess(id, customUrls = null) {
     } catch (e) {}
   }
 
-  const fp = p.fingerprint || generateFingerprint(p.os || 'windows', id, '155');
+  const fp = p.fingerprint || generateFingerprint(p.os || 'windows', id, getEngineMajorVersion());
 
   // Gather installed extensions requested by profile
   const installedExts = readJson(EXTENSIONS_FILE, []);
@@ -856,13 +908,24 @@ async function startProfileProcess(id, customUrls = null) {
     `--user-agent=${fp.user_agent || ''}`,
     `--fingerprint-platform=${fp.platform || 'Win32'}`,
     `--fingerprint-concurrency=${fp.hardware?.concurrency || 8}`,
-    `--fingerprint-memory=${fp.hardware?.memory || 16}`,
+    `--fingerprint-memory=${fp.hardware?.device_memory ?? approxDeviceMemory(fp.hardware?.memory || 16, p.os === 'android' || p.os === 'ios')}`,
     `--fingerprint-webgl-vendor=${fp.webgl?.unmasked_vendor || ''}`,
     `--fingerprint-webgl-renderer=${fp.webgl?.unmasked_renderer || ''}`,
     `--fingerprint-canvas-seed=${fp.canvas_noise ? (fp.canvas_seed || 0.002) : 0.0}`,
     `--fingerprint-audio-seed=${fp.audio_noise ? (fp.audio_seed || 0.0003) : 0.0}`,
     `--fingerprint-screen-width=${fp.screen?.width || 1920}`,
-    `--fingerprint-screen-height=${fp.screen?.height || 1080}`
+    `--fingerprint-screen-height=${fp.screen?.height || 1080}`,
+    // Полный WebGL-пресет (параметры/расширения/precision) — C++ патч читает base64url JSON
+    ...(() => {
+      try {
+        if (!fp.webgl?.preset) return [];
+        const presetPath = path.join(__dirname, 'data', 'webgl_presets', `${fp.webgl.preset}.json`);
+        if (!fs.existsSync(presetPath)) return [];
+        const minified = JSON.stringify(JSON.parse(fs.readFileSync(presetPath, 'utf8')));
+        const b64 = Buffer.from(minified, 'utf8').toString('base64url');
+        return b64.length < 100000 ? [`--fingerprint-webgl-preset-b64=${b64}`] : [];
+      } catch (e) { return []; }
+    })()
     // NOTE: --fingerprint-client-hints-* flags are NOT supported by the current
     // Chromium patch (only the 9 flags above are implemented). Client Hints
     // spoofing requires extending the patch to handle Sec-CH-UA headers.
@@ -904,7 +967,7 @@ async function startProfileProcess(id, customUrls = null) {
   // Always attach helper extension (media devices spoofing + proxy auth)
   const proxyUser = (p.proxy && p.proxy.enabled) ? p.proxy.user : null;
   const proxyPass = (p.proxy && p.proxy.enabled) ? p.proxy.pass : null;
-  const helperExt = ensureProfileHelperExtension(profileDir, proxyUser, proxyPass, p.os || 'windows', id);
+  const helperExt = ensureProfileHelperExtension(profileDir, proxyUser, proxyPass, p.os || 'windows', id, fp.speech_voices || []);
   if (helperExt) extPaths.push(helperExt);
 
   // Proxy & Authenticated Proxy Support
@@ -1181,7 +1244,7 @@ ipcMain.handle('import-proxies', async (event, rawText) => {
 });
 
 ipcMain.handle('test-proxy', async (event, proxy) => {
-  if (!proxy || !proxy.host || !proxy.port) return { success: false, error: 'Укажите хост и порт' };
+  if (!proxy || !proxy.host || !proxy.port) return { success: false, error: i18nMain.t('proxy.specifyHostPort') };
   const start = Date.now();
   const geo = await queryProxyGeo(proxy);
   const ping = Date.now() - start;
@@ -1210,7 +1273,7 @@ ipcMain.handle('test-proxy', async (event, proxy) => {
     });
     sock.on('timeout', () => {
       sock.destroy();
-      resolve({ success: false, error: 'Таймаут' });
+      resolve({ success: false, error: i18nMain.t('proxy.timeout') });
     });
   });
 });
@@ -1247,7 +1310,7 @@ ipcMain.handle('install-extension', async (event, rawExtId) => {
             const extRecord = {
               id: extId,
               name: popular?.name || res.name || extId,
-              description: popular?.description || 'Пользовательское расширение',
+              description: popular?.description || i18nMain.t('ext.customExtension'),
               version: res.version || '1.0',
               path: targetDir,
               icon: popular?.icon || '🧩',
@@ -1262,7 +1325,7 @@ ipcMain.handle('install-extension', async (event, rawExtId) => {
             writeJson(EXTENSIONS_FILE, installed);
             return resolve({ success: true, extension: extRecord });
           } else {
-            return resolve({ success: false, error: res.error || 'Ошибка установки расширения' });
+            return resolve({ success: false, error: res.error || i18nMain.t('err.extInstall') });
           }
         } catch (e) {
           // stdout wasn't json
@@ -1271,14 +1334,14 @@ ipcMain.handle('install-extension', async (event, rawExtId) => {
       if (error) {
         return resolve({ success: false, error: stderr || error.message });
       }
-      return resolve({ success: false, error: 'Неизвестный ответ установщика расширений' });
+      return resolve({ success: false, error: i18nMain.t('err.extInstallerUnknown') });
     });
   });
 });
 
 ipcMain.handle('pick-extension-folder', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: 'Выберите распакованную папку расширения',
+    title: i18nMain.t('dialog.pickExtensionFolder'),
     properties: ['openDirectory']
   });
 
@@ -1289,14 +1352,14 @@ ipcMain.handle('pick-extension-folder', async () => {
   const selectedPath = result.filePaths[0];
   const manifestPath = path.join(selectedPath, 'manifest.json');
   if (!fs.existsSync(manifestPath)) {
-    throw new Error('Выбранная папка не содержит manifest.json');
+    throw new Error(i18nMain.t('err.manifestNotFound'));
   }
 
   let manifest = {};
   try {
     manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
   } catch (e) {
-    throw new Error('Некорректный manifest.json');
+    throw new Error(i18nMain.t('err.invalidManifest'));
   }
 
   const id = `custom_${Date.now()}`;
@@ -1304,7 +1367,7 @@ ipcMain.handle('pick-extension-folder', async () => {
   const record = {
     id,
     name: manifest.name || path.basename(selectedPath),
-    description: manifest.description || 'Распакованное локальное расширение',
+    description: manifest.description || i18nMain.t('ext.unpackedExtension'),
     version: manifest.version || '1.0',
     path: selectedPath,
     icon: '📂',
@@ -1332,9 +1395,42 @@ ipcMain.handle('delete-extension', async (event, extId) => {
 // IPC HANDLERS: TEMPLATES & DICTIONARIES
 // ==========================================
 ipcMain.handle('get-fp-dictionaries', async () => {
+  // Kit-словари идут первыми (значения, которые реально генерируются
+  // hardware kits), legacy — дополняют выбор вручную. Дедупликация по
+  // renderer / "WxH" — иначе applyFingerprintToDropdowns не найдёт значение
+  // и syncDropdownsToFp при сохранении сбросит поле в первый пункт списка.
+  const kitDicts = getKitDictionaries();
+  const mergedGpus = {};
+  for (const os of ['windows', 'macos', 'linux']) {
+    const seen = new Set();
+    const list = [];
+    for (const g of [...(kitDicts.GPU_PROFILES[os] || []), ...(GPU_PROFILES[os] || [])]) {
+      if (seen.has(g.renderer)) continue;
+      seen.add(g.renderer);
+      list.push(g);
+    }
+    mergedGpus[os] = list;
+  }
+  const kitResSeen = new Set();
+  const mergedRes = [];
+  for (const os of ['windows', 'macos', 'linux']) {
+    for (const r of (kitDicts.RESOLUTIONS[os] || [])) {
+      const key = `${r.width}x${r.height}`;
+      if (kitResSeen.has(key)) continue;
+      kitResSeen.add(key);
+      mergedRes.push(r);
+    }
+  }
+  for (const r of RESOLUTIONS) {
+    const key = `${r.width}x${r.height}`;
+    if (kitResSeen.has(key)) continue;
+    kitResSeen.add(key);
+    mergedRes.push(r);
+  }
+  mergedRes.sort((a, b) => (b.width * b.height) - (a.width * a.height));
   return {
-    GPU_PROFILES,
-    RESOLUTIONS,
+    GPU_PROFILES: mergedGpus,
+    RESOLUTIONS: mergedRes,
     CPU_CORES_LIST,
     RAM_LIST,
     TIMEZONES,
@@ -1519,7 +1615,7 @@ ipcMain.handle('delete-template', async (event, id) => {
 });
 
 ipcMain.handle('get-preview-fingerprint', async (event, os, overrides) => {
-  return generateFingerprint(os || 'windows', require('crypto').randomUUID(), '155', overrides);
+  return generateFingerprint(os || 'windows', require('crypto').randomUUID(), getEngineMajorVersion(), overrides);
 });
 
 // ==========================================
@@ -1615,7 +1711,7 @@ ipcMain.handle('rotate-proxy-ip', async (event, proxyId) => {
   const proxies = readJson(PROXIES_FILE, []);
   const px = proxies.find(p => p.id === proxyId);
   if (!px || !px.change_ip_url) {
-    return { success: false, error: 'Ссылка смены IP не указана' };
+    return { success: false, error: i18nMain.t('proxy.rotateUrlNotSet') };
   }
 
   const https = require(px.change_ip_url.startsWith('https') ? 'https' : 'http');
@@ -1630,7 +1726,7 @@ ipcMain.handle('rotate-proxy-ip', async (event, proxyId) => {
     req.on('error', err => resolve({ success: false, error: err.message }));
     req.on('timeout', () => {
       req.destroy();
-      resolve({ success: false, error: 'Таймаут смены IP' });
+      resolve({ success: false, error: i18nMain.t('proxy.rotateTimeout') });
     });
   });
 });
@@ -1640,7 +1736,7 @@ ipcMain.handle('inspect-ip', async (event, proxy) => {
   if (geo) {
     return { success: true, info: geo };
   }
-  return { success: false, error: 'Не удалось получить геоданные через прокси' };
+  return { success: false, error: i18nMain.t('proxy.geoFailed') };
 });
 
 
@@ -1649,7 +1745,7 @@ ipcMain.handle('inspect-ip', async (event, proxy) => {
 // ==========================================
 ipcMain.handle('bulk-create-profiles', async (event, config) => {
   const count = Math.min(Math.max(parseInt(config.count) || 1, 1), 50);
-  const baseName = config.baseName || 'Профиль';
+  const baseName = config.baseName || i18nMain.t('profile.defaultBaseName');
   const os = config.os || 'windows';
   const tags = config.tags || ['Auto'];
   const folder = config.folder || '';
@@ -1660,7 +1756,7 @@ ipcMain.handle('bulk-create-profiles', async (event, config) => {
 
   for (let i = 1; i <= count; i++) {
     const id = require('crypto').randomUUID();
-    const fp = generateFingerprint(os, id, '155');
+    const fp = generateFingerprint(os, id, getEngineMajorVersion());
     if (startUrls.length > 0) {
       fp.start_url = startUrls[0];
     }
@@ -1668,10 +1764,10 @@ ipcMain.handle('bulk-create-profiles', async (event, config) => {
       id,
       name: `${baseName} #${profiles.length + 1}`,
       os,
-      browser_version: '155',
+      browser_version: getEngineMajorVersion(),
       folder: folder,
       tags: tags,
-      notes: `Массово создан (${new Date().toLocaleDateString('ru-RU')})`,
+      notes: i18nMain.t('profile.bulkCreatedNote', { date: new Date().toLocaleDateString(i18nMain.getLang() === 'en' ? 'en-US' : 'ru-RU') }),
       proxy: null,
       extensions: [],
       start_urls: startUrls,
@@ -1692,10 +1788,10 @@ ipcMain.handle('bulk-create-profiles', async (event, config) => {
 ipcMain.handle('export-profile-package', async (event, profileId) => {
   const profiles = readJson(PROFILES_FILE, []);
   const p = profiles.find(x => x.id === profileId);
-  if (!p) throw new Error('Профиль не найден');
+  if (!p) throw new Error(i18nMain.t('err.profileNotFound'));
 
   const { filePath } = await dialog.showSaveDialog(mainWindow, {
-    title: `Экспорт профиля "${p.name}" в .hyperion`,
+    title: i18nMain.t('export.saveTitle', { name: p.name }),
     defaultPath: `${p.name.replace(/[^a-zA-Z0-9А-Яа-я_-]/g, '_')}.hyperion`,
     filters: [{ name: 'Hyperion Profile Package', extensions: ['hyperion', 'json'] }]
   });
@@ -1728,7 +1824,7 @@ ipcMain.handle('export-profile-package', async (event, profileId) => {
 
 ipcMain.handle('import-profile-package', async (event) => {
   const { filePaths } = await dialog.showOpenDialog(mainWindow, {
-    title: 'Выберите архив профиля .hyperion',
+    title: i18nMain.t('export.openTitle'),
     filters: [{ name: 'Hyperion Profile Package', extensions: ['hyperion', 'json'] }],
     properties: ['openFile']
   });
@@ -1738,14 +1834,14 @@ ipcMain.handle('import-profile-package', async (event) => {
   const raw = fs.readFileSync(filePaths[0], 'utf-8');
   const pkg = JSON.parse(raw);
 
-  if (!pkg.profile) throw new Error('Некорректный формат архива .hyperion');
+  if (!pkg.profile) throw new Error(i18nMain.t('err.invalidProfileArchive'));
 
   const profiles = readJson(PROFILES_FILE, []);
   const newId = require('crypto').randomUUID();
   const newProfile = {
     ...pkg.profile,
     id: newId,
-    name: `${pkg.profile.name} (Импорт)`,
+    name: i18nMain.t('export.importedName', { name: pkg.profile.name }),
     createdAt: Date.now()
   };
 
@@ -1773,7 +1869,7 @@ ipcMain.handle('import-profile-package', async (event) => {
 ipcMain.handle('warmup-profile', async (event, profileId, customUrls) => {
   const profiles = readJson(PROFILES_FILE, []);
   const p = profiles.find(x => x.id === profileId);
-  if (!p) throw new Error('Профиль не найден');
+  if (!p) throw new Error(i18nMain.t('err.profileNotFound'));
 
   const chromeInfo = getChromeBinary();
   const CHROME_BIN = chromeInfo.path;
@@ -1922,7 +2018,7 @@ ipcMain.handle('export-backup', async () => {
   };
 
   const { filePath } = await dialog.showSaveDialog(mainWindow, {
-    title: 'Экспорт резервной копии Hyperion',
+    title: i18nMain.t('backup.exportTitle'),
     defaultPath: `hyperion_backup_${Date.now()}.json`,
     filters: [{ name: 'JSON Backup', extensions: ['json'] }]
   });
@@ -1936,7 +2032,7 @@ ipcMain.handle('export-backup', async () => {
 
 ipcMain.handle('import-backup', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
-    title: 'Выберите файл резервной копии Hyperion (JSON)',
+    title: i18nMain.t('backup.importTitle'),
     filters: [{ name: 'JSON Backup', extensions: ['json'] }],
     properties: ['openFile']
   });
@@ -1950,7 +2046,7 @@ ipcMain.handle('import-backup', async () => {
     const data = JSON.parse(raw);
 
     if (!data || (!data.profiles && !data.proxies && !data.templates)) {
-      return { success: false, error: 'Некорректный файл резервной копии' };
+      return { success: false, error: i18nMain.t('err.invalidBackupFile') };
     }
 
     if (Array.isArray(data.profiles)) writeJson(PROFILES_FILE, data.profiles);
@@ -1974,11 +2070,11 @@ ipcMain.handle('import-backup', async () => {
 ipcMain.handle('select-chrome-binary', async () => {
   const isWin = process.platform === 'win32';
   const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
-    title: 'Выберите исполняемый файл Chrome / Chromium',
+    title: i18nMain.t('dialog.selectChromeTitle'),
     properties: ['openFile'],
     filters: isWin
-      ? [{ name: 'Исполняемые файлы (*.exe)', extensions: ['exe'] }, { name: 'Все файлы', extensions: ['*'] }]
-      : [{ name: 'Исполняемые файлы', extensions: ['*'] }]
+      ? [{ name: i18nMain.t('dialog.filterExe'), extensions: ['exe'] }, { name: i18nMain.t('dialog.filterAll'), extensions: ['*'] }]
+      : [{ name: i18nMain.t('dialog.filterExecutables'), extensions: ['*'] }]
   });
   if (canceled || !filePaths || filePaths.length === 0) return null;
   const chosenPath = filePaths[0];
@@ -2067,7 +2163,7 @@ ipcMain.handle('get-app-version', async () => {
 let PENDING_UPDATE_FILE = null;
 
 ipcMain.handle('download-app-update', async (event, downloadUrl) => {
-  if (!downloadUrl) throw new Error('Отсутствует URL для скачивания обновления');
+  if (!downloadUrl) throw new Error(i18nMain.t('update.noDownloadUrl'));
 
   const isWin = process.platform === 'win32';
   const ext = isWin ? '.exe' : '.AppImage';
@@ -2091,7 +2187,7 @@ ipcMain.handle('download-app-update', async (event, downloadUrl) => {
         if (res.statusCode !== 200) {
           file.close();
           if (fs.existsSync(targetFile)) fs.unlinkSync(targetFile);
-          return reject(new Error(`Ошибка скачивания: HTTP ${res.statusCode}`));
+          return reject(new Error(i18nMain.t('update.downloadErrorHttp', { status: res.statusCode })));
         }
 
         const totalBytes = parseInt(res.headers['content-length'] || '0', 10);
@@ -2148,7 +2244,7 @@ ipcMain.handle('download-app-update', async (event, downloadUrl) => {
 
 ipcMain.handle('install-app-update', async () => {
   if (!PENDING_UPDATE_FILE || !fs.existsSync(PENDING_UPDATE_FILE)) {
-    throw new Error('Файл обновления не найден или не был загружен.');
+    throw new Error(i18nMain.t('update.fileNotFound'));
   }
 
   const isWin = process.platform === 'win32';

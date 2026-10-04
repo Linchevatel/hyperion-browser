@@ -1,0 +1,505 @@
+[
+  {
+    "id": "linux_laptop_intel_hd_graphics_1080p",
+    "os": "linux",
+    "category": "laptop",
+    "weight": 35.0,
+    "navigator": {
+      "platform": "Linux x86_64",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Intel",
+      "renderer": "Intel(R) HD Graphics",
+      "preset": null
+    },
+    "displays": [
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1048,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 25
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 832,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 15
+      },
+      {
+        "width": 1920,
+        "height": 1200,
+        "availWidth": 1920,
+        "availHeight": 1168,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 10
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 736,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 10
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 728,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 10
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "availWidth": 1280,
+        "availHeight": 688,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 10
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1400,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 5
+      },
+      {
+        "width": 1600,
+        "height": 900,
+        "availWidth": 1600,
+        "availHeight": 868,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 5
+      },
+      {
+        "width": 1536,
+        "height": 960,
+        "availWidth": 1536,
+        "availHeight": 928,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 5
+      },
+      {
+        "width": 1096,
+        "height": 616,
+        "availWidth": 1096,
+        "availHeight": 584,
+        "devicePixelRatio": 1.75,
+        "colorDepth": 24,
+        "weight": 5
+      }
+    ],
+    "speechVoices": [
+      "en_US-ryan-high:en-US:remote"
+    ]
+  },
+  {
+    "id": "linux_laptop_intel_hd400_864p",
+    "os": "linux",
+    "category": "laptop",
+    "weight": 20.0,
+    "navigator": {
+      "platform": "Linux x86_64",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Intel",
+      "renderer": "Intel(R) HD Graphics 400",
+      "preset": null
+    },
+    "displays": [
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 832,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 33.3
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1048,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 25
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 736,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 16.7
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1413,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 8.3
+      },
+      {
+        "width": 1600,
+        "height": 900,
+        "availWidth": 1575,
+        "availHeight": 880,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 8.3
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1296,
+        "availHeight": 741,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 8.3
+      }
+    ],
+    "speechVoices": [
+      "en_US-ryan-high:en-US:remote"
+    ]
+  },
+  {
+    "id": "linux_desktop_amd_r9_200_1080p",
+    "os": "linux",
+    "category": "desktop",
+    "weight": 18.0,
+    "navigator": {
+      "platform": "Linux x86_64",
+      "hardwareConcurrency": [
+        6,
+        12
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      16,
+      32
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "AMD",
+      "renderer": "Radeon R9 200 Series",
+      "preset": null
+    },
+    "displays": [
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1408,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 22.2
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1048,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 22.2
+      },
+      {
+        "width": 3840,
+        "height": 2160,
+        "availWidth": 3840,
+        "availHeight": 2128,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 2048,
+        "height": 1152,
+        "availWidth": 2048,
+        "availHeight": 1120,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1920,
+        "height": 1200,
+        "availWidth": 1920,
+        "availHeight": 1168,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1048,
+        "devicePixelRatio": 2,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1680,
+        "height": 1050,
+        "availWidth": 1680,
+        "availHeight": 1018,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 11.1
+      }
+    ],
+    "speechVoices": [
+      "en_US-ryan-high:en-US:remote"
+    ]
+  },
+  {
+    "id": "linux_desktop_amd_hd3200_1080p",
+    "os": "linux",
+    "category": "desktop",
+    "weight": 12.0,
+    "navigator": {
+      "platform": "Linux x86_64",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "AMD",
+      "renderer": "Radeon HD 3200 Graphics",
+      "preset": null
+    },
+    "displays": [
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1048,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 33.3
+      },
+      {
+        "width": 1536,
+        "height": 864,
+        "availWidth": 1536,
+        "availHeight": 832,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 22.2
+      },
+      {
+        "width": 1366,
+        "height": 768,
+        "availWidth": 1366,
+        "availHeight": 712,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 22.2
+      },
+      {
+        "width": 1728,
+        "height": 1152,
+        "availWidth": 1728,
+        "availHeight": 1120,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 11.1
+      },
+      {
+        "width": 1706,
+        "height": 960,
+        "availWidth": 1706,
+        "availHeight": 928,
+        "devicePixelRatio": 1.5,
+        "colorDepth": 24,
+        "weight": 11.1
+      }
+    ],
+    "speechVoices": [
+      "en_US-ryan-high:en-US:remote"
+    ]
+  },
+  {
+    "id": "linux_desktop_nvidia_gtx980_1080p",
+    "os": "linux",
+    "category": "desktop",
+    "weight": 12.0,
+    "navigator": {
+      "platform": "Linux x86_64",
+      "hardwareConcurrency": [
+        8,
+        16
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      16,
+      32
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "NVIDIA Corporation",
+      "renderer": "NVIDIA GeForce GTX 980",
+      "preset": "nvidia_gtx980_linux"
+    },
+    "displays": [
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1048,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 28.6
+      },
+      {
+        "width": 5120,
+        "height": 1440,
+        "availWidth": 5120,
+        "availHeight": 1408,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 14.3
+      },
+      {
+        "width": 3840,
+        "height": 1080,
+        "availWidth": 3840,
+        "availHeight": 1048,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 14.3
+      },
+      {
+        "width": 3072,
+        "height": 1728,
+        "availWidth": 3072,
+        "availHeight": 1696,
+        "devicePixelRatio": 1.25,
+        "colorDepth": 24,
+        "weight": 14.3
+      },
+      {
+        "width": 2560,
+        "height": 1440,
+        "availWidth": 2560,
+        "availHeight": 1408,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 14.3
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "availWidth": 1920,
+        "availHeight": 1040,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 14.3
+      }
+    ],
+    "speechVoices": [
+      "virginie:fr-FR:remote",
+      "isabel:es-ES:remote",
+      "serena:en-GB:remote",
+      "samantha:en-US:remote",
+      "sabrina:de-DE:remote",
+      "silvia:it-IT:remote"
+    ]
+  },
+  {
+    "id": "linux_desktop_llvmpipe_1440p",
+    "os": "linux",
+    "category": "desktop",
+    "weight": 3.0,
+    "navigator": {
+      "platform": "Linux x86_64",
+      "hardwareConcurrency": [
+        4,
+        8
+      ],
+      "maxTouchPoints": 0
+    },
+    "ram_gb": [
+      8,
+      16
+    ],
+    "deviceMemory": 8,
+    "webgl": {
+      "vendor": "Mesa",
+      "renderer": "llvmpipe",
+      "preset": null
+    },
+    "displays": [
+      {
+        "width": 3840,
+        "height": 1080,
+        "availWidth": 3840,
+        "availHeight": 1048,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 50
+      },
+      {
+        "width": 3440,
+        "height": 1440,
+        "availWidth": 3440,
+        "availHeight": 1408,
+        "devicePixelRatio": 1,
+        "colorDepth": 24,
+        "weight": 50
+      }
+    ],
+    "speechVoices": [
+      "en_US-ryan-high:en-US:remote"
+    ]
+  }
+]

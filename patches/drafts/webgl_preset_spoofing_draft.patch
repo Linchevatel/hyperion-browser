@@ -1,0 +1,400 @@
+diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+@@ -25,6 +25,21 @@
+ 
+ #include "third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h"
+ #include "base/command_line.h"
++
++#include <array>
++#include <cmath>
++#include <cstdint>
++#include <limits>
++#include <optional>
++#include <string>
++
++#include "base/base64url.h"
++#include "base/containers/span.h"
++#include "base/json/json_reader.h"
++#include "base/no_destructor.h"
++#include "base/strings/string_number_conversions.h"
++#include "base/strings/string_util.h"
++#include "base/values.h"
+ 
+ #include <inttypes.h>
+ 
+@@ -206,6 +221,183 @@
+ 
+ namespace {
+ 
++// [Hyperion Antidetect Patch] Immutable, process-wide preset data only.
++// Do not cache WTF Strings, Oilpan objects, or V8 handles here: OffscreenCanvas
++// may query WebGL from workers as well as from the renderer main thread.
++struct HyperionWebGLPresetCache {
++  HyperionWebGLPresetCache() {
++    const auto* command_line = base::CommandLine::ForCurrentProcess();
++    if (!command_line ||
++        !command_line->HasSwitch("fingerprint-webgl-preset-b64")) {
++      return;
++    }
++    const std::string encoded =
++        command_line->GetSwitchValueASCII("fingerprint-webgl-preset-b64");
++    if (encoded.size() > 2 * 1024 * 1024)
++      return;
++    std::string json;
++    // Command-line transport avoids file I/O in sandboxed renderers.
++    if (!base::Base64UrlDecode(encoded,
++                               base::Base64UrlDecodePolicy::IGNORE_PADDING,
++                               &json) ||
++        json.size() > 1024 * 1024) {
++      return;
++    }
++    auto parsed = base::JSONReader::Read(json, base::JSON_PARSE_RFC, 32);
++    if (parsed && parsed->is_dict())
++      root = std::move(parsed);
++  }
++
++  std::optional<base::Value> root;
++};
++
++const base::DictValue* HyperionWebGLSection(bool webgl2) {
++  // C++ local-static initialization is synchronized, including worker callers.
++  static const base::NoDestructor<HyperionWebGLPresetCache> cache;
++  return cache->root
++             ? cache->root->GetDict().FindDict(webgl2 ? "webgl2" : "webgl1")
++             : nullptr;
++}
++
++const base::ListValue* HyperionWebGLExtensions(bool webgl2) {
++  const auto* section = HyperionWebGLSection(webgl2);
++  const auto* list = section ? section->FindList("extensions") : nullptr;
++  if (!list)
++    return nullptr;
++  // A malformed list disables masking, whereas [] deliberately hides all.
++  for (const auto& entry : *list) {
++    const auto* name = entry.GetIfString();
++    if (!name || name->empty() || !base::IsStringASCII(*name))
++      return nullptr;
++  }
++  return list;
++}
++
++bool HyperionWebGLExtensionAllowed(bool webgl2, const String& name) {
++  const auto* list = HyperionWebGLExtensions(webgl2);
++  if (!list)
++    return true;
++  for (const auto& entry : *list) {
++    if (DeprecatedEqualIgnoringCase(name, String::FromUtf8(entry.GetString())))
++      return true;
++  }
++  return false;
++}
++
++std::optional<double> HyperionWebGLNumber(const base::Value& value) {
++  auto number = value.GetIfDouble();
++  return number && std::isfinite(*number) ? number : std::nullopt;
++}
++
++// JSONReader represents integers outside signed int32 as doubles. In particular
++// 4294967295 must not go through GetInt() or a signed narrowing cast.
++template <typename T>
++std::optional<T> HyperionWebGLInteger(const base::Value& value) {
++  auto number = HyperionWebGLNumber(value);
++  if (!number || std::trunc(*number) != *number ||
++      *number < static_cast<double>(std::numeric_limits<T>::lowest()) ||
++      *number > static_cast<double>(std::numeric_limits<T>::max())) {
++    return std::nullopt;
++  }
++  return static_cast<T>(*number);
++}
++
++// Return no override for bad data, invalid enums, nulls, or WebGL objects.
++// The native query is run first to retain extension checks and the error queue.
++std::optional<ScriptValue> HyperionWebGLParameter(
++    ScriptState* script_state,
++    const base::DictValue& entry,
++    const ScriptValue& native_value) {
++  const auto* type = entry.FindString("type");
++  const auto* value = entry.Find("value");
++  if (!type || !value)
++    return std::nullopt;
++  const auto native = native_value.V8Value();
++  if (native.IsEmpty() || native->IsNullOrUndefined())
++    return std::nullopt;
++
++  if (*type == "string" && native->IsString()) {
++    if (const auto* text = value->GetIfString())
++      return WebGLAny(script_state, String::FromUtf8(*text));
++  } else if (*type == "bool" && native->IsBoolean()) {
++    if (auto boolean = value->GetIfBool())
++      return WebGLAny(script_state, *boolean);
++  } else if (native->IsNumber()) {
++    if (*type == "int") {
++      if (auto integer = HyperionWebGLInteger<int>(*value))
++        return WebGLAny(script_state, *integer);
++    } else if (*type == "uint") {
++      if (auto integer = HyperionWebGLInteger<unsigned>(*value))
++        return WebGLAny(script_state, *integer);
++    } else if (*type == "float") {
++      if (auto number = HyperionWebGLNumber(*value)) {
++        if (std::abs(*number) <= std::numeric_limits<float>::max())
++          return WebGLAny(script_state, static_cast<float>(*number));
++      }
++    } else if (*type == "number") {
++      // 64-bit WebGL limits are JS Number, not BigInt. Avoid float32 rounding
++      // and out-of-range conversion to int64_t/uint64_t.
++      if (auto number = HyperionWebGLNumber(*value)) {
++        return ScriptValue(
++            script_state->GetIsolate(),
++            v8::Number::New(script_state->GetIsolate(), *number));
++      }
++    }
++  }
++
++  const auto* list = value->GetIfList();
++  if (!list || list->size() > 4096)
++    return std::nullopt;
++  if (*type == "intvec" && native->IsInt32Array()) {
++    if (list->size() != native.As<v8::Int32Array>()->Length())
++      return std::nullopt;
++    Vector<int32_t> values;
++    for (const auto& item : *list) {
++      auto integer = HyperionWebGLInteger<int32_t>(item);
++      if (!integer)
++        return std::nullopt;
++      values.push_back(*integer);
++    }
++    return WebGLAny(script_state, DOMInt32Array::Create(values));
++  }
++  if (*type == "uintvec" && native->IsUint32Array()) {
++    // COMPRESSED_TEXTURE_FORMATS may have a different number of formats.
++    Vector<uint32_t> values;
++    for (const auto& item : *list) {
++      auto integer = HyperionWebGLInteger<uint32_t>(item);
++      if (!integer)
++        return std::nullopt;
++      values.push_back(*integer);
++    }
++    return WebGLAny(script_state, DOMUint32Array::Create(values));
++  }
++  if (*type == "floatvec" && native->IsFloat32Array()) {
++    if (list->size() != native.As<v8::Float32Array>()->Length())
++      return std::nullopt;
++    Vector<float> values;
++    for (const auto& item : *list) {
++      auto number = HyperionWebGLNumber(item);
++      if (!number || std::abs(*number) > std::numeric_limits<float>::max())
++        return std::nullopt;
++      values.push_back(static_cast<float>(*number));
++    }
++    return WebGLAny(script_state, DOMFloat32Array::Create(values));
++  }
++  if (*type == "boolvec" && native->IsArray()) {
++    // The native WebGL boolean sequence is COLOR_WRITEMASK (four elements).
++    if (list->size() != 4 || native.As<v8::Array>()->Length() != 4)
++      return std::nullopt;
++    std::array<bool, 4> values;
++    for (size_t i = 0; i < values.size(); ++i) {
++      auto boolean = (*list)[i].GetIfBool();
++      if (!boolean)
++        return std::nullopt;
++      values[i] = *boolean;
++    }
++    return WebGLAny(script_state, base::span<const bool>(values));
++  }
++  return std::nullopt;
++}
+ enum class WebGLANGLEImplementation {
+   // These values are persisted to logs. Entries should not be renumbered and
+   // numeric values should never be reused.
+@@ -3881,7 +4073,12 @@
+     UseCounter::Count(context, WebFeature::kWebGLDebugRendererInfo);
+   }
+ 
+-  WebGLExtension* extension = EnableExtensionIfSupported(name, context);
++  // [Hyperion Antidetect Patch] WebGL names are matched case-insensitively.
++  // Keep the native registry/support check; never fabricate extension objects.
++  WebGLExtension* extension =
++      HyperionWebGLExtensionAllowed(IsWebGL2(), name)
++          ? EnableExtensionIfSupported(name, context)
++          : nullptr;
+   return ScriptObject(
+       script_state->GetIsolate(),
+       ToV8Traits<IDLNullable<WebGLExtension>>::ToV8(script_state, extension));
+@@ -3988,8 +4185,45 @@
+                             webgl_angle_implementation);
+ }
+ 
++ScriptValue WebGLRenderingContextBase::ApplyWebGLPresetParameter(
++    ScriptState* script_state,
++    GLenum pname,
++    ScriptValue native_value) {
++  // Null also represents invalid enums and unbound WebGL objects.
++  const auto native = native_value.V8Value();
++  if (native.IsEmpty() || native->IsNullOrUndefined())
++    return native_value;
++
++  // [Hyperion Antidetect Patch] Legacy unmasked flags win over the preset.
++  const auto* command_line = base::CommandLine::ForCurrentProcess();
++  if (command_line &&
++      ((pname == WebGLDebugRendererInfo::kUnmaskedRendererWebgl &&
++        command_line->HasSwitch("fingerprint-webgl-renderer")) ||
++       (pname == WebGLDebugRendererInfo::kUnmaskedVendorWebgl &&
++        command_line->HasSwitch("fingerprint-webgl-vendor")))) {
++    return native_value;
++  }
++  const auto* section = HyperionWebGLSection(IsWebGL2());
++  const auto* parameters = section ? section->FindDict("parameters") : nullptr;
++  const auto* entry =
++      parameters ? parameters->FindDict(base::NumberToString(pname)) : nullptr;
++  if (entry) {
++    if (auto override_value =
++            HyperionWebGLParameter(script_state, *entry, native_value)) {
++      return *override_value;
++    }
++  }
++  return native_value;
++}
+ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+                                                     GLenum pname) {
++  return ApplyWebGLPresetParameter(
++      script_state, pname, GetParameterWithoutPreset(script_state, pname));
++}
++
++ScriptValue WebGLRenderingContextBase::GetParameterWithoutPreset(
++    ScriptState* script_state,
++    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state->GetIsolate());
+   const int kIntZero = 0;
+@@ -4202,6 +4436,7 @@
+     case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
+       if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
+         // [Hyperion Antidetect Patch]
++        // Preset post-processing preserves this explicit legacy override.
+         auto* cmd = base::CommandLine::ForCurrentProcess();
+         if (cmd && cmd->HasSwitch("fingerprint-webgl-renderer")) {
+           return WebGLAny(script_state, String::FromUtf8(cmd->GetSwitchValueASCII("fingerprint-webgl-renderer")));
+@@ -4216,6 +4451,7 @@
+     case WebGLDebugRendererInfo::kUnmaskedVendorWebgl:
+       if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
+         // [Hyperion Antidetect Patch] Override unmasked vendor
++        // Preset post-processing preserves this explicit legacy override.
+         auto* cmd = base::CommandLine::ForCurrentProcess();
+         if (cmd && cmd->HasSwitch("fingerprint-webgl-vendor")) {
+           return WebGLAny(script_state, String::FromUtf8(cmd->GetSwitchValueASCII("fingerprint-webgl-vendor")));
+@@ -4517,6 +4753,23 @@
+       return nullptr;
+   }
+ 
++  // [Hyperion Antidetect Patch] Override only after native enum validation.
++  const auto* section = HyperionWebGLSection(IsWebGL2());
++  const auto* formats = section ? section->FindDict("shader_precision") : nullptr;
++  const std::string key = base::NumberToString(shader_type) + "_" +
++                          base::NumberToString(precision_type);
++  const auto* format = formats ? formats->FindDict(key) : nullptr;
++  if (format) {
++    const auto range_min = format->FindInt("rangeMin");
++    const auto range_max = format->FindInt("rangeMax");
++    const auto bits = format->FindInt("precision");
++    if (range_min && range_max && bits && *range_min >= 0 && *range_max >= 0 &&
++        *bits >= 0) {
++      return MakeGarbageCollected<WebGLShaderPrecisionFormat>(
++          *range_min, *range_max, *bits);
++    }
++  }
++
+   GLint range[2] = {0, 0};
+   GLint precision = 0;
+   ContextGL()->GetShaderPrecisionFormat(shader_type, precision_type, range,
+@@ -4542,6 +4795,23 @@
+     if (ExtensionSupportedAndAllowed(tracker)) {
+       result.push_back(tracker->ExtensionName());
+     }
++  }
++
++  // [Hyperion Antidetect Patch] Preset order, native canonical names.
++  // Unsupported preset entries are omitted rather than advertised falsely.
++  if (const auto* requested = HyperionWebGLExtensions(IsWebGL2())) {
++    Vector<String> masked;
++    for (const auto& entry : *requested) {
++      const String requested_name = String::FromUtf8(entry.GetString());
++      for (const auto& supported_name : result) {
++        if (DeprecatedEqualIgnoringCase(requested_name, supported_name)) {
++          if (!masked.Contains(supported_name))
++            masked.push_back(supported_name);
++          break;
++        }
++      }
++    }
++    return masked;
+   }
+ 
+   return result;
+diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h
+@@ -1147,6 +1147,11 @@
+   GLenumHashSet supported_types_;
+   GLenumHashSet supported_tex_image_source_types_;
+ 
++  // [Hyperion Antidetect Patch] Native validation precedes preset conversion.
++  // Non-virtual: WebGL2 has its own native switch and delegates to this one.
++  ScriptValue GetParameterWithoutPreset(ScriptState*, GLenum);
++  ScriptValue ApplyWebGLPresetParameter(ScriptState*, GLenum, ScriptValue);
++
+   // Helpers for getParameter and others
+   ScriptValue GetBooleanParameter(ScriptState*, GLenum);
+   ScriptValue GetBooleanArrayParameter(ScriptState*, GLenum);
+diff --git a/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc
+--- a/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc
+@@ -4838,6 +4838,14 @@
+ 
+ ScriptValue WebGL2RenderingContextBase::getParameter(ScriptState* script_state,
+                                                      GLenum pname) {
++  // [Hyperion Antidetect Patch] Includes WebGL2-only pnames and version strings.
++  return ApplyWebGLPresetParameter(
++      script_state, pname, GetParameterWithoutPreset(script_state, pname));
++}
++
++ScriptValue WebGL2RenderingContextBase::GetParameterWithoutPreset(
++    ScriptState* script_state,
++    GLenum pname) {
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state->GetIsolate());
+   switch (pname) {
+@@ -5050,7 +5058,8 @@
+       return ScriptValue::CreateNull(script_state->GetIsolate());
+ 
+     default:
+-      return WebGLRenderingContextBase::getParameter(script_state, pname);
++      return WebGLRenderingContextBase::GetParameterWithoutPreset(script_state,
++                                                                pname);
+   }
+ }
+ 
+diff --git a/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.h b/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.h
+--- a/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.h
++++ b/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.h
+@@ -933,6 +933,9 @@
+   void Trace(Visitor*) const override;
+ 
+  protected:
++  // [Hyperion Antidetect Patch] Delegate common pnames without double spoofing.
++  ScriptValue GetParameterWithoutPreset(ScriptState*, GLenum);
++
+   friend class V8WebGL2RenderingContext;
+   friend class WebGLSync;
+ 
+diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
+--- a/content/browser/renderer_host/render_process_host_impl.cc
++++ b/content/browser/renderer_host/render_process_host_impl.cc
+@@ -4047,6 +4047,7 @@
+       "fingerprint-memory",
+       "fingerprint-webgl-renderer",
+       "fingerprint-webgl-vendor",
++      "fingerprint-webgl-preset-b64",
+       "fingerprint-canvas-seed",
+       "fingerprint-audio-seed",
+       "fingerprint-screen-width",

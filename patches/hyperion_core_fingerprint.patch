@@ -4,7 +4,7 @@ index 5d96c60405807..3e8bcdd8cccff 100644
 +++ b/components/embedder_support/user_agent_utils.cc
 @@ -599,6 +599,13 @@ bool GetMobileBitForUAMetadata() {
  }
- 
+
  std::string GetPlatformVersion() {
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
@@ -18,7 +18,7 @@ index 5d96c60405807..3e8bcdd8cccff 100644
    // version when kAndroidDesktopUAPlatform is enabled to follow the spec:
 @@ -630,6 +637,15 @@ std::string GetPlatformVersion() {
  }
- 
+
  std::string GetPlatformForUAMetadata() {
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
@@ -52,7 +52,7 @@ index 0d96dedc4dfeb..8d44191da3c41 100644
 +      "fingerprint-screen-height",
 +  };
 +  renderer_cmd->CopySwitchesFrom(browser_cmd, kHyperionSwitches);
- 
+
    // Propagate WebNN switches needed by backends that run in the renderer.
    renderer_cmd->CopySwitchesFrom(
 diff --git a/third_party/blink/renderer/core/execution_context/navigator_base.cc b/third_party/blink/renderer/core/execution_context/navigator_base.cc
@@ -61,15 +61,15 @@ index cccfafe8f93a0..d2bca578e4ed5 100644
 +++ b/third_party/blink/renderer/core/execution_context/navigator_base.cc
 @@ -3,6 +3,7 @@
  // found in the LICENSE file.
- 
+
  #include "third_party/blink/renderer/core/execution_context/navigator_base.h"
 +#include "base/command_line.h"
- 
+
  #include "base/feature_list.h"
  #include "build/build_config.h"
 @@ -52,6 +53,11 @@ String NavigatorBase::userAgent() const {
  }
- 
+
  String NavigatorBase::platform() const {
 +  // [Hyperion Antidetect Patch]
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
@@ -90,7 +90,7 @@ index 583f05f8dd5fb..c03e5bf940df7 100644
   *  Copyright (c) 2000 Daniel Molkentin (molkentin@kde.org)
 @@ -56,6 +57,10 @@ String Navigator::vendorSub() const {
  }
- 
+
  String Navigator::platform() const {
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  if (cmd && cmd->HasSwitch("fingerprint-platform")) {
@@ -101,7 +101,7 @@ index 583f05f8dd5fb..c03e5bf940df7 100644
    // mobile and desktop when ReduceUserAgent is enabled.
 @@ -98,12 +103,8 @@ bool Navigator::cookieEnabled() const {
  }
- 
+
  bool Navigator::webdriver() const {
 -  if (RuntimeEnabledFeatures::AutomationControlledEnabled())
 -    return true;
@@ -112,7 +112,7 @@ index 583f05f8dd5fb..c03e5bf940df7 100644
 +  // [Hyperion Antidetect Patch] Never expose automation to websites
 +  return false;
  }
- 
+
  String Navigator::GetAcceptLanguages() {
 diff --git a/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc b/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc
 index f5c0db2d1b58d..127439c768fd0 100644
@@ -120,15 +120,15 @@ index f5c0db2d1b58d..127439c768fd0 100644
 +++ b/third_party/blink/renderer/core/frame/navigator_concurrent_hardware.cc
 @@ -3,12 +3,22 @@
  // found in the LICENSE file.
- 
+
  #include "third_party/blink/renderer/core/frame/navigator_concurrent_hardware.h"
 +#include "base/strings/string_number_conversions.h"
 +#include "base/command_line.h"
- 
+
  #include "base/system/sys_info.h"
- 
+
  namespace blink {
- 
+
  unsigned NavigatorConcurrentHardware::hardwareConcurrency() const {
 +  // [Hyperion Antidetect Patch]
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
@@ -140,62 +140,52 @@ index f5c0db2d1b58d..127439c768fd0 100644
 +  }
    return static_cast<unsigned>(base::SysInfo::NumberOfProcessors());
  }
- 
-diff --git a/third_party/blink/renderer/core/frame/navigator_device_memory.cc b/third_party/blink/renderer/core/frame/navigator_device_memory.cc
-index 05fa33e4568e8..7e3c61678733a 100644
---- a/third_party/blink/renderer/core/frame/navigator_device_memory.cc
-+++ b/third_party/blink/renderer/core/frame/navigator_device_memory.cc
-@@ -3,6 +3,8 @@
- // found in the LICENSE file.
- 
- #include "third_party/blink/renderer/core/frame/navigator_device_memory.h"
-+#include "base/strings/string_number_conversions.h"
-+#include "base/command_line.h"
- 
+
+diff --git a/third_party/blink/common/device_memory/approximated_device_memory.cc b/third_party/blink/common/device_memory/approximated_device_memory.cc
+index 1111111111111..2222222222222 100644
+--- a/third_party/blink/common/device_memory/approximated_device_memory.cc
++++ b/third_party/blink/common/device_memory/approximated_device_memory.cc
+@@ -5,6 +5,8 @@
  #include "third_party/blink/public/common/device_memory/approximated_device_memory.h"
- #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom-shared.h"
-@@ -12,6 +14,14 @@
- namespace blink {
- 
- float NavigatorDeviceMemory::deviceMemory() const {
+
+ #include "base/byte_size.h"
++#include "base/command_line.h"
++#include "base/strings/string_number_conversions.h"
+ #include "base/check_op.h"
+ #include "base/feature_list.h"
+ #include "base/system/sys_info.h"
+@@ -26,5 +28,15 @@
+
+ // static
+ float ApproximatedDeviceMemory::GetApproximatedDeviceMemory() {
 +  // [Hyperion Antidetect Patch]
++  // Single source of truth: covers navigator.deviceMemory, Device-Memory
++  // HTTP Client Hint and workers — all read from this function.
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  if (cmd && cmd->HasSwitch("fingerprint-memory")) {
-+    int val = 0;
-+    if (base::StringToInt(cmd->GetSwitchValueASCII("fingerprint-memory"), &val) && val > 0) {
++    double val = 0.0;
++    if (base::StringToDouble(cmd->GetSwitchValueASCII("fingerprint-memory"), &val) && val > 0.0) {
 +      return static_cast<float>(val);
 +    }
 +  }
-   return ApproximatedDeviceMemory::GetApproximatedDeviceMemory();
+   return approximated_device_memory_gb_;
  }
- 
-diff --git a/third_party/blink/renderer/core/frame/navigator_device_memory.idl b/third_party/blink/renderer/core/frame/navigator_device_memory.idl
-index 6a57f5507df3c..6305877490e23 100644
---- a/third_party/blink/renderer/core/frame/navigator_device_memory.idl
-+++ b/third_party/blink/renderer/core/frame/navigator_device_memory.idl
-@@ -5,6 +5,6 @@
- // https://github.com/w3c/device-memory#the-web-exposed-api
- 
- interface mixin NavigatorDeviceMemory {
--    [MeasureAs=NavigatorDeviceMemory,SecureContext]
-+    [MeasureAs=NavigatorDeviceMemory]
-     readonly attribute float deviceMemory;
- };
+
 diff --git a/third_party/blink/renderer/core/frame/navigator_id.cc b/third_party/blink/renderer/core/frame/navigator_id.cc
 index 22243ebf5e26f..fc7e7698b391e 100644
 --- a/third_party/blink/renderer/core/frame/navigator_id.cc
 +++ b/third_party/blink/renderer/core/frame/navigator_id.cc
 @@ -30,6 +30,7 @@
   */
- 
+
  #include "third_party/blink/renderer/core/frame/navigator_id.h"
 +#include "base/command_line.h"
- 
+
  #include "base/feature_list.h"
  #include "build/build_config.h"
 @@ -59,6 +60,11 @@ String NavigatorID::appVersion() {
  }
- 
+
  String NavigatorID::platform() const {
 +  // [Hyperion Antidetect Patch]
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
@@ -216,7 +206,7 @@ index 73ad371b3237a..798416d1766fd 100644
  // found in the LICENSE file.
 @@ -90,6 +91,11 @@ void NavigatorUAData::SetFormFactors(Vector<String> form_factors) {
  }
- 
+
  bool NavigatorUAData::mobile() const {
 +  // [Hyperion Antidetect Patch]
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
@@ -228,7 +218,7 @@ index 73ad371b3237a..798416d1766fd 100644
    }
 @@ -106,6 +112,18 @@ const HeapVector<Member<NavigatorUABrandVersion>>& NavigatorUAData::brands()
  }
- 
+
  const String& NavigatorUAData::platform() const {
 +  // [Hyperion Antidetect Patch]
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
@@ -247,13 +237,13 @@ index 73ad371b3237a..798416d1766fd 100644
    }
 @@ -144,23 +162,30 @@ ScriptPromise<UADataValues> NavigatorUAData::getHighEntropyValues(
    // convenience.
- 
+
    values->setBrands(brand_set_);
 -  values->setMobile(is_mobile_);
 -  values->setPlatform(platform_);
 +  values->setMobile(mobile());
 +  values->setPlatform(platform());
- 
+
    // If the "ch-ua-high-entropy-values" permission policy is enabled for a
    // document, add high-entropy client hints to values (if requested)
    if (AllowedToCollectHighEntropyValues(execution_context)) {
@@ -287,16 +277,16 @@ index ed5028943e3d7..f87d63882df8c 100644
 +++ b/third_party/blink/renderer/core/frame/screen.cc
 @@ -27,6 +27,8 @@
   */
- 
+
  #include "third_party/blink/renderer/core/frame/screen.h"
 +#include "base/command_line.h"
-+#include "base/strings/string_number_conversions.h" 
- 
++#include "base/strings/string_number_conversions.h"
+
  #include "base/numerics/safe_conversions.h"
  #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom-blink.h"
 @@ -88,12 +90,22 @@ bool Screen::AreWebExposedScreenPropertiesEqual(
  }
- 
+
  int Screen::height() const {
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  if (cmd && cmd->HasSwitch("fingerprint-screen-height")) {
@@ -307,7 +297,7 @@ index ed5028943e3d7..f87d63882df8c 100644
      return 0;
    return GetRect(/*available=*/false).height();
  }
- 
+
  int Screen::width() const {
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  if (cmd && cmd->HasSwitch("fingerprint-screen-width")) {
@@ -319,7 +309,7 @@ index ed5028943e3d7..f87d63882df8c 100644
    return GetRect(/*available=*/false).width();
 @@ -131,12 +143,22 @@ int Screen::availTop() const {
  }
- 
+
  int Screen::availHeight() const {
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  if (cmd && cmd->HasSwitch("fingerprint-screen-height")) {
@@ -330,7 +320,7 @@ index ed5028943e3d7..f87d63882df8c 100644
      return 0;
    return GetRect(/*available=*/true).height();
  }
- 
+
  int Screen::availWidth() const {
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  if (cmd && cmd->HasSwitch("fingerprint-screen-width")) {
@@ -346,12 +336,12 @@ index 3d7a843995b4d..cfd9ee07b0190 100644
 +++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
 @@ -3,6 +3,9 @@
  // found in the LICENSE file.
- 
+
  #include "third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.h"
 +#include "base/command_line.h"
 +#include "base/strings/string_number_conversions.h"
 +#include <algorithm>
- 
+
  #include <cmath>
  #include <cstdint>
 @@ -515,6 +518,33 @@ ImageData* BaseRenderingContext2D::getImageDataInternal(
@@ -387,25 +377,25 @@ index 3d7a843995b4d..cfd9ee07b0190 100644
 +      }
      }
    }
- 
+
 diff --git a/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc b/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
 index 4604be68adba4..98a23f531142c 100644
 --- a/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
 +++ b/third_party/blink/renderer/modules/webaudio/offline_audio_context.cc
 @@ -24,6 +24,9 @@
   */
- 
+
  #include "third_party/blink/renderer/modules/webaudio/offline_audio_context.h"
 +#include "base/command_line.h"
 +#include "base/strings/string_number_conversions.h"
 +#include <cmath>
- 
+
  #include "base/metrics/histogram_functions.h"
  #include "base/metrics/histogram_macros.h"
 @@ -437,6 +440,29 @@ void OfflineAudioContext::FireCompletionEvent() {
        return;
      }
- 
+
 +    // [Hyperion Antidetect Patch] Deterministic micro-noise
 +    auto* cmd = base::CommandLine::ForCurrentProcess();
 +    if (cmd && cmd->HasSwitch("fingerprint-audio-seed")) {
@@ -438,12 +428,12 @@ index 26c0a088cc1ab..6a717c53f4f33 100644
 +++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 @@ -24,6 +24,7 @@
   */
- 
+
  #include "third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h"
 +#include "base/command_line.h"
- 
+
  #include <inttypes.h>
- 
+
 @@ -4200,6 +4201,11 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
        return ScriptValue::CreateNull(script_state->GetIsolate());
      case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
@@ -474,19 +464,19 @@ index c76f6553e1cec..c28906c2964c5 100644
 +++ b/third_party/blink/renderer/platform/graphics/image_data_buffer.cc
 @@ -31,6 +31,10 @@
   */
- 
+
  #include "third_party/blink/renderer/platform/graphics/image_data_buffer.h"
 +#include "base/command_line.h"
 +#include "base/strings/string_number_conversions.h"
 +#include <algorithm>
 +#include <cmath>
- 
+
  #include "base/compiler_specific.h"
  #include "base/memory/ptr_util.h"
 @@ -63,8 +67,11 @@ ImageDataBuffer::ImageDataBuffer(scoped_refptr<StaticBitmapImage> image) {
    }
  #endif
- 
+
 +  auto* cmd = base::CommandLine::ForCurrentProcess();
 +  bool has_canvas_seed = cmd && cmd->HasSwitch("fingerprint-canvas-seed");
 +

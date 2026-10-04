@@ -27,7 +27,7 @@
             <line x1="8" y1="21" x2="16" y2="21"/>
             <line x1="12" y1="17" x2="12" y2="21"/>
           </svg>
-          <span>Профили</span>
+          <span data-i18n="nav.profiles">Профили</span>
           <span class="badge" id="sidebar-profile-count">0</span>
         </button>
 
@@ -37,7 +37,7 @@
             <line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>
-          <span>Прокси</span>
+          <span data-i18n="nav.proxies">Прокси</span>
           <span class="badge" id="sidebar-proxies-count">0</span>
         </button>
 
@@ -49,14 +49,14 @@
             <path d="M12 12a3.5 3.5 0 0 1 3.5 3.5c0 2-1 4-2 6"/>
             <path d="M19 15c.5 1.5.7 3.2.7 5"/>
           </svg>
-          <span>Отпечатки</span>
+          <span data-i18n="nav.fingerprints">Отпечатки</span>
         </button>
 
         <button class="nav-item" data-view="extensions">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
           </svg>
-          <span>Расширения</span>
+          <span data-i18n="nav.extensions">Расширения</span>
           <span class="badge" id="sidebar-ext-count">0</span>
         </button>
 
@@ -65,13 +65,15 @@
             <circle cx="12" cy="12" r="3"/>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
-          <span>Настройки</span>
+          <span data-i18n="nav.settings">Настройки</span>
+          <span class="update-dot" id="settings-update-dot" style="display: none;" title="Доступно обновление" data-i18n-title="sidebar.updateAvailable"></span>
         </button>
       </nav>
 
+      <!-- LANGUAGE SWITCHER -->
       <!-- SYSTEM STATUS FOOTER -->
       <div class="sidebar-status">
-        <div class="status-indicator" id="sidebar-status-btn" style="margin-bottom: 0; cursor: pointer;" title="Открыть центр обновлений">
+        <div class="status-indicator" id="sidebar-status-btn" style="margin-bottom: 0; cursor: pointer;" title="Открыть центр обновлений" data-i18n-title="sidebar.updateCenter">
           <span class="status-dot pulse" id="sys-status-dot"></span>
           <span class="status-label" id="sys-engine-name">Hyperion v1.0.21</span>
         </div>
@@ -90,19 +92,19 @@
                 <circle cx="11" cy="11" r="8"/>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
-              <input type="text" id="search-input" placeholder="Поиск профилей, тегов, прокси...">
+              <input type="text" id="search-input" placeholder="Поиск профилей, тегов, прокси..." data-i18n-ph="topbar.searchPh">
             </div>
 
             <div class="filter-group">
-              <button class="filter-btn active" data-filter-status="all">Все</button>
+              <button class="filter-btn active" data-filter-status="all" data-i18n="topbar.filterAll">Все</button>
               <button class="filter-btn" data-filter-status="running">
-                <span class="status-dot-mini green"></span> Активные
+                <span class="status-dot-mini green"></span> <span data-i18n="topbar.filterRunning">Активные</span>
               </button>
-              <button class="filter-btn" data-filter-status="stopped">Остановленные</button>
+              <button class="filter-btn" data-filter-status="stopped" data-i18n="topbar.filterStopped">Остановленные</button>
             </div>
 
             <div class="filter-group os-filters">
-              <button class="filter-btn active" data-filter-os="all">Все ОС</button>
+              <button class="filter-btn active" data-filter-os="all" data-i18n="topbar.filterAllOs">Все ОС</button>
               <button class="filter-btn" data-filter-os="windows">Windows</button>
               <button class="filter-btn" data-filter-os="macos">macOS</button>
               <button class="filter-btn" data-filter-os="linux">Linux</button>
@@ -112,12 +114,6 @@
           </div>
 
           <div class="topbar-right">
-            <div id="global-update-alert" style="display: none; align-items: center; gap: 8px; padding: 4px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 12px; color: #fff;">
-              <span id="global-update-text">Доступно обновление Hyperion</span>
-              <button type="button" class="btn btn-primary" id="btn-global-open-settings-update" style="padding: 2px 10px; font-size: 11px; height: 24px;">Обновить</button>
-            </div>
-
-
             <!-- Split Button for New Profile + Dropdown -->
             <div class="split-btn-container" style="position: relative; display: inline-flex; align-items: stretch;">
               <button class="btn btn-primary" id="btn-create-profile" style="border-top-right-radius: 0; border-bottom-right-radius: 0; padding-right: 12px;">
@@ -125,9 +121,9 @@
                   <line x1="12" y1="5" x2="12" y2="19"/>
                   <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <span>Новый профиль</span>
+                <span data-i18n="topbar.newProfile">Новый профиль</span>
               </button>
-              <button class="btn btn-primary" id="btn-create-profile-dropdown" style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 1px solid rgba(255,255,255,0.25); padding: 0 10px;" title="Другие варианты">
+              <button class="btn btn-primary" id="btn-create-profile-dropdown" style="border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 1px solid rgba(255,255,255,0.25); padding: 0 10px;" title="Другие варианты" data-i18n-title="topbar.moreOptions">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
 
@@ -135,16 +131,16 @@
               <div class="dropdown-menu" id="menu-create-profile" style="display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 270px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 1000; padding: 6px 0;">
                 <button type="button" class="dropdown-item" id="menu-item-new-profile" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: none; border: none; color: #fff; text-align: left; font-size: 13px; cursor: pointer;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  <span>Создать новый профиль</span>
+                  <span data-i18n="menu.createNew">Создать новый профиль</span>
                 </button>
                 <button type="button" class="dropdown-item" id="menu-item-import-file" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: none; border: none; color: #fff; text-align: left; font-size: 13px; cursor: pointer;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  <span>Импортировать профиль из файла</span>
+                  <span data-i18n="menu.importFile">Импортировать профиль из файла</span>
                 </button>
                 <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
                 <button type="button" class="dropdown-item" id="menu-item-bulk-create" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: none; border: none; color: #fff; text-align: left; font-size: 13px; cursor: pointer;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                  <span>Массовое создание профилей</span>
+                  <span data-i18n="menu.bulkCreate">Массовое создание профилей</span>
                 </button>
               </div>
             </div>
@@ -157,7 +153,7 @@
           <div class="folder-pills" id="folder-pills-list">
             <!-- Dynamically populated -->
           </div>
-          <button class="btn-icon" id="btn-add-folder" title="Создать новую папку">+</button>
+          <button class="btn-icon" id="btn-add-folder" title="Создать новую папку" data-i18n-title="folders.addTitle">+</button>
         </div>
 
         <!-- STATS BANNER -->
@@ -172,7 +168,7 @@
             </div>
             <div class="stat-content">
               <div class="stat-value" id="stat-total-profiles">0</div>
-              <div class="stat-label">Всего профилей</div>
+              <div class="stat-label" data-i18n="stats.totalProfiles">Всего профилей</div>
             </div>
           </div>
 
@@ -184,7 +180,7 @@
             </div>
             <div class="stat-content">
               <div class="stat-value" id="stat-active-profiles">0</div>
-              <div class="stat-label">Запущенных сессий</div>
+              <div class="stat-label" data-i18n="stats.runningSessions">Запущенных сессий</div>
             </div>
           </div>
 
@@ -198,7 +194,7 @@
             </div>
             <div class="stat-content">
               <div class="stat-value" id="stat-proxies-count">0</div>
-              <div class="stat-label">Подключенных прокси</div>
+              <div class="stat-label" data-i18n="stats.connectedProxies">Подключенных прокси</div>
             </div>
           </div>
 
@@ -211,20 +207,20 @@
         <!-- BULK ACTIONS BAR -->
         <div class="bulk-bar" id="bulk-bar" style="display: none;">
           <div class="bulk-info">
-            <span>Выбрано профилей: <strong id="bulk-selected-count">0</strong></span>
+            <span data-i18n="bulk.selectedLabel">Выбрано профилей:</span> <strong id="bulk-selected-count">0</strong>
           </div>
           <div class="bulk-actions">
             <button class="btn btn-start" id="btn-bulk-start">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              <span>Запустить выбранные</span>
+              <span data-i18n="bulk.startSelected">Запустить выбранные</span>
             </button>
             <button class="btn btn-stop" id="btn-bulk-stop">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-              <span>Остановить выбранные</span>
+              <span data-i18n="bulk.stopSelected">Остановить выбранные</span>
             </button>
             <button class="btn btn-secondary" id="btn-bulk-delete" style="color: var(--accent-rose);">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              <span>Удалить выбранные</span>
+              <span data-i18n="bulk.deleteSelected">Удалить выбранные</span>
             </button>
           </div>
         </div>
@@ -233,13 +229,13 @@
             <thead>
               <tr>
                 <th style="width: 34px;"><input type="checkbox" id="th-check-all-profiles"></th>
-                <th style="width: 76px;">Статус</th>
-                <th style="min-width: 110px;">Профиль</th>
-                <th style="min-width: 60px;">Теги</th>
-                <th style="min-width: 110px;">Прокси</th>
-                <th style="min-width: 150px;">Цифровой отпечаток</th>
-                <th style="width: 100px; min-width: 90px;">Плагины</th>
-                <th style="width: 190px; min-width: 180px; text-align: right;">Действия</th>
+                <th style="width: 76px;" data-i18n="table.status">Статус</th>
+                <th style="min-width: 110px;" data-i18n="table.profile">Профиль</th>
+                <th style="min-width: 60px;" data-i18n="table.tags">Теги</th>
+                <th style="min-width: 110px;" data-i18n="table.proxy">Прокси</th>
+                <th style="min-width: 150px;" data-i18n="table.fingerprint">Цифровой отпечаток</th>
+                <th style="width: 100px; min-width: 90px;" data-i18n="table.plugins">Плагины</th>
+                <th style="width: 190px; min-width: 180px; text-align: right;" data-i18n="table.actions">Действия</th>
               </tr>
             </thead>
             <tbody id="profiles-tbody">
@@ -256,14 +252,14 @@
                 <line x1="12" y1="17" x2="12" y2="21"/>
               </svg>
             </div>
-            <h3>Нет созданных профилей</h3>
-            <p>Создайте свой первый антидетект-профиль с уникальным аппаратным отпечатком прямо сейчас.</p>
+            <h3 data-i18n="empty.noProfiles">Нет созданных профилей</h3>
+            <p data-i18n="empty.noProfilesDesc">Создайте свой первый антидетект-профиль с уникальным аппаратным отпечатком прямо сейчас.</p>
             <button class="btn btn-primary" id="btn-empty-create">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              Создать профиль
+              <span data-i18n="empty.createProfile">Создать профиль</span>
             </button>
           </div>
         </section>
@@ -273,8 +269,8 @@
       <section class="view-pane" id="view-proxies" style="display: none;">
         <header class="topbar">
           <div class="topbar-left">
-            <h2 class="view-title">Менеджер прокси</h2>
-            <span class="view-desc">Управление SOCKS5 / HTTP прокси-серверами</span>
+            <h2 class="view-title" data-i18n="proxies.title">Менеджер прокси</h2>
+            <span class="view-desc" data-i18n="proxies.desc">Управление SOCKS5 / HTTP прокси-серверами</span>
           </div>
           <div class="topbar-right">
             <button class="btn btn-secondary" id="btn-import-proxies-modal">
@@ -283,14 +279,14 @@
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              <span>Импорт списком</span>
+              <span data-i18n="proxies.importList">Импорт списком</span>
             </button>
             <button class="btn btn-primary" id="btn-add-proxy">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              <span>Добавить прокси</span>
+              <span data-i18n="proxies.addProxy">Добавить прокси</span>
             </button>
           </div>
         </header>
@@ -299,12 +295,12 @@
           <table class="profiles-table">
             <thead>
               <tr>
-                <th style="width: 100px;">Протокол</th>
-                <th>Хост / IP</th>
-                <th style="width: 100px;">Порт</th>
-                <th>Авторизация</th>
-                <th style="width: 120px;">Пинг / Статус</th>
-                <th style="width: 160px; text-align: right;">Действия</th>
+                <th style="width: 100px;" data-i18n="proxies.thProto">Протокол</th>
+                <th data-i18n="proxies.thHost">Хост / IP</th>
+                <th style="width: 100px;" data-i18n="proxies.thPort">Порт</th>
+                <th data-i18n="proxies.thAuth">Авторизация</th>
+                <th style="width: 120px;" data-i18n="proxies.thPing">Пинг / Статус</th>
+                <th style="width: 160px; text-align: right;" data-i18n="proxies.thActions">Действия</th>
               </tr>
             </thead>
             <tbody id="proxies-tbody">
@@ -320,9 +316,9 @@
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
               </svg>
             </div>
-            <h3>Список прокси пуст</h3>
-            <p>Добавьте SOCKS5 или HTTP прокси для привязки к сессиям браузера.</p>
-            <button class="btn btn-primary" id="btn-empty-add-proxy">Добавить прокси</button>
+            <h3 data-i18n="proxies.emptyTitle">Список прокси пуст</h3>
+            <p data-i18n="proxies.emptyDesc">Добавьте SOCKS5 или HTTP прокси для привязки к сессиям браузера.</p>
+            <button class="btn btn-primary" id="btn-empty-add-proxy" data-i18n="proxies.emptyBtn">Добавить прокси</button>
           </div>
         </section>
       </section>
@@ -331,8 +327,8 @@
       <section class="view-pane" id="view-fingerprints" style="display: none;">
         <header class="topbar">
           <div class="topbar-left">
-            <h2 class="view-title">Библиотека аппаратных профилей</h2>
-            <span class="view-desc">Готовые эталонные комбинации видеокарт, ядер процессора и разрешений</span>
+            <h2 class="view-title" data-i18n="fpview.title">Библиотека аппаратных профилей</h2>
+            <span class="view-desc" data-i18n="fpview.desc">Готовые эталонные комбинации видеокарт, ядер процессора и разрешений</span>
           </div>
           <div class="topbar-right">
             <button class="btn btn-primary" id="btn-open-create-template">
@@ -340,7 +336,7 @@
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              <span>Создать шаблон</span>
+              <span data-i18n="fpview.createTemplate">Создать шаблон</span>
             </button>
           </div>
         </header>
@@ -358,15 +354,15 @@
       <section class="view-pane" id="view-extensions" style="display: none;">
         <header class="topbar">
           <div class="topbar-left">
-            <h2 class="view-title">Каталог и менеджер расширений</h2>
-            <span class="view-desc">Установка плагинов в профили из Web Store или распакованных папок</span>
+            <h2 class="view-title" data-i18n="extview.title">Каталог и менеджер расширений</h2>
+            <span class="view-desc" data-i18n="extview.desc">Установка плагинов в профили из Web Store или распакованных папок</span>
           </div>
           <div class="topbar-right">
             <button class="btn btn-secondary" id="btn-pick-folder-ext">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
               </svg>
-              <span>Загрузить из папки (Unpacked)</span>
+              <span data-i18n="extview.loadUnpacked">Загрузить из папки (Unpacked)</span>
             </button>
           </div>
         </header>
@@ -374,16 +370,16 @@
         <div class="view-scroll-body">
           <!-- DIRECT URL / ID INSTALL BOX -->
           <div class="ext-install-bar">
-            <input type="text" id="input-custom-ext-id" placeholder="Вставьте ссылку на расширение из Chrome Web Store или 32-значный ID...">
+            <input type="text" id="input-custom-ext-id" placeholder="Вставьте ссылку на расширение из Chrome Web Store или 32-значный ID..." data-i18n-ph="extview.inputPh">
             <button class="btn btn-primary" id="btn-install-custom-ext">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Установить по ссылке/ID</span>
+              <span data-i18n="extview.installByLink">Установить по ссылке/ID</span>
             </button>
           </div>
 
           <div class="ext-section-header">
-            <h3>Установленные расширения</h3>
-            <span class="ext-count-tag" id="installed-ext-count-tag">0 установлено</span>
+            <h3 data-i18n="extview.installedTitle">Установленные расширения</h3>
+            <span class="ext-count-tag" id="installed-ext-count-tag" data-i18n="extview.installedCount">0 установлено</span>
           </div>
           <div class="ext-grid" id="installed-ext-grid">
             <!-- Dynamically populated -->
@@ -392,15 +388,15 @@
           <!-- CATALOG WITH CATEGORIES -->
           <div class="ext-section-header" style="margin-top: 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div>
-              <h3>Каталог проверенных плагинов (24 расширения)</h3>
-              <span style="color:var(--text-dim); font-size:12px;">Автоматическая загрузка из Web Store и привязка к профилям</span>
+              <h3 data-i18n="extview.catalogTitle">Каталог проверенных плагинов (24 расширения)</h3>
+              <span style="color:var(--text-dim); font-size:12px;" data-i18n="extview.catalogDesc">Автоматическая загрузка из Web Store и привязка к профилям</span>
             </div>
             <div class="filter-group" id="ext-category-filters">
-              <button class="filter-btn active" data-ext-cat="all">Все (24)</button>
-              <button class="filter-btn" data-ext-cat="Utility">Утилиты / Cookies</button>
-              <button class="filter-btn" data-ext-cat="Crypto">Web3 / Крипта</button>
-              <button class="filter-btn" data-ext-cat="Security">Безопасность / Капча</button>
-              <button class="filter-btn" data-ext-cat="Traffic">Трафик / Арбитраж</button>
+              <button class="filter-btn active" data-ext-cat="all" data-i18n="extview.catAll">Все (24)</button>
+              <button class="filter-btn" data-ext-cat="Utility" data-i18n="extview.catUtility">Утилиты / Cookies</button>
+              <button class="filter-btn" data-ext-cat="Crypto" data-i18n="extview.catCrypto">Web3 / Крипта</button>
+              <button class="filter-btn" data-ext-cat="Security" data-i18n="extview.catSecurity">Безопасность / Капча</button>
+              <button class="filter-btn" data-ext-cat="Traffic" data-i18n="extview.catTraffic">Трафик / Арбитраж</button>
             </div>
           </div>
           <div class="ext-grid" id="catalog-ext-grid">
@@ -413,8 +409,8 @@
       <section class="view-pane" id="view-settings" style="display: none;">
         <header class="topbar">
           <div class="topbar-left">
-            <h2 class="view-title">Настройки</h2>
-            <span class="view-desc">Конфигурация Hyperion Anti-Detect Multibrowser</span>
+            <h2 class="view-title" data-i18n="settings.title">Настройки</h2>
+            <span class="view-desc" data-i18n="settings.desc">Конфигурация Hyperion Anti-Detect Multibrowser</span>
           </div>
         </header>
 
@@ -425,52 +421,63 @@
             </div>
 
           <div class="settings-card">
-            <h3>Глобальные настройки сессий</h3>
+            <h3 data-i18n="settings.langTitle">Язык интерфейса</h3>
             <div class="form-group">
-              <label for="settings-default-url">Стартовая страница по умолчанию:</label>
+              <label for="btn-lang-toggle" data-i18n="settings.langLabel">Язык интерфейса приложения:</label>
+              <select id="btn-lang-toggle" class="lang-select">
+                <option value="ru" class="lang-opt" data-lang="ru">Русский</option>
+                <option value="en" class="lang-opt" data-lang="en">English</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3 data-i18n="settings.globalTitle">Глобальные настройки сессий</h3>
+            <div class="form-group">
+              <label for="settings-default-url" data-i18n="settings.defaultUrlLabel">Стартовая страница по умолчанию:</label>
               <input type="text" id="settings-default-url" value="https://google.com">
             </div>
 
             <div class="form-row">
-              <button class="btn btn-primary" id="btn-save-settings">Сохранить настройки</button>
+              <button class="btn btn-primary" id="btn-save-settings" data-i18n="settings.saveBtn">Сохранить настройки</button>
             </div>
           </div>
 
           <div class="settings-card" id="settings-update-card">
-            <h3>Обновление программы</h3>
+            <h3 data-i18n="settings.updateTitle">Обновление программы</h3>
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
               <div>
                 <div style="font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px;">
                   Hyperion Browser <span style="color: var(--text-dim); font-weight: 400;" id="settings-app-version">v1.0.21</span>
                 </div>
                 <div style="font-size: 12.5px; color: var(--text-muted);" id="settings-update-status-text">
-                  Установлена актуальная версия. Проверка выполняется автоматически.
+                  <span data-i18n="settings.upToDate">Установлена актуальная версия. Проверка выполняется автоматически.</span>
                 </div>
               </div>
               <div style="display: flex; align-items: center; gap: 10px;">
                 <button type="button" class="btn btn-secondary" id="btn-settings-check-update">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                  <span>Проверить сейчас</span>
+                  <span data-i18n="settings.checkNow">Проверить сейчас</span>
                 </button>
                 <button type="button" class="btn btn-primary" id="btn-settings-install-update" style="display: none;">
-                  <span>Установить обновление</span>
+                  <span data-i18n="settings.installUpdate">Установить обновление</span>
                 </button>
               </div>
             </div>
             <div id="settings-update-notification" style="display: none; margin-top: 14px; padding: 14px 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
-                  <div style="font-weight: 600; color: #fff; font-size: 14px;" id="settings-update-banner-title">Доступно обновление Hyperion</div>
-                  <div style="font-size: 12px; color: var(--text-dim); margin-top: 3px;" id="settings-update-banner-notes">Новая версия готова к автоматической установке.</div>
+                  <div style="font-weight: 600; color: #fff; font-size: 14px;" id="settings-update-banner-title" data-i18n="settings.bannerTitleDflt">Доступно обновление Hyperion</div>
+                  <div style="font-size: 12px; color: var(--text-dim); margin-top: 3px;" id="settings-update-banner-notes" data-i18n="settings.bannerNotesDflt">Новая версия готова к автоматической установке.</div>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
                   <button type="button" class="btn btn-primary" id="btn-settings-start-download">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span>Скачать и обновить</span>
+                    <span data-i18n="settings.downloadUpdate">Скачать и обновить</span>
                   </button>
                   <button type="button" class="btn btn-success" id="btn-settings-apply-restart" style="display: none; background-color: var(--accent-emerald); border-color: var(--accent-emerald); color: #fff;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                    <span>Перезапустить и применить</span>
+                    <span data-i18n="settings.restartApply">Перезапустить и применить</span>
                   </button>
                 </div>
               </div>
@@ -478,29 +485,29 @@
               <!-- Animated In-App Download Progress -->
               <div id="settings-update-progress-wrap" style="display: none; margin-top: 14px; border-top: 1px solid var(--border-color); padding-top: 12px;">
                 <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">
-                  <span id="settings-update-progress-label">Загрузка компонентов...</span>
+                  <span id="settings-update-progress-label" data-i18n="settings.progressLabel">Загрузка компонентов...</span>
                   <span id="settings-update-progress-percent" style="font-weight: 600; color: #fff;">0%</span>
                 </div>
                 <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
                   <div id="settings-update-progress-bar" style="width: 0%; height: 100%; background: var(--accent-gradient); transition: width 0.2s ease;"></div>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-top: 5px;">
-                  <span id="settings-update-size-info">0 МБ / 0 МБ</span>
-                  <span id="settings-update-speed-info">0 МБ/с</span>
+                  <span id="settings-update-size-info" data-i18n="settings.sizeInfo">0 МБ / 0 МБ</span>
+                  <span id="settings-update-speed-info" data-i18n="settings.speedInfo">0 МБ/с</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="settings-card">
-            <h3>Обслуживание и резервные копии</h3>
+            <h3 data-i18n="settings.maintenanceTitle">Обслуживание и резервные копии</h3>
             <div class="settings-actions-row">
               <button class="btn btn-secondary" id="btn-clear-cache">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6"/>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                 </svg>
-                <span>Очистить кэш всех сессий</span>
+                <span data-i18n="settings.clearCache">Очистить кэш всех сессий</span>
               </button>
 
               <button class="btn btn-secondary" id="btn-export-backup">
@@ -509,7 +516,7 @@
                   <polyline points="7 10 12 15 17 10"/>
                   <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
-                <span>Экспорт резервной копии (JSON)</span>
+                <span data-i18n="settings.exportBackup">Экспорт резервной копии (JSON)</span>
               </button>
 
               <button class="btn btn-secondary" id="btn-import-backup">
@@ -518,7 +525,7 @@
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
-                <span>Импорт резервной копии (JSON)</span>
+                <span data-i18n="settings.importBackup">Импорт резервной копии (JSON)</span>
               </button>
             </div>
           </div>
@@ -533,8 +540,8 @@
     <div class="modal-dialog modal-large">
       <div class="modal-header">
         <div class="modal-title-group">
-          <h2 id="modal-heading">Новый профиль</h2>
-          <span class="modal-subtitle">Настройка параметров изоляции, отпечатка и расширений</span>
+          <h2 id="modal-heading" data-i18n="modal.titleNew">Новый профиль</h2>
+          <span class="modal-subtitle" data-i18n="modal.subtitle">Настройка параметров изоляции, отпечатка и расширений</span>
         </div>
         <button class="modal-close" id="btn-modal-close">&times;</button>
       </div>
@@ -542,10 +549,10 @@
       <div class="modal-body">
         <!-- TABS -->
         <div class="modal-tabs">
-          <button class="modal-tab active" data-tab="general">Основное</button>
-          <button class="modal-tab" data-tab="proxy">Прокси</button>
-          <button class="modal-tab" data-tab="fingerprint">Аппаратный отпечаток (Hardware)</button>
-          <button class="modal-tab" data-tab="extensions">Расширения</button>
+          <button class="modal-tab active" data-tab="general" data-i18n="modal.tabGeneral">Основное</button>
+          <button class="modal-tab" data-tab="proxy" data-i18n="modal.tabProxy">Прокси</button>
+          <button class="modal-tab" data-tab="fingerprint" data-i18n="modal.tabFingerprint">Аппаратный отпечаток (Hardware)</button>
+          <button class="modal-tab" data-tab="extensions" data-i18n="modal.tabExtensions">Расширения</button>
           <button class="modal-tab" data-tab="cookies">Cookies</button>
         </div>
 
@@ -557,8 +564,8 @@
             <!-- QUICK PRESETS STRIP -->
             <div class="quick-presets-section">
               <div class="quick-presets-label">
-                <span>Аппаратные профили (Quick Setup)</span>
-                <span class="quick-presets-hint">Быстрая конфигурация отпечатка в 1 клик</span>
+                <span data-i18n="modal.quickPresets">Аппаратные профили (Quick Setup)</span>
+                <span class="quick-presets-hint" data-i18n="modal.quickPresetsHint">Быстрая конфигурация отпечатка в 1 клик</span>
               </div>
               <div class="quick-presets-grid">
                 <button type="button" class="preset-card" data-preset="gaming" onclick="applyQuickPreset('gaming')">
@@ -613,13 +620,13 @@
             </div>
 
             <div class="form-group">
-              <label for="form-name">Название профиля <span class="req">*</span></label>
-              <input type="text" id="form-name" required maxlength="30" placeholder="Например: FB Ads #1, Crypto farming...">
+              <label for="form-name" data-i18n-html="modal.nameLabel">Название профиля <span class="req">*</span></label>
+              <input type="text" id="form-name" required maxlength="30" placeholder="Например: FB Ads #1, Crypto farming..." data-i18n-ph="modal.namePh">
             </div>
 
             <div class="form-row">
               <div class="form-group flex-1">
-                <label>Операционная система</label>
+                <label data-i18n="common.osLabel">Операционная система</label>
                 <div class="os-selector">
                   <label class="os-card">
                     <input type="radio" name="form-os" value="windows" checked>
@@ -676,24 +683,24 @@
 
             <div class="form-row">
               <div class="form-group" style="width: 180px;">
-                <label for="form-folder-select">Папка / Группа</label>
+                <label for="form-folder-select" data-i18n="modal.folderLabel">Папка / Группа</label>
                 <select id="form-folder-select">
                   <!-- Populated dynamically -->
                 </select>
               </div>
               <div class="form-group flex-1">
-                <label for="form-tags">Теги (через запятую)</label>
+                <label for="form-tags" data-i18n="modal.tagsLabel">Теги (через запятую)</label>
                 <input type="text" id="form-tags" placeholder="Facebook, Ads, Google, Farming">
               </div>
               <div class="form-group flex-1">
-                <label for="form-start-url">Стартовые вкладки сессии (URL через запятую; пусто = глобальная настройка)</label>
+                <label for="form-start-url" data-i18n="modal.startUrlLabel">Стартовые вкладки сессии (URL через запятую; пусто = глобальная настройка)</label>
                 <input type="text" id="form-start-url" placeholder="https://google.com">
               </div>
             </div>
 
             <div class="form-group">
-              <label for="form-notes">Заметки к профилю</label>
-              <textarea id="form-notes" rows="2" maxlength="1000" placeholder="Логины, назначения или заметки..."></textarea>
+              <label for="form-notes" data-i18n="modal.notesLabel">Заметки к профилю</label>
+              <textarea id="form-notes" rows="2" maxlength="1000" placeholder="Логины, назначения или заметки..." data-i18n-ph="modal.notesPh"></textarea>
             </div>
           </div>
 
@@ -703,21 +710,21 @@
               <label class="toggle-container">
                 <input type="checkbox" id="form-proxy-enabled">
                 <span class="toggle-switch"></span>
-                <span class="toggle-label">Использовать прокси-сервер</span>
+                <span class="toggle-label" data-i18n="modal.proxyToggle">Использовать прокси-сервер</span>
               </label>
             </div>
 
             <div id="proxy-fields-container" style="display: none;">
               <div class="form-group">
-                <label for="form-saved-proxy-select">Выбрать из сохраненных прокси</label>
+                <label for="form-saved-proxy-select" data-i18n="modal.savedProxyLabel">Выбрать из сохраненных прокси</label>
                 <select id="form-saved-proxy-select">
-                  <option value="">— Ввести вручную —</option>
+                  <option value="" data-i18n="modal.manualOption">— Ввести вручную —</option>
                 </select>
               </div>
 
               <div class="form-row">
                 <div class="form-group" style="width: 140px;">
-                  <label for="form-proxy-proto">Протокол</label>
+                  <label for="form-proxy-proto" data-i18n="modal.protoLabel">Протокол</label>
                   <select id="form-proxy-proto">
                     <option value="socks5" selected>SOCKS5</option>
                     <option value="http">HTTP</option>
@@ -726,24 +733,24 @@
                 </div>
 
                 <div class="form-group flex-1">
-                  <label for="form-proxy-host">Хост / IP</label>
-                  <input type="text" id="form-proxy-host" placeholder="192.168.1.1 или proxy.domain.com">
+                  <label for="form-proxy-host" data-i18n="modal.hostLabel">Хост / IP</label>
+                  <input type="text" id="form-proxy-host" placeholder="192.168.1.1 или proxy.domain.com" data-i18n-ph="modal.hostPh">
                 </div>
 
                 <div class="form-group" style="width: 120px;">
-                  <label for="form-proxy-port">Порт</label>
+                  <label for="form-proxy-port" data-i18n="modal.portLabel">Порт</label>
                   <input type="number" id="form-proxy-port" placeholder="1080">
                 </div>
               </div>
 
               <div class="form-row">
                 <div class="form-group flex-1">
-                  <label for="form-proxy-user">Логин (опционально)</label>
-                  <input type="text" id="form-proxy-user" placeholder="Логин">
+                  <label for="form-proxy-user" data-i18n="modal.userLabel">Логин (опционально)</label>
+                  <input type="text" id="form-proxy-user" placeholder="Логин" data-i18n-ph="modal.userPh">
                 </div>
                 <div class="form-group flex-1">
-                  <label for="form-proxy-pass">Пароль (опционально)</label>
-                  <input type="password" id="form-proxy-pass" placeholder="Пароль">
+                  <label for="form-proxy-pass" data-i18n="modal.passLabel">Пароль (опционально)</label>
+                  <input type="password" id="form-proxy-pass" placeholder="Пароль" data-i18n-ph="modal.passPh">
                 </div>
               </div>
 
@@ -752,7 +759,7 @@
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                   </svg>
-                  <span>Проверить соединение</span>
+                  <span data-i18n="modal.testConn">Проверить соединение</span>
                 </button>
                 <div class="proxy-test-result" id="proxy-test-result"></div>
               </div>
@@ -763,8 +770,8 @@
           <div class="tab-pane" id="pane-fingerprint">
             <div class="fp-header-banner">
               <div class="fp-header-info">
-                <span class="fp-title">Конфигуратор цифрового отпечатка</span>
-                <span class="fp-desc">Выбирайте видеокарту, процессор и параметры вручную из списков или генерируйте случайно</span>
+                <span class="fp-title" data-i18n="modal.fpTitle">Конфигуратор цифрового отпечатка</span>
+                <span class="fp-desc" data-i18n="modal.fpDesc">Выбирайте видеокарту, процессор и параметры вручную из списков или генерируйте случайно</span>
               </div>
               <button type="button" class="btn btn-secondary btn-reroll" id="btn-reroll-fp">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -772,7 +779,7 @@
                   <circle cx="8.5" cy="8.5" r="1.5"/>
                   <circle cx="15.5" cy="15.5" r="1.5"/>
                 </svg>
-                <span>Случайный отпечаток</span>
+                <span data-i18n="modal.randomFp">Случайный отпечаток</span>
               </button>
             </div>
 
@@ -780,7 +787,7 @@
             <div class="fp-custom-panel">
               <div class="form-row">
                 <div class="form-group flex-1">
-                  <label for="sel-fp-gpu">Видеокарта (WebGL Renderer) <span class="badge-mini">Blink Spoof</span></label>
+                  <label for="sel-fp-gpu" data-i18n-html="modal.gpuLabel">Видеокарта (WebGL Renderer) <span class="badge-mini">Blink Spoof</span></label>
                   <select id="sel-fp-gpu" class="form-select-highlight">
                     <!-- Populated dynamically based on OS -->
                   </select>
@@ -789,21 +796,21 @@
 
               <div class="form-row">
                 <div class="form-group flex-1">
-                  <label for="sel-fp-cores">Процессор (Ядра CPU)</label>
+                  <label for="sel-fp-cores" data-i18n="modal.coresLabel">Процессор (Ядра CPU)</label>
                   <select id="sel-fp-cores">
                     <!-- Populated dynamically -->
                   </select>
                 </div>
 
                 <div class="form-group flex-1">
-                  <label for="sel-fp-ram">Память (RAM GB)</label>
+                  <label for="sel-fp-ram" data-i18n="modal.ramLabel">Память (RAM GB)</label>
                   <select id="sel-fp-ram">
                     <!-- Populated dynamically -->
                   </select>
                 </div>
 
                 <div class="form-group flex-1">
-                  <label for="sel-fp-res">Разрешение экрана</label>
+                  <label for="sel-fp-res" data-i18n="modal.resLabel">Разрешение экрана</label>
                   <select id="sel-fp-res">
                     <!-- Populated dynamically -->
                   </select>
@@ -812,14 +819,14 @@
 
               <div class="form-row">
                 <div class="form-group flex-1">
-                  <label for="sel-fp-tz">Часовой пояс (Timezone)</label>
+                  <label for="sel-fp-tz" data-i18n="modal.tzLabel">Часовой пояс (Timezone)</label>
                   <select id="sel-fp-tz">
                     <!-- Populated dynamically -->
                   </select>
                 </div>
 
                 <div class="form-group flex-1">
-                  <label for="sel-fp-locale">Язык браузера (Locale)</label>
+                  <label for="sel-fp-locale" data-i18n="modal.localeLabel">Язык браузера (Locale)</label>
                   <select id="sel-fp-locale">
                     <!-- Populated dynamically -->
                   </select>
@@ -828,7 +835,7 @@
 
               <div class="form-row">
                 <div class="form-group flex-1">
-                  <label for="sel-fp-webrtc">Режим WebRTC</label>
+                  <label for="sel-fp-webrtc" data-i18n="modal.webrtcLabel">Режим WebRTC</label>
                   <select id="sel-fp-webrtc">
                     <!-- Populated dynamically -->
                   </select>
@@ -844,13 +851,13 @@
                 <label class="toggle-container">
                   <input type="checkbox" id="fp-toggle-canvas" checked>
                   <span class="toggle-switch"></span>
-                  <span class="toggle-label-sm">Аппаратный шум Canvas</span>
+                  <span class="toggle-label-sm" data-i18n="modal.canvasNoise">Аппаратный шум Canvas</span>
                 </label>
 
                 <label class="toggle-container">
                   <input type="checkbox" id="fp-toggle-audio" checked>
                   <span class="toggle-switch"></span>
-                  <span class="toggle-label-sm">Аппаратный шум AudioContext</span>
+                  <span class="toggle-label-sm" data-i18n="modal.audioNoise">Аппаратный шум AudioContext</span>
                 </label>
 
                 <label class="toggle-container">
@@ -865,7 +872,7 @@
           <!-- TAB 4: EXTENSIONS -->
           <div class="tab-pane" id="pane-extensions">
             <div class="ext-modal-header">
-              <p>Отметьте расширения, которые должны загружаться при запуске этого профиля:</p>
+              <p data-i18n="modal.extPick">Отметьте расширения, которые должны загружаться при запуске этого профиля:</p>
             </div>
             <div class="ext-profile-selector-list" id="ext-profile-selector-list">
               <!-- Dynamically populated -->
@@ -876,32 +883,32 @@
           <div class="tab-pane" id="pane-cookies">
             <div class="cookies-panel-header">
               <div class="fp-header-info">
-                <span class="fp-title">Управление Cookies сессии</span>
-                <span class="fp-desc">Прямой импорт и экспорт в SQLite базу данных профиля (JSON / Netscape)</span>
+                <span class="fp-title" data-i18n="modal.cookiesTitle">Управление Cookies сессии</span>
+                <span class="fp-desc" data-i18n="modal.cookiesDesc">Прямой импорт и экспорт в SQLite базу данных профиля (JSON / Netscape)</span>
               </div>
               <div style="display: flex; gap: 8px;">
                 <button type="button" class="btn btn-secondary" id="btn-export-profile-cookies">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  <span>Экспорт</span>
+                  <span data-i18n="modal.exportBtn">Экспорт</span>
                 </button>
                 <button type="button" class="btn btn-primary" id="btn-import-profile-cookies">
-                  <span>Импортировать в базу</span>
+                  <span data-i18n="modal.importBtn">Импортировать в базу</span>
                 </button>
               </div>
             </div>
 
             <div class="form-group" style="margin-top: 14px;">
-              <label for="cookies-textarea">Вставьте cookies (JSON массив или строки Netscape):</label>
+              <label for="cookies-textarea" data-i18n="modal.cookiesLabel">Вставьте cookies (JSON массив или строки Netscape):</label>
               <textarea id="cookies-textarea" rows="9" style="font-family: var(--font-mono); font-size: 11.5px;" placeholder="[{"name": "session_id", "value": "xyz...", "domain": ".facebook.com", "path": "/"}]"></textarea>
-              <span class="hint-text" id="cookies-status-hint" style="margin-top: 6px;">Поддерживается стандартный экспорт из расширений Cookie-Editor и EditThisCookie</span>
+              <span class="hint-text" id="cookies-status-hint" data-i18n="modal.cookiesHint" style="margin-top: 6px;">Поддерживается стандартный экспорт из расширений Cookie-Editor и EditThisCookie</span>
             </div>
           </div>
         </form>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-modal-cancel">Отмена</button>
-        <button type="button" class="btn btn-primary" id="btn-modal-save">Сохранить профиль</button>
+        <button type="button" class="btn btn-secondary" id="btn-modal-cancel" data-i18n="common.cancel">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-modal-save" data-i18n="modal.saveProfile">Сохранить профиль</button>
       </div>
     </div>
   </div>
@@ -910,13 +917,13 @@
   <div class="modal-overlay" id="add-proxy-modal" style="display: none;">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h2>Добавить прокси</h2>
+        <h2 data-i18n="proxymodal.title">Добавить прокси</h2>
         <button class="modal-close" id="btn-close-add-proxy">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group" style="width: 140px;">
-            <label>Протокол</label>
+            <label data-i18n="proxymodal.protoLabel">Протокол</label>
             <select id="modal-proxy-proto">
               <option value="socks5" selected>SOCKS5</option>
               <option value="http">HTTP</option>
@@ -924,33 +931,33 @@
             </select>
           </div>
           <div class="form-group flex-1">
-            <label>Хост / IP <span class="req">*</span></label>
+            <label data-i18n-html="proxymodal.hostLabel">Хост / IP <span class="req">*</span></label>
             <input type="text" id="modal-proxy-host" placeholder="192.168.1.1">
           </div>
           <div class="form-group" style="width: 120px;">
-            <label>Порт <span class="req">*</span></label>
+            <label data-i18n-html="proxymodal.portLabel">Порт <span class="req">*</span></label>
             <input type="number" id="modal-proxy-port" placeholder="1080">
           </div>
         </div>
         
         <div class="form-group">
-          <label for="modal-proxy-rotate-url">Ссылка смены IP (для мобильных прокси / Rotate URL)</label>
+          <label for="modal-proxy-rotate-url" data-i18n="proxymodal.rotateLabel">Ссылка смены IP (для мобильных прокси / Rotate URL)</label>
           <input type="text" id="modal-proxy-rotate-url" placeholder="http://changeip.mobileproxy.space/?api_key=...">
         </div>
 <div class="form-row">
           <div class="form-group flex-1">
-            <label>Логин</label>
-            <input type="text" id="modal-proxy-user" placeholder="Пользователь">
+            <label data-i18n="proxymodal.userLabel">Логин</label>
+            <input type="text" id="modal-proxy-user" placeholder="Пользователь" data-i18n-ph="proxymodal.userPh">
           </div>
           <div class="form-group flex-1">
-            <label>Пароль</label>
-            <input type="password" id="modal-proxy-pass" placeholder="Пароль">
+            <label data-i18n="proxymodal.passLabel">Пароль</label>
+            <input type="password" id="modal-proxy-pass" placeholder="Пароль" data-i18n-ph="proxymodal.passPh">
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-cancel-add-proxy">Отмена</button>
-        <button type="button" class="btn btn-primary" id="btn-save-new-proxy">Сохранить прокси</button>
+        <button type="button" class="btn btn-secondary" id="btn-cancel-add-proxy" data-i18n="common.cancel">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-save-new-proxy" data-i18n="proxymodal.save">Сохранить прокси</button>
       </div>
     </div>
   </div>
@@ -959,18 +966,18 @@
   <div class="modal-overlay" id="import-proxies-modal" style="display: none;">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h2>Импорт списка прокси</h2>
+        <h2 data-i18n="importmodal.title">Импорт списка прокси</h2>
         <button class="modal-close" id="btn-close-import-proxy">&times;</button>
       </div>
       <div class="modal-body">
-        <p class="hint-text">Вставьте каждую строку в формате <code>ip:port:user:pass</code> или <code>protocol://user:pass@ip:port</code></p>
+        <p class="hint-text" data-i18n-html="importmodal.hint">Вставьте каждую строку в формате <code>ip:port:user:pass</code> или <code>protocol://user:pass@ip:port</code></p>
         <textarea id="import-proxy-textarea" rows="8" placeholder="185.220.101.5:1080:login:password
 socks5://user:pass@185.220.101.6:1080
 192.168.1.100:8080"></textarea>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-cancel-import-proxy">Отмена</button>
-        <button type="button" class="btn btn-primary" id="btn-submit-import-proxy">Импортировать</button>
+        <button type="button" class="btn btn-secondary" id="btn-cancel-import-proxy" data-i18n="common.cancel">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-import-proxy" data-i18n="importmodal.submit">Импортировать</button>
       </div>
     </div>
   </div>
@@ -980,19 +987,19 @@ socks5://user:pass@185.220.101.6:1080
     <div class="modal-dialog modal-large">
       <div class="modal-header">
         <div class="modal-title-group">
-          <h2>Создать шаблон отпечатка</h2>
-          <span class="modal-subtitle">Сохранение эталонной аппаратной конфигурации для быстрого создания профилей</span>
+          <h2 data-i18n="tplmodal.title">Создать шаблон отпечатка</h2>
+          <span class="modal-subtitle" data-i18n="tplmodal.subtitle">Сохранение эталонной аппаратной конфигурации для быстрого создания профилей</span>
         </div>
         <button class="modal-close" id="btn-close-create-template">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="tpl-input-name">Название шаблона <span class="req">*</span></label>
-          <input type="text" id="tpl-input-name" placeholder="Например: RTX 4080 Gaming Rig, MacBook M3 Max Dev">
+          <label for="tpl-input-name" data-i18n-html="tplmodal.nameLabel">Название шаблона <span class="req">*</span></label>
+          <input type="text" id="tpl-input-name" placeholder="Например: RTX 4080 Gaming Rig, MacBook M3 Max Dev" data-i18n-ph="tplmodal.namePh">
         </div>
 
         <div class="form-group">
-          <label>Операционная система</label>
+          <label data-i18n="common.osLabel">Операционная система</label>
           <div class="os-selector">
             <label class="os-card">
               <input type="radio" name="tpl-os" value="windows" checked>
@@ -1043,7 +1050,7 @@ socks5://user:pass@185.220.101.6:1080
         </div>
 
         <div class="form-group">
-          <label for="tpl-select-gpu">Видеокарта (WebGL Renderer)</label>
+          <label for="tpl-select-gpu" data-i18n="tplmodal.gpuLabel">Видеокарта (WebGL Renderer)</label>
           <select id="tpl-select-gpu" class="form-select-highlight">
             <!-- Populated dynamically -->
           </select>
@@ -1051,19 +1058,19 @@ socks5://user:pass@185.220.101.6:1080
 
         <div class="form-row">
           <div class="form-group flex-1">
-            <label for="tpl-select-cores">Ядра CPU</label>
+            <label for="tpl-select-cores" data-i18n="tplmodal.coresLabel">Ядра CPU</label>
             <select id="tpl-select-cores">
               <!-- Populated dynamically -->
             </select>
           </div>
           <div class="form-group flex-1">
-            <label for="tpl-select-ram">Память RAM</label>
+            <label for="tpl-select-ram" data-i18n="tplmodal.ramLabel">Память RAM</label>
             <select id="tpl-select-ram">
               <!-- Populated dynamically -->
             </select>
           </div>
           <div class="form-group flex-1">
-            <label for="tpl-select-res">Разрешение экрана</label>
+            <label for="tpl-select-res" data-i18n="tplmodal.resLabel">Разрешение экрана</label>
             <select id="tpl-select-res">
               <!-- Populated dynamically -->
             </select>
@@ -1072,13 +1079,13 @@ socks5://user:pass@185.220.101.6:1080
 
         <div class="form-row">
           <div class="form-group flex-1">
-            <label for="tpl-select-tz">Часовой пояс (Timezone)</label>
+            <label for="tpl-select-tz" data-i18n="tplmodal.tzLabel">Часовой пояс (Timezone)</label>
             <select id="tpl-select-tz">
               <!-- Populated dynamically -->
             </select>
           </div>
           <div class="form-group flex-1">
-            <label for="tpl-select-locale">Локаль (Язык)</label>
+            <label for="tpl-select-locale" data-i18n="tplmodal.localeLabel">Локаль (Язык)</label>
             <select id="tpl-select-locale">
               <!-- Populated dynamically -->
             </select>
@@ -1092,8 +1099,8 @@ socks5://user:pass@185.220.101.6:1080
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-cancel-create-template">Отмена</button>
-        <button type="button" class="btn btn-primary" id="btn-save-new-template">Сохранить шаблон</button>
+        <button type="button" class="btn btn-secondary" id="btn-cancel-create-template" data-i18n="common.cancel">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-save-new-template" data-i18n="tplmodal.save">Сохранить шаблон</button>
       </div>
     </div>
   </div>
@@ -1104,25 +1111,25 @@ socks5://user:pass@185.220.101.6:1080
     <div class="modal-dialog">
       <div class="modal-header">
         <div class="modal-title-group">
-          <h2>Массовое создание профилей</h2>
-          <span class="modal-subtitle">Генерация N уникальных профилей с валидным железом в 1 клик</span>
+          <h2 data-i18n="bulkmodal.title">Массовое создание профилей</h2>
+          <span class="modal-subtitle" data-i18n="bulkmodal.subtitle">Генерация N уникальных профилей с валидным железом в 1 клик</span>
         </div>
         <button class="modal-close" id="btn-close-bulk-create">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group flex-1">
-            <label>Базовое название</label>
+            <label data-i18n="bulkmodal.baseName">Базовое название</label>
             <input type="text" id="bulk-input-basename" value="FB Farm" maxlength="30">
           </div>
           <div class="form-group" style="width: 140px;">
-            <label>Количество (1 - 50)</label>
+            <label data-i18n="bulkmodal.countLabel">Количество (1 - 50)</label>
             <input type="number" id="bulk-input-count" value="5" min="1" max="50">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group flex-1">
-            <label>Операционная система</label>
+            <label data-i18n="common.osLabel">Операционная система</label>
             <select id="bulk-select-os">
               <option value="windows" selected>Windows 11 / 10</option>
               <option value="macos">macOS Sonoma / Ventura</option>
@@ -1132,20 +1139,20 @@ socks5://user:pass@185.220.101.6:1080
             </select>
           </div>
           <div class="form-group flex-1">
-            <label>Папка назначения</label>
+            <label data-i18n="bulkmodal.folderLabel">Папка назначения</label>
             <select id="bulk-select-folder">
               <!-- Populated dynamically -->
             </select>
           </div>
         </div>
         <div class="form-group">
-          <label>Стартовые вкладки (через запятую)</label>
+          <label data-i18n="bulkmodal.startTabs">Стартовые вкладки (через запятую)</label>
           <input type="text" id="bulk-input-urls" value="https://google.com">
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-cancel-bulk-create">Отмена</button>
-        <button type="button" class="btn btn-primary" id="btn-submit-bulk-create">Сгенерировать профили</button>
+        <button type="button" class="btn btn-secondary" id="btn-cancel-bulk-create" data-i18n="common.cancel">Отмена</button>
+        <button type="button" class="btn btn-primary" id="btn-submit-bulk-create" data-i18n="bulkmodal.submit">Сгенерировать профили</button>
       </div>
     </div>
   </div>
@@ -1155,16 +1162,16 @@ socks5://user:pass@185.220.101.6:1080
     <div class="modal-dialog">
       <div class="modal-header">
         <div class="modal-title-group">
-          <h2>Cookie Robot (Автопрогрев профиля)</h2>
-          <span class="modal-subtitle">Фоновый серфинг по сайтам для сбора истории и доверенных куки</span>
+          <h2 data-i18n="warmup.title">Cookie Robot (Автопрогрев профиля)</h2>
+          <span class="modal-subtitle" data-i18n="warmup.subtitle">Фоновый серфинг по сайтам для сбора истории и доверенных куки</span>
         </div>
         <button class="modal-close" id="btn-close-warmup">&times;</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="warmup-profile-id" value="">
-        <p class="hint-text">Робот запустит сессию в скрытом режиме и поочередно зайдет на каждый сайт с паузами, накапливая кэш и куки:</p>
+        <p class="hint-text" data-i18n="warmup.desc">Робот запустит сессию в скрытом режиме и поочередно зайдет на каждый сайт с паузами, накапливая кэш и куки:</p>
         <div class="form-group">
-          <label>Список URL для прогрева (по одному на строку):</label>
+          <label data-i18n="warmup.urlLabel">Список URL для прогрева (по одному на строку):</label>
           <textarea id="warmup-urls-textarea" rows="7" style="font-family: var(--font-mono); font-size: 12px;">https://www.wikipedia.org
 https://www.bbc.com
 https://news.ycombinator.com
@@ -1174,17 +1181,18 @@ https://www.amazon.com
 https://www.reddit.com</textarea>
         </div>
         <div class="warmup-status-box" id="warmup-status-box" style="display:none; font-size:13px; color:var(--accent-cyan); font-weight:600;">
-          ⏳ Идет фоновый серфинг... Пожалуйста, подождите.
+          <span data-i18n="warmup.progress">⏳ Идет фоновый серфинг... Пожалуйста, подождите.</span>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-cancel-warmup">Закрыть</button>
-        <button type="button" class="btn btn-primary" id="btn-start-warmup">Запустить прогрев</button>
+        <button type="button" class="btn btn-secondary" id="btn-cancel-warmup" data-i18n="common.close">Закрыть</button>
+        <button type="button" class="btn btn-primary" id="btn-start-warmup" data-i18n="warmup.start">Запустить прогрев</button>
       </div>
     </div>
   </div>
 
 
+  <script src="i18n.js"></script>
   <script src="app.js"></script>
 
   <!-- ================= UNIVERSAL PROMPT MODAL ================= -->
@@ -1192,19 +1200,19 @@ https://www.reddit.com</textarea>
     <div class="modal-dialog" style="width: 420px; animation: modal-slide 0.15s ease;">
       <div class="modal-header" style="padding: 14px 20px;">
         <div class="modal-title-group">
-          <h2 id="prompt-modal-title" style="font-size: 15px;">Добавление</h2>
+          <h2 id="prompt-modal-title" style="font-size: 15px;" data-i18n="prompt.title">Добавление</h2>
         </div>
         <button type="button" class="modal-close" id="prompt-modal-close">&times;</button>
       </div>
       <div class="modal-body" style="padding: 18px 20px;">
         <div class="form-group" style="margin-bottom: 0;">
-          <label id="prompt-modal-label" for="prompt-modal-input" style="font-size: 13px; margin-bottom: 6px; display: block;">Название:</label>
+          <label id="prompt-modal-label" for="prompt-modal-input" style="font-size: 13px; margin-bottom: 6px; display: block;" data-i18n="prompt.label">Название:</label>
           <input type="text" id="prompt-modal-input" style="font-size: 13.5px; width: 100%; box-sizing: border-box;" autocomplete="off">
         </div>
       </div>
       <div class="modal-footer" style="padding: 12px 20px;">
-        <button type="button" class="btn btn-secondary" id="prompt-modal-cancel">Отмена</button>
-        <button type="button" class="btn btn-primary" id="prompt-modal-confirm">Добавить</button>
+        <button type="button" class="btn btn-secondary" id="prompt-modal-cancel" data-i18n="common.cancel">Отмена</button>
+        <button type="button" class="btn btn-primary" id="prompt-modal-confirm" data-i18n="prompt.confirm">Добавить</button>
       </div>
     </div>
   </div>
@@ -1214,7 +1222,7 @@ https://www.reddit.com</textarea>
     <div class="modal-dialog" style="width: 440px; animation: modal-slide 0.15s ease;">
       <div class="modal-header" style="padding: 14px 20px;">
         <div class="modal-title-group">
-          <h2 id="confirm-modal-title" style="font-size: 15px;">Подтверждение</h2>
+          <h2 id="confirm-modal-title" style="font-size: 15px;" data-i18n="confirm.title">Подтверждение</h2>
         </div>
         <button type="button" class="modal-close" id="confirm-modal-close">&times;</button>
       </div>
@@ -1222,8 +1230,8 @@ https://www.reddit.com</textarea>
         <p id="confirm-modal-message" style="margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--text-color);"></p>
       </div>
       <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; gap: 10px;">
-        <button type="button" class="btn btn-secondary" id="confirm-modal-cancel">Отмена</button>
-        <button type="button" class="btn btn-danger" id="confirm-modal-confirm">Подтвердить</button>
+        <button type="button" class="btn btn-secondary" id="confirm-modal-cancel" data-i18n="common.cancel">Отмена</button>
+        <button type="button" class="btn btn-danger" id="confirm-modal-confirm" data-i18n="confirm.confirm">Подтвердить</button>
       </div>
     </div>
   </div>
@@ -1235,7 +1243,7 @@ https://www.reddit.com</textarea>
       <div class="drawer-title-group">
         <div class="drawer-os-icon" id="inspector-os-icon"></div>
         <div>
-          <h3 id="inspector-name" class="drawer-profile-name">Имя профиля</h3>
+          <h3 id="inspector-name" class="drawer-profile-name" data-i18n="inspector.name">Имя профиля</h3>
           <div class="drawer-status-line">
             <span id="inspector-status-pill" class="status-pill stopped">
               <span class="status-dot-mini"></span>
@@ -1245,23 +1253,23 @@ https://www.reddit.com</textarea>
           </div>
         </div>
       </div>
-      <button type="button" class="drawer-close-btn" onclick="closeProfileInspector()" title="Закрыть">&times;</button>
+      <button type="button" class="drawer-close-btn" onclick="closeProfileInspector()" title="Закрыть" data-i18n-title="common.close">&times;</button>
     </div>
 
     <div class="drawer-body">
       <!-- QUICK ACTIONS -->
       <div class="drawer-section">
-        <div class="drawer-section-title">Действия с профилем</div>
+        <div class="drawer-section-title" data-i18n="inspector.actionsTitle">Действия с профилем</div>
         <button type="button" class="btn btn-start btn-drawer-main" id="inspector-btn-start" onclick="inspectorToggleRun()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span id="inspector-btn-start-label">Запустить профиль</span>
+          <span id="inspector-btn-start-label" data-i18n="inspector.startProfile">Запустить профиль</span>
         </button>
         <div class="drawer-actions-grid">
-          <button type="button" class="btn btn-secondary" onclick="inspectorEditProfile()" title="Настройки профиля и отпечатка">
+          <button type="button" class="btn btn-secondary" onclick="inspectorEditProfile()" title="Настройки профиля и отпечатка" data-i18n-title="inspector.settingsTitle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            <span>Настройки</span>
+            <span data-i18n="inspector.settings">Настройки</span>
           </button>
-          <button type="button" class="btn btn-secondary" onclick="inspectorOpenCookies()" title="Импорт, экспорт и просмотр cookies">
+          <button type="button" class="btn btn-secondary" onclick="inspectorOpenCookies()" title="Импорт, экспорт и просмотр cookies" data-i18n-title="inspector.cookiesTitle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"/>
               <circle cx="8" cy="9" r="1.5" fill="currentColor"/>
@@ -1271,7 +1279,7 @@ https://www.reddit.com</textarea>
             </svg>
             <span>Cookies</span>
           </button>
-          <button type="button" class="btn btn-secondary" onclick="inspectorOpenWarmupRobot()" title="Cookie Robot - автопрогрев сайтов">
+          <button type="button" class="btn btn-secondary" onclick="inspectorOpenWarmupRobot()" title="Cookie Robot - автопрогрев сайтов" data-i18n-title="inspector.warmupTitle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="11" width="18" height="10" rx="2"/>
               <circle cx="12" cy="5" r="2"/>
@@ -1279,36 +1287,36 @@ https://www.reddit.com</textarea>
               <line x1="8" y1="16" x2="8.01" y2="16"/>
               <line x1="16" y1="16" x2="16.01" y2="16"/>
             </svg>
-            <span>Прогрев (Robot)</span>
+            <span data-i18n="inspector.warmup">Прогрев (Robot)</span>
           </button>
-          <button type="button" class="btn btn-secondary" onclick="inspectorCloneProfile()" title="Клонировать профиль">
+          <button type="button" class="btn btn-secondary" onclick="inspectorCloneProfile()" title="Клонировать профиль" data-i18n-title="inspector.cloneTitle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span>Клонировать</span>
+            <span data-i18n="inspector.clone">Клонировать</span>
           </button>
-          <button type="button" class="btn btn-secondary" onclick="inspectorExportProfile()" title="Экспортировать архив (.hyperion)">
+          <button type="button" class="btn btn-secondary" onclick="inspectorExportProfile()" title="Экспортировать архив (.hyperion)" data-i18n-title="inspector.exportTitle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
               <line x1="12" y1="22.08" x2="12" y2="12"/>
             </svg>
-            <span>Экспорт</span>
+            <span data-i18n="inspector.export">Экспорт</span>
           </button>
-          <button type="button" class="btn btn-secondary" onclick="inspectorOpenFolder()" title="Открыть папку данных профиля">
+          <button type="button" class="btn btn-secondary" onclick="inspectorOpenFolder()" title="Открыть папку данных профиля" data-i18n-title="inspector.folderTitle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            <span>Папка данных</span>
+            <span data-i18n="inspector.folder">Папка данных</span>
           </button>
         </div>
         <div style="margin-top: 10px;">
-          <button type="button" class="btn btn-danger-outline" onclick="inspectorDeleteProfile()" title="Удалить профиль">
+          <button type="button" class="btn btn-danger-outline" onclick="inspectorDeleteProfile()" title="Удалить профиль" data-i18n-title="inspector.deleteTitle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            <span>Удалить профиль</span>
+            <span data-i18n="inspector.delete">Удалить профиль</span>
           </button>
         </div>
       </div>
 
       <!-- HARDWARE & FINGERPRINT SPECS -->
       <div class="drawer-section">
-        <div class="drawer-section-title">Аппаратный отпечаток</div>
+        <div class="drawer-section-title" data-i18n="inspector.fpTitle">Аппаратный отпечаток</div>
         <div class="drawer-spec-card">
           <div class="drawer-spec-row">
             <span class="drawer-spec-label">GPU</span>
@@ -1319,15 +1327,15 @@ https://www.reddit.com</textarea>
             <span class="drawer-spec-value" id="inspector-cpu-ram">—</span>
           </div>
           <div class="drawer-spec-row">
-            <span class="drawer-spec-label">Экран</span>
+            <span class="drawer-spec-label" data-i18n="inspector.screen">Экран</span>
             <span class="drawer-spec-value" id="inspector-screen">—</span>
           </div>
           <div class="drawer-spec-row">
-            <span class="drawer-spec-label">Плагины</span>
+            <span class="drawer-spec-label" data-i18n="inspector.plugins">Плагины</span>
             <span class="drawer-spec-value" id="inspector-extensions">—</span>
           </div>
           <div class="drawer-spec-row">
-            <span class="drawer-spec-label">Защита</span>
+            <span class="drawer-spec-label" data-i18n="inspector.protection">Защита</span>
             <span class="drawer-spec-value" id="inspector-protection">Canvas, Audio, WebGL</span>
           </div>
           <div class="drawer-spec-row">
@@ -1339,7 +1347,7 @@ https://www.reddit.com</textarea>
 
       <!-- PROXY & NETWORK SPECS -->
       <div class="drawer-section">
-        <div class="drawer-section-title">Сеть и Прокси</div>
+        <div class="drawer-section-title" data-i18n="inspector.netTitle">Сеть и Прокси</div>
         <div class="drawer-spec-card">
           <div class="drawer-proxy-header">
             <div id="inspector-proxy-status">—</div>
@@ -1355,10 +1363,10 @@ https://www.reddit.com</textarea>
       <!-- LIVE SCRATCHPAD & NOTES (AUTO-SAVE) -->
       <div class="drawer-section">
         <div class="drawer-section-title" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>Быстрые заметки</span>
-          <span id="inspector-notes-status" class="drawer-saved-status">Автосохранение</span>
+          <span data-i18n="inspector.quickNotes">Быстрые заметки</span>
+          <span id="inspector-notes-status" class="drawer-saved-status" data-i18n="inspector.autosave">Автосохранение</span>
         </div>
-        <textarea id="inspector-notes-input" class="drawer-notes-area" rows="4" maxlength="1000" placeholder="Заметки, логины, пароли, 2FA..."></textarea>
+        <textarea id="inspector-notes-input" class="drawer-notes-area" rows="4" maxlength="1000" placeholder="Заметки, логины, пароли, 2FA..." data-i18n-ph="inspector.notesPh"></textarea>
       </div>
     </div>
   </aside>

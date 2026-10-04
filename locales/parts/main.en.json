@@ -1,0 +1,71 @@
+{
+  "dialog": {
+    "pickExtensionFolder": "Select unpacked extension folder",
+    "selectChromeTitle": "Select Chrome / Chromium executable",
+    "filterExe": "Executable files (*.exe)",
+    "filterAll": "All files",
+    "filterExecutables": "Executable files"
+  },
+  "err": {
+    "profileNotFound": "Profile not found",
+    "chromeNotFound": "Browser executable ({binName}) not found.\nSpecify the path to Chrome in Settings or install Google Chrome.",
+    "extInstall": "Extension installation error",
+    "extInstallerUnknown": "Unknown extension installer response",
+    "manifestNotFound": "Selected folder does not contain manifest.json",
+    "invalidManifest": "Invalid manifest.json",
+    "invalidProfileArchive": "Invalid .hyperion archive format",
+    "invalidBackupFile": "Invalid backup file"
+  },
+  "proxy": {
+    "specifyHostPort": "Specify host and port",
+    "timeout": "Timeout",
+    "rotateUrlNotSet": "IP rotation link not specified",
+    "rotateTimeout": "IP rotation timeout",
+    "geoFailed": "Failed to get geo data via proxy"
+  },
+  "export": {
+    "saveTitle": "Export profile \"{name}\" to .hyperion",
+    "openTitle": "Select .hyperion profile archive",
+    "importedName": "{name} (Import)"
+  },
+  "backup": {
+    "exportTitle": "Export Hyperion backup",
+    "importTitle": "Select Hyperion backup file (JSON)"
+  },
+  "update": {
+    "noDownloadUrl": "Missing update download URL",
+    "downloadErrorHttp": "Download error: HTTP {status}",
+    "fileNotFound": "Update file not found or has not been downloaded."
+  },
+  "profile": {
+    "defaultName": "Profile #{num}",
+    "clonedName": "{name} (Copy)",
+    "defaultBaseName": "Profile",
+    "bulkCreatedNote": "Bulk created ({date})"
+  },
+  "ext": {
+    "customExtension": "Custom extension",
+    "unpackedExtension": "Unpacked local extension",
+    "desc": {
+      "cookieEditor": "View, export and import session cookies (Netscape/JSON)",
+      "clearCache": "1-click clear cache, history and session storage",
+      "dontCareCookies": "Automatically hide and accept GDPR cookie notices",
+      "metamask": "Leading crypto wallet for Ethereum / EVM networks",
+      "phantom": "Crypto wallet for Solana, Bitcoin and Polygon networks",
+      "rabby": "Best Web3 wallet for multi-accounting",
+      "okx": "Universal crypto wallet with 100+ blockchain support",
+      "trustWallet": "Official Binance wallet for crypto assets",
+      "keplr": "Primary wallet for Cosmos, Osmosis, and Celestia ecosystem",
+      "sui": "Official Web3 wallet for Sui Network",
+      "coinbase": "Secure crypto wallet and Web3 browser by Coinbase",
+      "tronLink": "Leading wallet for TRON network (TRX, TRC-20, USDT)",
+      "ublockOriginLite": "Fast, next-generation ad and tracker blocker (Manifest V3)",
+      "adguard": "Effective pop-up and banner blocker",
+      "authenticator": "In-browser 2FA verification code generator",
+      "metaPixelHelper": "Verify Facebook / Meta Ads conversion pixel status",
+      "foxyproxy": "Classic proxy server list management tool",
+      "tampermonkey": "Most popular userscript manager",
+      "violentmonkey": "Fast open-source automation script manager"
+    }
+  }
+}

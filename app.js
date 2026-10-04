@@ -28,13 +28,13 @@ function escapeHtml(str) {
 function showToast(message, type = 'info', duration = TOAST_DURATION_DEFAULT) {
   let container = document.getElementById('toast-container');
   if (!container) {
-    container = document.createElement('div');
+    container = document.createElement("div");
     container.id = 'toast-container';
     container.className = 'toast-container';
     document.body.appendChild(container);
   }
 
-  const toast = document.createElement('div');
+  const toast = document.createElement("div");
   toast.className = `hyperion-toast toast-${type}`;
 
   let iconSvg = '';
@@ -49,18 +49,18 @@ function showToast(message, type = 'info', duration = TOAST_DURATION_DEFAULT) {
     iconSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
   }
 
-  const iconSpan = document.createElement('span');
+  const iconSpan = document.createElement("span");
   iconSpan.className = 'toast-icon';
   iconSpan.innerHTML = iconSvg;
 
-  const messageSpan = document.createElement('span');
+  const messageSpan = document.createElement("span");
   messageSpan.className = 'toast-message';
   messageSpan.textContent = String(message || '');
 
-  const closeBtn = document.createElement('button');
+  const closeBtn = document.createElement("button");
   closeBtn.type = 'button';
   closeBtn.className = 'toast-close';
-  closeBtn.title = 'Закрыть';
+  closeBtn.title = t('toast.close');
   closeBtn.textContent = '×';
 
   toast.appendChild(iconSpan);
@@ -90,9 +90,9 @@ window.showToast = showToast;
 // Custom notification function (DO NOT override native alert)
 window.showNotification = (msg) => {
   const text = String(msg || '');
-  const isErr = /ошибк|неверн|fault|fail|error|заполните|введите|укажите/i.test(text);
-  const isWarn = /внимание|warning/i.test(text);
-  const isSuccess = /успешн|сохранен|очищен|импортирован|установлен/i.test(text);
+  const isErr = /ошибк|неверн|fault|fail|error|заполните|введите|укажите|invalid|required|missing|cannot|could not|unable|denied/i.test(text);
+  const isWarn = /внимание|warning|caution|attention/i.test(text);
+  const isSuccess = /успешн|сохранен|очищен|импортирован|установлен|success|saved|cleared|imported|installed|added|created|deleted|removed|updated|started|stopped|exported|copied|downloaded|applied|done|complete/i.test(text);
   const type = isErr ? 'error' : isWarn ? 'warning' : isSuccess ? 'success' : 'info';
   showToast(text, type, isErr ? TOAST_DURATION_ERROR : TOAST_DURATION_DEFAULT);
 };
@@ -100,7 +100,7 @@ window.showNotification = (msg) => {
 // =========================================================================
 // CUSTOM CONFIRM MODAL (HYPERION UI)
 // =========================================================================
-function showConfirmDialog({ title = 'Подтверждение', message, confirmText = 'Подтвердить', cancelText = 'Отмена', isDanger = false }) {
+function showConfirmDialog({ title = t('dialog.confirmTitle'), message, confirmText = t('dialog.confirmBtn'), cancelText = t('dialog.cancelBtn'), isDanger = false }) {
   return new Promise((resolve) => {
     const modal = document.getElementById('confirm-modal');
     if (!modal) {
@@ -168,8 +168,8 @@ function openPromptDialog({ title, label, placeholder, defaultValue = '', maxLen
   const btnCancel = document.getElementById('prompt-modal-cancel');
   const btnClose = document.getElementById('prompt-modal-close');
 
-  if (titleEl) titleEl.textContent = title || 'Добавление';
-  if (labelEl) labelEl.textContent = label || 'Значение:';
+  if (titleEl) titleEl.textContent = title || t('dialog.promptDefaultTitle');
+  if (labelEl) labelEl.textContent = label || t('dialog.promptDefaultLabel');
   if (inputEl) {
     inputEl.placeholder = placeholder || '';
     inputEl.value = defaultValue;
@@ -216,12 +216,12 @@ function openPromptDialog({ title, label, placeholder, defaultValue = '', maxLen
 // =========================================================================
 window.addEventListener('error', (event) => {
   console.error('Unhandled error:', event.error);
-  showToast('Произошла непредвиденная ошибка. Проверьте консоль для деталей.', 'error');
+  showToast(t('toast.unhandledError'), 'error');
 });
 
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled promise rejection:', event.reason);
-  showToast('Ошибка асинхронной операции. Проверьте консоль для деталей.', 'error');
+  showToast(t('toast.unhandledRejection'), 'error');
   event.preventDefault();
 });
 
@@ -300,10 +300,29 @@ const importProxiesModal = document.getElementById('import-proxies-modal');
 // INITIALIZATION
 // =========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
+  await I18N.init();
   initEventListeners();
   await checkSystemStatus();
   await loadDictionaries();
   await loadAllData();
+
+  // Восстановить раздел после reload (например, при смене языка)
+  const restoreView = sessionStorage.getItem('hyperion.restoreView');
+  if (restoreView) {
+    sessionStorage.removeItem('hyperion.restoreView');
+    if (restoreView !== 'profiles') switchMainView(restoreView);
+  }
+
+  // Живое переключение языка: словарь уже подменён в i18n.js,
+  // здесь перерендериваем весь динамический контент.
+  window.addEventListener('hyperion:language-changed', async () => {
+    await loadAllData();
+    switchMainView(CURRENT_VIEW);
+    // Тексты блока обновлений (ставятся через t() при проверке)
+    if (CURRENT_UPDATE_INFO && typeof window.checkSettingsUpdates === 'function') {
+      window.checkSettingsUpdates(false);
+    }
+  });
 
   if (window.hyperion && window.hyperion.onProfileStopped) {
     window.hyperion.onProfileStopped((id) => {
@@ -339,7 +358,7 @@ async function checkSystemStatus() {
       if (label) label.textContent = 'Hyperion v' + (status.version || '1.0.4');
       if (badge) {
         badge.className = 'badge badge-success';
-        badge.textContent = 'Обнаружен';
+        badge.textContent = t('status.detected');
         badge.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
         badge.style.color = '#34d399';
         badge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
@@ -352,13 +371,13 @@ async function checkSystemStatus() {
       if (label) label.textContent = 'Chrome binary missing';
       if (badge) {
         badge.className = 'badge badge-danger';
-        badge.textContent = 'Не найден';
+        badge.textContent = t('status.notFound');
         badge.style.backgroundColor = 'rgba(244, 63, 94, 0.15)';
         badge.style.color = '#f43f5e';
         badge.style.borderColor = 'rgba(244, 63, 94, 0.3)';
       }
     }
-    if (pathEl) pathEl.textContent = (status && status.binary) ? status.binary : 'Не определен';
+    if (pathEl) pathEl.textContent = (status && status.binary) ? status.binary : t('status.notDefined');
   } catch (e) {
     console.error('Status error:', e);
   }
@@ -378,7 +397,7 @@ function populateDropdownDictionaries() {
 
   // CPU Cores
   selFpCores.innerHTML = DICTIONARIES.CPU_CORES_LIST.map(c =>
-    `<option value="${c}">${c} ядер CPU</option>`
+    `<option value="${c}">${t('modal.cpuCores', {count: c})}</option>`
   ).join('');
 
   // RAM
@@ -489,7 +508,7 @@ function updateStats() {
   sidebarExtCount.textContent = extCount;
 
   const tagEl = document.getElementById('installed-ext-count-tag');
-  if (tagEl) tagEl.textContent = `${extCount} установлено`;
+  if (tagEl) tagEl.textContent = t('ext.installedCountTag', {count: extCount});
 }
 
 function updateUptimes() {
@@ -500,7 +519,7 @@ function updateUptimes() {
     const diff = Math.floor((Date.now() - startTime) / 1000);
     const m = Math.floor(diff / 60);
     const s = diff % 60;
-    el.textContent = `В сети: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    el.textContent = `${t('profiles.uptime')}: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   });
   if (typeof updateInspectorUptime === 'function') {
     updateInspectorUptime();
@@ -561,13 +580,13 @@ function renderProfiles() {
     const os = p.os || 'windows';
     const osIcon = getOsSvg(os);
     const fp = p.fingerprint || {};
-  const tagsHtml = (p.tags || []).map(t => `<span class="tag-badge">${escapeHtml(t)} <span class="tag-remove-x" onclick="removeTagFromProfile('${escapeHtml(p.id)}', '${escapeHtml(t)}', event)" title="Удалить тег">&times;</span></span>`).join('') + `<button class="btn-add-tag-inline" onclick="promptAddTag('${escapeHtml(p.id)}', event)" title="Добавить тег">+</button>`;
+  const tagsHtml = (p.tags || []).map(tag => `<span class="tag-badge">${escapeHtml(tag)} <span class="tag-remove-x" onclick="removeTagFromProfile('${escapeHtml(p.id)}', '${escapeHtml(tag)}', event)" title="${t('profiles.deleteTag')}">&times;</span></span>`).join('') + `<button class="btn-add-tag-inline" onclick="promptAddTag('${escapeHtml(p.id)}', event)" title="${t('profiles.addTag')}">+</button>`;
 
-    let proxyHtml = '<span class="proxy-direct">Прямое подключение</span>';
+    let proxyHtml = `<span class="proxy-direct">${t('profiles.directConnection')}</span>`;
     if (p.proxy && p.proxy.enabled && p.proxy.host) {
       const geo = PROXY_GEO_CACHE.get(p.proxy.host);
       const geoFlag = geo && geo.countryCode ? getCountryFlag(geo.countryCode) + " " + geo.countryCode : "";
-      const rotateBtn = p.proxy.change_ip_url ? `<button class="btn-rotate" onclick="triggerProxyRotate('${escapeHtml(p.id)}', '${escapeHtml(p.proxy.id || '')}', event)" title="Сменить IP">🔄 Сменить IP</button>` : '';
+      const rotateBtn = p.proxy.change_ip_url ? `<button class="btn-rotate" onclick="triggerProxyRotate('${escapeHtml(p.id)}', '${escapeHtml(p.proxy.id || '')}', event)" title="${t('proxy.rotateIp')}">🔄 ${t('proxy.rotateIp')}</button>` : '';
       proxyHtml = `
         <div class="proxy-meta">
           <span class="proxy-host">${geoFlag ? geoFlag + " " : ""}${escapeHtml(p.proxy.host)}:${escapeHtml(p.proxy.port || '80')}</span>
@@ -586,7 +605,7 @@ function renderProfiles() {
 
     const extCount = (p.extensions || []).length;
     const extHtml = extCount > 0
-      ? `<span class="ext-pill" title="Подключено расширений: ${extCount}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v4h1.5a2.5 2.5 0 0 1 0 5H2v4a2 2 0 0 0 2 2h4v-1.5a2.5 2.5 0 0 1 5 0V22h4a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/></svg><span>${extCount}&nbsp;плаг.</span></span>`
+      ? `<span class="ext-pill" title="${t('profiles.connectedExtensions', {count: extCount})}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4a2 2 0 0 0-2 2v4h1.5a2.5 2.5 0 0 1 0 5H2v4a2 2 0 0 0 2 2h4v-1.5a2.5 2.5 0 0 1 5 0V22h4a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/></svg><span>${t('profiles.extCountShort', {count: extCount})}</span></span>`
       : `<span style="color:var(--text-dim); font-size:12px;">—</span>`;
 
     return `
@@ -597,7 +616,7 @@ function renderProfiles() {
         <td>
           <span class="status-pill ${isRunning ? 'running' : 'stopped'}">
             <span class="status-dot-mini ${isRunning ? 'green' : ''}"></span>
-            ${isRunning ? 'В СЕТИ' : 'OFF'}
+            ${isRunning ? t('status.online') : 'OFF'}
           </span>
         </td>
         <td>
@@ -606,9 +625,9 @@ function renderProfiles() {
               ${osIcon}
             </div>
             <div class="profile-info">
-              <span class="profile-name clickable-title" onclick="openProfileInspector('${escapeHtml(p.id)}')" title="Открыть быстрый инспектор">${escapeHtml(p.name)}</span>
+              <span class="profile-name clickable-title" onclick="openProfileInspector('${escapeHtml(p.id)}')" title="${t('profiles.openQuickInspector')}">${escapeHtml(p.name)}</span>
               ${isRunning
-                ? `<span class="profile-uptime" data-start-time="${p.startTime || Date.now()}">В сети: 00:00</span>`
+                ? `<span class="profile-uptime" data-start-time="${p.startTime || Date.now()}">${t('profiles.uptime')}: 00:00</span>`
                 : (p.notes ? `<span class="profile-notes-sub" title="${escapeHtml(p.notes)}">${escapeHtml(p.notes.slice(0, 36))}...</span>` : '')
               }
             </div>
@@ -639,15 +658,15 @@ function renderProfiles() {
             ${isRunning ? `
               <button class="btn btn-stop" onclick="stopProfile('${escapeHtml(p.id)}')">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                <span>Стоп</span>
+                <span>${t('profiles.stopBtn')}</span>
               </button>
             ` : `
               <button class="btn btn-start" onclick="startProfile('${escapeHtml(p.id)}')">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span>Старт</span>
+                <span>${t('profiles.startBtn')}</span>
               </button>
             `}
-            <button class="btn-manage" onclick="openProfileInspector('${escapeHtml(p.id)}')" title="Открыть панель управления профилем">
+            <button class="btn-manage" onclick="openProfileInspector('${escapeHtml(p.id)}')" title="${t('profiles.openControlPanel')}">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="4" y1="21" x2="4" y2="14"/>
                 <line x1="4" y1="10" x2="4" y2="3"/>
@@ -659,7 +678,7 @@ function renderProfiles() {
                 <line x1="9" y1="8" x2="15" y2="8"/>
                 <line x1="17" y1="16" x2="23" y2="16"/>
               </svg>
-              <span>Управление</span>
+              <span>${t('profiles.manageBtn')}</span>
             </button>
           </div>
         </td>
@@ -684,7 +703,7 @@ window.startProfile = async (id) => {
       refreshInspectorContent();
     }
   } catch (e) {
-    alert('Ошибка запуска: ' + e.message);
+    alert(t('toast.startError') + ': ' + e.message);
   }
 };
 
@@ -702,7 +721,7 @@ window.stopProfile = async (id) => {
       refreshInspectorContent();
     }
   } catch (e) {
-    alert('Ошибка остановки: ' + e.message);
+    alert(t('toast.stopError') + ': ' + e.message);
   }
 };
 
@@ -713,7 +732,7 @@ window.cloneProfile = async (id) => {
     renderProfiles();
     updateStats();
   } catch (e) {
-    alert('Ошибка клонирования: ' + e.message);
+    alert(t('toast.cloneError') + ': ' + e.message);
   }
 };
 
@@ -721,7 +740,7 @@ window.openProfileFolder = async (id) => {
   try {
     await window.hyperion.openProfileFolder(id);
   } catch (e) {
-    alert('Ошибка открытия директории: ' + e.message);
+    alert(t('toast.openFolderError') + ': ' + e.message);
   }
 };
 
@@ -729,9 +748,9 @@ window.deleteProfile = async (id) => {
   const p = PROFILES.find(x => x.id === id);
   if (!p) return;
   const ok = await showConfirmDialog({
-    title: 'Удаление профиля',
-    message: `Удалить профиль "${p.name}" и все его данные? Это действие необратимо.`,
-    confirmText: 'Удалить',
+    title: t('dialog.deleteProfileTitle'),
+    message: t('dialog.deleteProfileConfirm', {name: p.name}),
+    confirmText: t('dialog.deleteBtn'),
     isDanger: true
   });
   if (!ok) return;
@@ -745,7 +764,7 @@ window.deleteProfile = async (id) => {
     renderProfiles();
     updateStats();
   } catch (e) {
-    alert('Ошибка удаления: ' + e.message);
+    alert(t('toast.deleteError') + ': ' + e.message);
   }
 };
 
@@ -764,7 +783,7 @@ function updateInspectorUptime() {
     const diff = Math.floor((Date.now() - p.startTime) / 1000);
     const m = Math.floor(diff / 60);
     const s = diff % 60;
-    uptimeEl.textContent = `В сети: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    uptimeEl.textContent = `${t('profiles.uptime')}: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   } else {
     uptimeEl.textContent = '';
   }
@@ -812,7 +831,7 @@ function refreshInspectorContent() {
   const statusText = document.getElementById('inspector-status-text');
   if (statusPill && statusText) {
     statusPill.className = `status-pill ${isRunning ? 'running' : 'stopped'}`;
-    statusText.textContent = isRunning ? 'В СЕТИ' : 'OFF';
+    statusText.textContent = isRunning ? t('status.online') : 'OFF';
   }
 
   // Quick Action Button
@@ -821,11 +840,11 @@ function refreshInspectorContent() {
   if (btnStart && btnStartLabel) {
     if (isRunning) {
       btnStart.className = 'btn btn-stop btn-drawer-main';
-      btnStartLabel.textContent = 'Остановить профиль';
+      btnStartLabel.textContent = t('profiles.stopProfile');
       btnStart.querySelector('svg').innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/>';
     } else {
       btnStart.className = 'btn btn-start btn-drawer-main';
-      btnStartLabel.textContent = 'Запустить профиль';
+      btnStartLabel.textContent = t('profiles.startProfile');
       btnStart.querySelector('svg').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
     }
   }
@@ -853,7 +872,7 @@ function refreshInspectorContent() {
   const extEl = document.getElementById('inspector-extensions');
   if (extEl) {
     const extCount = (p.extensions || []).length;
-    extEl.textContent = extCount > 0 ? `${extCount} плаг.` : 'Нет';
+    extEl.textContent = extCount > 0 ? t('profiles.extCountShort', {count: extCount}) : t('profiles.noExtensions');
   }
 
   const uaEl = document.getElementById('inspector-ua');
@@ -875,20 +894,20 @@ function refreshInspectorContent() {
     }
     if (proxyDetailsEl) {
       proxyDetailsEl.innerHTML = `
-        <div><strong>Хост:</strong> ${escapeHtml(p.proxy.host)}:${escapeHtml(p.proxy.port || '80')}</div>
-        ${p.proxy.change_ip_url ? `<div style="margin-top:4px;"><button class="btn-rotate" onclick="triggerProxyRotate('${escapeHtml(p.id)}', '${escapeHtml(p.proxy.id || '')}', event)">🔄 Сменить IP</button></div>` : ''}
+        <div><strong>${t('proxy.hostLabel')}:</strong> ${escapeHtml(p.proxy.host)}:${escapeHtml(p.proxy.port || '80')}</div>
+        ${p.proxy.change_ip_url ? `<div style="margin-top:4px;"><button class="btn-rotate" onclick="triggerProxyRotate('${escapeHtml(p.id)}', '${escapeHtml(p.proxy.id || '')}', event)">🔄 ${t('proxy.rotateIp')}</button></div>` : ''}
       `;
     }
     if (btnPing) {
       btnPing.style.display = 'inline-flex';
-      btnPing.outerHTML = '<button type="button" class="btn btn-secondary btn-mini" id="inspector-btn-ping" onclick="inspectorPingProxy()">⚡ Тест Ping</button>';
+      btnPing.outerHTML = `<button type="button" class="btn btn-secondary btn-mini" id="inspector-btn-ping" onclick="inspectorPingProxy()">⚡ ${t('proxy.pingTest')}</button>`;
     }
   } else {
     if (proxyStatusEl) {
-      proxyStatusEl.innerHTML = '<span style="color:var(--text-dim);">● Прямое подключение</span>';
+      proxyStatusEl.innerHTML = `<span style="color:var(--text-dim);">● ${t('profiles.directConnection')}</span>`;
     }
     if (proxyDetailsEl) {
-      proxyDetailsEl.innerHTML = 'Прокси-сервер не настроен. Используется прямой IP адрес системы.';
+      proxyDetailsEl.innerHTML = t('proxy.notConfiguredDetails');
     }
     if (btnPing) btnPing.style.display = 'none';
   }
@@ -900,7 +919,7 @@ function refreshInspectorContent() {
     notesArea.value = p.notes || '';
   }
   if (notesStatus) {
-    notesStatus.textContent = 'Автосохранение';
+    notesStatus.textContent = t('profiles.autoSaving');
     notesStatus.classList.remove('saved');
   }
 
@@ -971,7 +990,7 @@ window.inspectorPingProxy = async () => {
   const btnPing = document.getElementById('inspector-btn-ping');
   if (btnPing) {
     btnPing.disabled = true;
-    btnPing.textContent = 'Проверка...';
+    btnPing.textContent = t('proxy.checking');
   }
 
   try {
@@ -985,16 +1004,16 @@ window.inspectorPingProxy = async () => {
       if (res && res.success) {
         const pingVal = parseInt(res.ping) || 0;
         const pingClass = pingVal < 100 ? 'good' : pingVal < 300 ? 'medium' : 'bad';
-        currentBtn.outerHTML = `<span class="ping-badge ${pingClass}" id="inspector-btn-ping" onclick="inspectorPingProxy()" style="cursor:pointer;" title="Нажмите для повторного теста">⚡ ${pingVal}ms</span>`;
+        currentBtn.outerHTML = `<span class="ping-badge ${pingClass}" id="inspector-btn-ping" onclick="inspectorPingProxy()" style="cursor:pointer;" title="${t('proxy.clickToRetest')}">⚡ ${pingVal}ms</span>`;
       } else {
-        currentBtn.outerHTML = `<span class="ping-badge bad" id="inspector-btn-ping" onclick="inspectorPingProxy()" style="cursor:pointer;" title="${escapeHtml(res?.error || 'Ошибка')}">⚡ Ошибка</span>`;
+        currentBtn.outerHTML = `<span class="ping-badge bad" id="inspector-btn-ping" onclick="inspectorPingProxy()" style="cursor:pointer;" title="${escapeHtml(res?.error || t('toast.error'))}">⚡ ${t('proxy.pingError')}</span>`;
       }
     }
   } catch (err) {
     const currentBtn = document.getElementById('inspector-btn-ping');
     if (currentBtn) {
       currentBtn.disabled = false;
-      currentBtn.textContent = '⚡ Тест Ping';
+      currentBtn.textContent = `⚡ ${t('proxy.pingTest')}`;
     }
   }
 };
@@ -1011,13 +1030,13 @@ function renderProxies() {
 
   emptyProxiesState.style.display = 'none';
   tbodyProxies.innerHTML = PROXIES.map(px => {
-    let pingText = '<span style="color:var(--text-dim);">Не проверен</span>';
+    let pingText = `<span style="color:var(--text-dim);">${t('proxy.notChecked')}</span>`;
     if (px.status === 'checking') {
-      pingText = '<span style="color:var(--accent-amber);">Проверка...</span>';
+      pingText = `<span style="color:var(--accent-amber);">${t('proxy.checking')}</span>`;
     } else if (px.ping !== null && px.ping !== undefined) {
       pingText = `<span style="color:var(--accent-emerald); font-weight:700; font-family:var(--font-mono);">${px.ping} ms</span>`;
     } else if (px.error) {
-      pingText = `<span style="color:var(--accent-rose); font-size:11px;">Ошибка</span>`;
+      pingText = `<span style="color:var(--accent-rose); font-size:11px;">${t('proxy.error')}</span>`;
     }
 
     return `
@@ -1043,9 +1062,9 @@ function renderProxies() {
         <td>
           <div class="row-actions">
             <button class="btn btn-secondary" style="padding:4px 10px; font-size:11.5px;" onclick="testSingleProxy('${escapeHtml(px.id)}')">
-              Проверить
+              ${t('proxy.checkBtn')}
             </button>
-            <button class="btn-icon" onclick="deleteProxy('${escapeHtml(px.id)}')" title="Удалить" style="color:var(--accent-rose);">
+            <button class="btn-icon" onclick="deleteProxy('${escapeHtml(px.id)}')" title="${t('proxy.deleteBtn')}" style="color:var(--accent-rose);">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -1079,9 +1098,9 @@ window.testSingleProxy = async (id) => {
 
 window.deleteProxy = async (id) => {
   const ok = await showConfirmDialog({
-    title: 'Удаление прокси',
-    message: 'Удалить этот прокси из списка?',
-    confirmText: 'Удалить',
+    title: t('dialog.deleteProxyTitle'),
+    message: t('dialog.deleteProxyConfirm'),
+    confirmText: t('dialog.deleteBtn'),
     isDanger: true
   });
   if (!ok) return;
@@ -1104,14 +1123,14 @@ function renderTemplates() {
           <div style="display:flex; align-items:center; gap:8px;">
             <span class="tpl-name">${escapeHtml(tpl.name)}</span>
             ${isCustom
-              ? `<span class="tag-badge" style="color:var(--accent-emerald); border-color:rgba(16,185,129,0.3); font-size:10px;">Пользовательский</span>`
-              : `<span class="tag-badge" style="font-size:10px;">Эталонный</span>`
+              ? `<span class="tag-badge" style="color:var(--accent-emerald); border-color:rgba(16,185,129,0.3); font-size:10px;">${t('tpl.customTag')}</span>`
+              : `<span class="tag-badge" style="font-size:10px;">${t('tpl.referenceTag')}</span>`
             }
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
             <div class="os-badge">${getOsSvg(tpl.os)}</div>
             ${isCustom ? `
-              <button class="btn-icon" onclick="deleteCustomTemplate('${escapeHtml(tpl.id)}')" title="Удалить шаблон" style="color:var(--accent-rose);">
+              <button class="btn-icon" onclick="deleteCustomTemplate('${escapeHtml(tpl.id)}')" title="${t('tpl.deleteTemplateTitle')}" style="color:var(--accent-rose);">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6"/>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -1121,13 +1140,13 @@ function renderTemplates() {
           </div>
         </div>
         <div class="tpl-specs">
-          <div class="tpl-spec-item">Видеокарта: <strong>${escapeHtml(tpl.gpu)}</strong></div>
-          <div class="tpl-spec-item">CPU / RAM: <strong>${tpl.cores} ядер, ${tpl.ram} GB</strong></div>
-          <div class="tpl-spec-item">Разрешение: <strong>${tpl.res}</strong></div>
+          <div class="tpl-spec-item">${t('tpl.gpuLabel')}: <strong>${escapeHtml(tpl.gpu)}</strong></div>
+          <div class="tpl-spec-item">CPU / RAM: <strong>${t('tpl.coresAndRam', {cores: tpl.cores, ram: tpl.ram})}</strong></div>
+          <div class="tpl-spec-item">${t('tpl.resolutionLabel')}: <strong>${tpl.res}</strong></div>
           ${tpl.tz ? `<div class="tpl-spec-item">Timezone: <strong>${tpl.tz}</strong></div>` : ''}
         </div>
         <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="applyTemplateToNewProfile('${escapeHtml(tpl.id)}')">
-          Создать профиль из шаблона
+          ${t('tpl.createProfileFromTpl')}
         </button>
       </div>
     `;
@@ -1141,22 +1160,22 @@ function renderTemplates() {
         <div class="stat-card" style="flex:1;">
           <div class="stat-icon icon-blue">GPU</div>
           <div>
-            <div class="stat-value">${Object.values(DICTIONARIES.GPU_PROFILES || {}).reduce((sum, arr) => sum + (arr?.length || 0), 0)} видеокарт</div>
+            <div class="stat-value">${t('tpl.gpusCount', {count: Object.values(DICTIONARIES.GPU_PROFILES || {}).reduce((sum, arr) => sum + (arr?.length || 0), 0)})}</div>
             <div class="stat-label">NVIDIA RTX 40/30, Apple A17/M3/M2, Qualcomm Adreno 750/740, ARM Immortalis/Mali, AMD, Intel</div>
           </div>
         </div>
         <div class="stat-card" style="flex:1;">
           <div class="stat-icon icon-cyan">CPU</div>
           <div>
-            <div class="stat-value">2 – 64 ядер</div>
-            <div class="stat-label">Подмена navigator.hardwareConcurrency</div>
+            <div class="stat-value">${t('tpl.cpuRange')}</div>
+            <div class="stat-label">${t('tpl.concurrencySpoof')}</div>
           </div>
         </div>
         <div class="stat-card" style="flex:1;">
           <div class="stat-icon icon-purple">RAM</div>
           <div>
             <div class="stat-value">4 – 128 GB</div>
-            <div class="stat-label">Подмена navigator.deviceMemory</div>
+            <div class="stat-label">${t('tpl.deviceMemorySpoof')}</div>
           </div>
         </div>
       </div>
@@ -1166,9 +1185,9 @@ function renderTemplates() {
 
 window.deleteCustomTemplate = async (tplId) => {
   const ok = await showConfirmDialog({
-    title: 'Удаление шаблона',
-    message: 'Удалить этот шаблон отпечатка?',
-    confirmText: 'Удалить',
+    title: t('dialog.deleteTemplateTitle'),
+    message: t('dialog.deleteTemplateConfirm'),
+    confirmText: t('dialog.deleteBtn'),
     isDanger: true
   });
   if (!ok) return;
@@ -1218,7 +1237,7 @@ function renderExtensions() {
   if (EXTENSIONS.installed.length === 0) {
     installedGrid.innerHTML = `
       <div style="grid-column: 1 / -1; padding: 24px; background: var(--bg-card); border-radius: var(--radius-md); color: var(--text-muted); text-align: center;">
-        Расширения еще не установлены. Установите любое из каталога ниже в 1 клик или загрузите из папки.
+        ${t('ext.noExtensionsInstalled')}
       </div>
     `;
   } else {
@@ -1233,7 +1252,7 @@ function renderExtensions() {
           <p class="ext-desc">${escapeHtml(ext.description)}</p>
           <div class="ext-footer">
             <button class="btn btn-secondary" style="color:var(--accent-rose); font-size:11.5px; padding:4px 10px;" onclick="deleteExtension('${escapeHtml(ext.id)}')">
-              Удалить
+              ${t('ext.deleteBtn')}
             </button>
           </div>
         </div>
@@ -1260,11 +1279,11 @@ function renderExtensions() {
           <div class="ext-footer">
             ${isInstalled ? `
               <button class="btn btn-secondary" disabled style="font-size:11.5px; padding:4px 10px; color:var(--accent-emerald);">
-                ✓ Установлено
+                ${t('ext.installed')}
               </button>
             ` : `
               <button class="btn btn-primary" id="btn-inst-${escapeHtml(cat.id)}" style="font-size:11.5px; padding:4px 12px;" onclick="installCatalogExtension('${escapeHtml(cat.id)}')">
-                Установить
+                ${t('ext.installBtn')}
               </button>
             `}
           </div>
@@ -1277,7 +1296,7 @@ function renderExtensions() {
 window.installCatalogExtension = async (extId) => {
   const btn = document.getElementById(`btn-inst-${extId}`);
   if (btn) {
-    btn.textContent = 'Загрузка...';
+    btn.textContent = t('ext.loading');
     btn.disabled = true;
   }
 
@@ -1286,16 +1305,16 @@ window.installCatalogExtension = async (extId) => {
     if (res.success) {
       await loadExtensions();
     } else {
-      alert('Ошибка установки расширения: ' + res.error);
+      alert(t('ext.installError') + ': ' + res.error);
       if (btn) {
-        btn.textContent = 'Установить';
+        btn.textContent = t('ext.installBtn');
         btn.disabled = false;
       }
     }
   } catch (e) {
-    alert('Ошибка: ' + e.message);
+    alert(t('toast.error') + ': ' + e.message);
     if (btn) {
-      btn.textContent = 'Установить';
+      btn.textContent = t('ext.installBtn');
       btn.disabled = false;
     }
   }
@@ -1303,9 +1322,9 @@ window.installCatalogExtension = async (extId) => {
 
 window.deleteExtension = async (extId) => {
   const ok = await showConfirmDialog({
-    title: 'Удаление расширения',
-    message: 'Удалить это расширение из системы?',
-    confirmText: 'Удалить',
+    title: t('dialog.deleteExtensionTitle'),
+    message: t('dialog.deleteExtensionConfirm'),
+    confirmText: t('dialog.deleteBtn'),
     isDanger: true
   });
   if (!ok) return;
@@ -1406,7 +1425,7 @@ window.applyQuickPreset = async (presetKey) => {
 
   // 5. Sync back to CURRENT_FP
   syncFingerprintFromDropdowns();
-  showToast(`Применен пресет: ${presetKey.toUpperCase()}`, 'success');
+  showToast(t('toast.presetApplied', {name: presetKey.toUpperCase()}), 'success');
 };
 
 // =========================================================================
@@ -1415,8 +1434,8 @@ window.applyQuickPreset = async (presetKey) => {
 function openCreateModal() {
   document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
   editProfileId.value = '';
-  modalHeading.textContent = 'Новый профиль';
-  formName.value = `Профиль #${PROFILES.length + 1}`;
+  modalHeading.textContent = t('modal.newProfile');
+  formName.value = t('modal.defaultProfileName', {num: PROFILES.length + 1});
   formTags.value = '';
   formNotes.value = '';
   formStartUrl.value = '';
@@ -1441,7 +1460,7 @@ function openCreateModal() {
   if (cTa) cTa.value = '';
   const cHint = document.getElementById('cookies-status-hint');
   if (cHint) {
-    cHint.textContent = 'Поддерживается стандартный экспорт из расширений Cookie-Editor и EditThisCookie';
+    cHint.textContent = t('modal.cookiesHint');
     cHint.style.color = 'var(--text-dim)';
   }
   switchTab('general');
@@ -1459,7 +1478,7 @@ window.editProfile = (id) => {
   if (!p) return;
 
   editProfileId.value = p.id;
-  modalHeading.textContent = 'Редактировать профиль';
+  modalHeading.textContent = t('modal.editProfile');
   formName.value = p.name || '';
   formTags.value = (p.tags || []).join(', ');
   formNotes.value = p.notes || '';
@@ -1496,7 +1515,7 @@ window.editProfile = (id) => {
 };
 
 function populateSavedProxiesSelect() {
-  formSavedProxySelect.innerHTML = '<option value="">— Ввести вручную —</option>' +
+  formSavedProxySelect.innerHTML = `<option value="">— ${t('modal.manualProxyInput')} —</option>` +
     PROXIES.map(px => `
       <option value="${px.id}">${escapeHtml(px.title || `${px.host}:${px.port}`)} (${px.protocol.toUpperCase()})</option>
     `).join('');
@@ -1506,7 +1525,7 @@ function renderProfileExtensionsSelector(selectedIds = []) {
   if (EXTENSIONS.installed.length === 0) {
     extProfileList.innerHTML = `
       <div style="padding:16px; background:var(--bg-card); border-radius:var(--radius-md); color:var(--text-muted); font-size:13px;">
-        Нет установленных расширений. Перейдите во вкладку «Расширения» в главном меню для добавления плагинов.
+        ${t('modal.noExtensionsInstalledHint')}
       </div>
     `;
     return;
@@ -1640,7 +1659,7 @@ function initEventListeners() {
       const profileId = CURRENT_INSPECTOR_PROFILE_ID;
       const statusEl = document.getElementById('inspector-notes-status');
       if (statusEl) {
-        statusEl.textContent = 'Сохранение...';
+        statusEl.textContent = t('profiles.savingNotes');
         statusEl.classList.remove('saved');
       }
 
@@ -1653,7 +1672,7 @@ function initEventListeners() {
         try {
           await window.hyperion.updateProfile(profileId, { notes: newNotes });
           if (statusEl) {
-            statusEl.textContent = '✓ Сохранено';
+            statusEl.textContent = t('profiles.savedNotes');
             statusEl.classList.add('saved');
           }
           const row = document.querySelector(`tr[data-id="${profileId}"]`);
@@ -1662,7 +1681,7 @@ function initEventListeners() {
             if (!noteSub && newNotes) {
               const infoBox = row.querySelector('.profile-info');
               if (infoBox) {
-                noteSub = document.createElement('span');
+                noteSub = document.createElement("span");
                 noteSub.className = 'profile-notes-sub';
                 infoBox.appendChild(noteSub);
               }
@@ -1674,7 +1693,7 @@ function initEventListeners() {
           }
         } catch (e) {
           if (statusEl) {
-            statusEl.textContent = 'Ошибка';
+            statusEl.textContent = t('profiles.notesError');
           }
         }
       }, 400);
@@ -1805,20 +1824,12 @@ function initEventListeners() {
     const dot = document.getElementById('sys-status-dot');
     const isMissing = dot && (dot.style.backgroundColor !== '');
     if (isMissing) {
-      showToast('Ядро браузера не найдено. Проверьте установку или обновите программу.', 'error');
+      showToast(t('settings.browserCoreNotFound'), 'error');
       document.getElementById('settings-update-card')?.scrollIntoView({ behavior: 'smooth' });
     } else {
       document.getElementById('settings-update-card')?.scrollIntoView({ behavior: 'smooth' });
     }
   });
-  document.getElementById('btn-global-open-settings-update')?.addEventListener('click', () => {
-    switchMainView('settings');
-    document.getElementById('settings-update-card')?.scrollIntoView({ behavior: 'smooth' });
-    if (CURRENT_UPDATE_INFO && !IS_DOWNLOADING_UPDATE) {
-      window.startInAppUpdate();
-    }
-  });
-
   // Background auto-check for updates after boot
   setTimeout(() => window.checkSettingsUpdates(false), 3000);
   document.getElementById('btn-empty-create').addEventListener('click', openCreateModal);
@@ -1873,20 +1884,20 @@ function initEventListeners() {
     const port = formProxyPort.value.trim();
     if (!host || !port) {
       proxyTestResult.className = 'proxy-test-result error';
-      proxyTestResult.textContent = 'Укажите хост и порт';
+      proxyTestResult.textContent = t('proxy.specifyHostAndPort');
       return;
     }
 
     proxyTestResult.className = 'proxy-test-result';
-    proxyTestResult.textContent = 'Проверка...';
+    proxyTestResult.textContent = t('proxy.checking');
 
     const res = await window.hyperion.testProxy({ host, port });
     if (res.success) {
       proxyTestResult.className = 'proxy-test-result success';
-      proxyTestResult.textContent = `Успешно! Пинг: ${res.ping}ms`;
+      proxyTestResult.textContent = t('proxy.testSuccessPing', {ping: res.ping});
     } else {
       proxyTestResult.className = 'proxy-test-result error';
-      proxyTestResult.textContent = `Ошибка: ${res.error}`;
+      proxyTestResult.textContent = `${t('toast.error')}: ${res.error}`;
     }
   });
 
@@ -1911,7 +1922,7 @@ function initEventListeners() {
   document.getElementById('btn-modal-save').addEventListener('click', async () => {
     const name = formName.value.trim().slice(0, PROFILE_NAME_MAX_LENGTH);
     if (!name) {
-      alert(`Введите название профиля (до ${PROFILE_NAME_MAX_LENGTH} символов)`);
+      alert(t('modal.enterProfileName', {max: PROFILE_NAME_MAX_LENGTH}));
       return;
     }
 
@@ -1981,7 +1992,7 @@ function initEventListeners() {
       await loadFolders();
       await loadProfiles();
     } catch (e) {
-      alert('Ошибка сохранения: ' + e.message);
+      alert(t('toast.saveError') + ': ' + e.message);
     }
   });
 
@@ -2003,7 +2014,7 @@ function initEventListeners() {
     const host = document.getElementById('modal-proxy-host').value.trim();
     const port = document.getElementById('modal-proxy-port').value.trim();
     if (!host || !port) {
-      alert('Укажите хост и порт');
+      alert(t('proxy.specifyHostAndPort'));
       return;
     }
     const proto = document.getElementById('modal-proxy-proto').value;
@@ -2041,7 +2052,7 @@ function initEventListeners() {
     const raw = document.getElementById('import-proxy-textarea').value.trim();
     if (!raw) return;
     const res = await window.hyperion.importProxies(raw);
-    alert(`Успешно импортировано прокси: ${res.count}`);
+    alert(t('proxy.proxiesImported', {count: res.count}));
     importProxiesModal.style.display = 'none';
     document.getElementById('import-proxy-textarea').value = '';
     await loadProxies();
@@ -2063,7 +2074,7 @@ function initEventListeners() {
     const gpus = DICTIONARIES.GPU_PROFILES[os] || DICTIONARIES.GPU_PROFILES.windows;
     tplSelectGpu.innerHTML = gpus.map(g => `<option value="${escapeHtml(g.name)}">${escapeHtml(g.name)}</option>`).join('');
 
-    tplSelectCores.innerHTML = DICTIONARIES.CPU_CORES_LIST.map(c => `<option value="${c}">${c} ядер</option>`).join('');
+    tplSelectCores.innerHTML = DICTIONARIES.CPU_CORES_LIST.map(c => `<option value="${c}">${t('tpl.coresOption', {count: c})}</option>`).join('');
     tplSelectRam.innerHTML = DICTIONARIES.RAM_LIST.map(r => `<option value="${r}">${r} GB</option>`).join('');
     tplSelectRes.innerHTML = DICTIONARIES.RESOLUTIONS.map(r => `<option value="${r.width}x${r.height}">${r.label}</option>`).join('');
     tplSelectTz.innerHTML = DICTIONARIES.TIMEZONES.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
@@ -2072,7 +2083,7 @@ function initEventListeners() {
   }
 
   document.getElementById('btn-open-create-template').addEventListener('click', () => {
-    tplInputName.value = `Шаблон #${TEMPLATES.length + 1}`;
+    tplInputName.value = t('tpl.defaultTemplateName', {num: TEMPLATES.length + 1});
     document.querySelector('input[name="tpl-os"][value="windows"]').checked = true;
     populateTemplateModalFields('windows');
     createTemplateModal.style.display = 'flex';
@@ -2094,7 +2105,7 @@ function initEventListeners() {
   document.getElementById('btn-save-new-template').addEventListener('click', async () => {
     const name = tplInputName.value.trim();
     if (!name) {
-      alert('Введите название шаблона');
+      alert(t('tpl.enterTemplateName'));
       return;
     }
     const os = document.querySelector('input[name="tpl-os"]:checked')?.value || 'windows';
@@ -2140,10 +2151,10 @@ function initEventListeners() {
       const input = document.getElementById('input-custom-ext-id');
       const val = input.value.trim();
       if (!val) {
-        alert('Введите ID или ссылку на расширение из Chrome Web Store');
+        alert(t('ext.enterIdOrUrl'));
         return;
       }
-      btnInstallCustom.textContent = 'Загрузка...';
+      btnInstallCustom.textContent = t('ext.loading');
       btnInstallCustom.disabled = true;
       try {
         const res = await window.hyperion.installExtension(val);
@@ -2151,14 +2162,14 @@ function initEventListeners() {
           input.value = '';
           await loadExtensions();
         } else {
-          alert('Ошибка установки: ' + (res.error || 'Проверьте ID или подключение к интернету'));
+          alert(t('ext.installError') + ': ' + (res.error || t('ext.checkIdOrInternet')));
         }
       } catch (e) {
-        alert('Ошибка: ' + e.message);
+        alert(t('toast.error') + ': ' + e.message);
       } finally {
         btnInstallCustom.innerHTML = `
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Установить по ссылке/ID</span>
+          <span>${t('ext.installByUrlOrId')}</span>
         `;
         btnInstallCustom.disabled = false;
       }
@@ -2169,11 +2180,11 @@ function initEventListeners() {
     try {
       const res = await window.hyperion.pickExtensionFolder();
       if (res && res.success) {
-        alert(`Расширение "${res.extension.name}" успешно подключено!`);
+        alert(t('ext.extensionConnected', {name: res.extension.name}));
         await loadExtensions();
       }
     } catch (e) {
-      alert('Ошибка подключения: ' + e.message);
+      alert(t('ext.connectError') + ': ' + e.message);
     }
   });
 
@@ -2183,30 +2194,30 @@ function initEventListeners() {
     try {
       await window.hyperion.saveSettings({ default_url: url });
       SETTINGS.default_url = url;
-      showToast('Настройки сохранены', 'success');
+      showToast(t('settings.saved'), 'success');
     } catch (e) {
-      showToast(`Ошибка сохранения: ${e.message}`, 'error');
+      showToast(`${t('toast.saveError')}: ${e.message}`, 'error');
     }
   });
 
   document.getElementById('btn-clear-cache').addEventListener('click', async () => {
     const res = await window.hyperion.clearCache();
-    showToast(`Кэш успешно очищен для ${res.clearedProfiles} профилей.`, 'success');
+    showToast(t('settings.cacheCleared', {count: res.clearedProfiles}), 'success');
   });
 
   document.getElementById('btn-export-backup').addEventListener('click', async () => {
     const api = window.hyperion;
     const res = await api.exportBackup();
     if (res.success) {
-      alert(`Резервная копия сохранена в файл: ${res.filePath}`);
+      alert(t('settings.backupSaved', {path: res.filePath}));
     }
   });
 
   document.getElementById('btn-import-backup')?.addEventListener('click', async () => {
     const ok = await showConfirmDialog({
-      title: 'Восстановление резервной копии',
-      message: 'Вы действительно хотите импортировать резервную копию? Все профили, прокси и настройки будут объединены и восстановлены.',
-      confirmText: 'Импортировать',
+      title: t('dialog.restoreBackupTitle'),
+      message: t('dialog.restoreBackupConfirm'),
+      confirmText: t('dialog.importBtn'),
       isDanger: false
     });
     if (!ok) return;
@@ -2214,13 +2225,13 @@ function initEventListeners() {
       const api = window.hyperion;
       const res = await api.importBackup();
       if (res && res.success) {
-        alert(`Резервная копия успешно восстановлена!\nПрофилей: ${res.profilesCount || 0}, Прокси: ${res.proxiesCount || 0}`);
+        alert(t('settings.backupRestored', {profiles: res.profilesCount || 0, proxies: res.proxiesCount || 0}));
         await loadAllData();
       } else if (res && res.error && res.error !== 'Отменено') {
-        alert('Ошибка восстановления: ' + res.error);
+        alert(t('settings.restoreError') + ': ' + res.error);
       }
     } catch (e) {
-      alert('Ошибка импорта: ' + e.message);
+      alert(t('settings.importError') + ': ' + e.message);
     }
   });
 }
@@ -2299,7 +2310,7 @@ window.bulkStartSelected = async () => {
     updateStats();
     updateBulkBar();
   } catch (e) {
-    alert('Ошибка массового запуска: ' + e.message);
+    alert(t('bulk.startError') + ': ' + e.message);
   }
 };
 
@@ -2316,7 +2327,7 @@ window.bulkStopSelected = async () => {
     updateStats();
     updateBulkBar();
   } catch (e) {
-    alert('Ошибка массовой остановки: ' + e.message);
+    alert(t('bulk.stopError') + ': ' + e.message);
   }
 };
 
@@ -2324,9 +2335,9 @@ window.bulkDeleteSelected = async () => {
   const ids = Array.from(SELECTED_PROFILE_IDS);
   if (ids.length === 0) return;
   const ok = await showConfirmDialog({
-    title: 'Массовое удаление',
-    message: `Удалить выбранные ${ids.length} профилей и все их данные? Это действие необратимо.`,
-    confirmText: 'Удалить',
+    title: t('dialog.bulkDeleteTitle'),
+    message: t('dialog.bulkDeleteConfirm', {count: ids.length}),
+    confirmText: t('dialog.deleteBtn'),
     isDanger: true
   });
   if (!ok) return;
@@ -2338,7 +2349,7 @@ window.bulkDeleteSelected = async () => {
     renderProfiles();
     updateStats();
   } catch (e) {
-    alert('Ошибка удаления: ' + e.message);
+    alert(t('toast.deleteError') + ': ' + e.message);
   }
 };
 
@@ -2348,7 +2359,7 @@ window.bulkDeleteSelected = async () => {
 window.exportProfileCookies = async () => {
   const id = editProfileId.value;
   if (!id) {
-    alert('Сначала выберите или сохраните профиль');
+    alert(t('cookie.selectProfileFirst'));
     return;
   }
   const res = await window.hyperion.exportCookies(id);
@@ -2356,10 +2367,10 @@ window.exportProfileCookies = async () => {
   const hint = document.getElementById('cookies-status-hint');
   if (res.success) {
     ta.value = JSON.stringify(res.cookies, null, 2);
-    hint.textContent = `Экспортировано cookies: ${res.cookies.length} шт.`;
+    hint.textContent = t('cookie.cookiesExported', {count: res.cookies.length});
     hint.style.color = 'var(--accent-emerald)';
   } else {
-    hint.textContent = `Ошибка экспорта: ${res.error}`;
+    hint.textContent = `${t('cookie.exportError')}: ${res.error}`;
     hint.style.color = 'var(--accent-rose)';
   }
 };
@@ -2367,14 +2378,14 @@ window.exportProfileCookies = async () => {
 window.importProfileCookies = async () => {
   const id = editProfileId.value;
   if (!id) {
-    alert('Сначала сохраните профиль');
+    alert(t('cookie.saveProfileFirst'));
     return;
   }
   const ta = document.getElementById('cookies-textarea');
   const hint = document.getElementById('cookies-status-hint');
   const val = ta.value.trim();
   if (!val) {
-    alert('Вставьте JSON список куки');
+    alert(t('cookie.insertJsonList'));
     return;
   }
 
@@ -2382,17 +2393,17 @@ window.importProfileCookies = async () => {
   try {
     parsed = JSON.parse(val);
   } catch (e) {
-    alert('Неверный формат JSON: ' + e.message);
+    alert(t('cookie.invalidJsonFormat') + ': ' + e.message);
     return;
   }
 
   const res = await window.hyperion.importCookies(id, parsed);
   if (res.success) {
-    hint.textContent = `Успешно записано в базу данных: ${res.count} cookies!`;
+    hint.textContent = t('cookie.savedToDbSuccess', {count: res.count});
     hint.style.color = 'var(--accent-emerald)';
-    alert(`Импортировано куки: ${res.count} шт.`);
+    alert(t('cookie.cookiesImported', {count: res.count}));
   } else {
-    hint.textContent = `Ошибка импорта: ${res.error}`;
+    hint.textContent = `${t('cookie.importError')}: ${res.error}`;
     hint.style.color = 'var(--accent-rose)';
   }
 };
@@ -2405,22 +2416,22 @@ window.triggerProxyRotate = async (profileId, proxyId, event) => {
   const p = PROFILES.find(x => x.id === profileId);
   const px = PROXIES.find(x => x.id === proxyId) || (p ? p.proxy : null);
   if (!px || !px.change_ip_url) {
-    alert('Для этого прокси не указана ссылка смены IP');
+    alert(t('proxy.noChangeIpUrl'));
     return;
   }
 
   const btn = event?.currentTarget;
-  if (btn) btn.textContent = '🔄 Смена...';
+  if (btn) btn.textContent = '🔄 ' + t('proxy.rotating');
 
   const res = await window.hyperion.rotateProxyIp(px.id || proxyId);
   if (res.success) {
-    alert('IP успешно сменен! Ответ сервера: ' + res.response);
+    alert(t('proxy.rotateSuccess', {response: res.response}));
     // Refresh geo
     inspectHostGeo(px.host);
   } else {
-    alert('Ошибка смены IP: ' + res.error);
+    alert(t('proxy.rotateError') + ': ' + res.error);
   }
-  if (btn) btn.textContent = '🔄 Сменить IP';
+  if (btn) btn.textContent = '🔄 ' + t('proxy.rotateIp');
 };
 
 async function inspectHostGeo(host) {
@@ -2462,9 +2473,9 @@ function renderFolders() {
   container.innerHTML = FOLDERS.map(f => {
     const isActive = f === CURRENT_FOLDER;
     return `
-      <button class="folder-pill ${isActive ? 'active' : ''}" onclick="toggleSelectFolder('${escapeHtml(f)}')" title="Фильтр по папке (повторный клик сбрасывает)">
+      <button class="folder-pill ${isActive ? 'active' : ''}" onclick="toggleSelectFolder('${escapeHtml(f)}')" title="${t('folders.filterTooltip')}">
         <span>📁 ${escapeHtml(f)}</span>
-        <span class="folder-remove-x" onclick="deleteFolder('${escapeHtml(f)}', event)" title="Удалить папку">&times;</span>
+        <span class="folder-remove-x" onclick="deleteFolder('${escapeHtml(f)}', event)" title="${t('folders.deleteTooltip')}">&times;</span>
       </button>
     `;
   }).join('');
@@ -2472,7 +2483,7 @@ function renderFolders() {
   // Populate folder select in profile modal and bulk modal
   const modalSel = document.getElementById('form-folder-select');
   const bulkSel = document.getElementById('bulk-select-folder');
-  const opts = '<option value="">Без папки</option>' + FOLDERS.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
+  const opts = `<option value="">${t('folders.noFolder')}</option>` + FOLDERS.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
   if (modalSel) modalSel.innerHTML = opts;
   if (bulkSel) bulkSel.innerHTML = opts;
 }
@@ -2490,9 +2501,9 @@ window.selectFolder = window.toggleSelectFolder;
 
 window.createNewFolder = () => {
   openPromptDialog({
-    title: 'Новая папка / Группа',
-    label: 'Название папки:',
-    placeholder: 'Например: Crypto, Facebook, Farming...',
+    title: t('folders.newFolderTitle'),
+    label: t('folders.folderNameLabel'),
+    placeholder: t('folders.folderNamePlaceholder'),
     onConfirm: async (clean) => {
       const cleanName = clean.trim();
       if (!cleanName || cleanName === 'Все профили') return;
@@ -2532,7 +2543,7 @@ window.closeBulkCreateModal = () => {
 };
 
 window.submitBulkCreate = async () => {
-  const baseName = (document.getElementById('bulk-input-basename').value.trim() || 'Профиль').slice(0, 30);
+  const baseName = (document.getElementById('bulk-input-basename').value.trim() || t('bulk.defaultBaseName')).slice(0, 30);
   const count = parseInt(document.getElementById('bulk-input-count').value) || 5;
   const os = document.getElementById('bulk-select-os').value;
   const folder = document.getElementById('bulk-select-folder').value;
@@ -2549,7 +2560,7 @@ window.submitBulkCreate = async () => {
   });
 
   if (res.success) {
-    alert(`Создано профилей: ${res.count}`);
+    alert(t('bulk.profilesCreated', {count: res.count}));
     window.closeBulkCreateModal();
     await loadFolders();
   await loadProfiles();
@@ -2560,10 +2571,10 @@ window.exportProfilePackage = async (id) => {
   try {
     const res = await window.hyperion.exportProfilePackage(id);
     if (res.success) {
-      alert(`Профиль успешно упакован в архив: ${res.filePath}`);
+      alert(t('profiles.packageExported', {path: res.filePath}));
     }
   } catch (e) {
-    alert('Ошибка экспорта: ' + e.message);
+    alert(t('profiles.exportError') + ': ' + e.message);
   }
 };
 
@@ -2571,12 +2582,12 @@ window.importProfilePackage = async () => {
   try {
     const res = await window.hyperion.importProfilePackage();
     if (res && res.success) {
-      alert(`Профиль "${res.profile.name}" успешно импортирован со всеми cookies и отпечатком!`);
+      alert(t('profiles.packageImported', {name: res.profile.name}));
       await loadFolders();
   await loadProfiles();
     }
   } catch (e) {
-    alert('Ошибка импорта: ' + e.message);
+    alert(t('profiles.importError') + ': ' + e.message);
   }
 };
 
@@ -2589,7 +2600,7 @@ window.openWarmupRobot = (profileId) => {
   document.getElementById('warmup-profile-id').value = profileId;
   document.getElementById('warmup-status-box').style.display = 'none';
   document.getElementById('btn-start-warmup').disabled = false;
-  document.getElementById('btn-start-warmup').textContent = 'Запустить прогрев';
+  document.getElementById('btn-start-warmup').textContent = t('cookie.startWarmup');
   document.getElementById('warmup-modal').style.display = 'flex';
 };
 
@@ -2603,7 +2614,7 @@ window.startWarmupSession = async () => {
   const urls = urlsRaw.split('\n').map(u => u.trim()).filter(Boolean);
 
   if (urls.length === 0) {
-    showToast('Укажите хотя бы один URL для прогрева', 'warning');
+    showToast(t('cookie.specifyAtLeastOneUrl'), 'warning');
     return;
   }
 
@@ -2611,16 +2622,16 @@ window.startWarmupSession = async () => {
   const startBtn = document.getElementById('btn-start-warmup');
 
   statusBox.style.display = 'block';
-  statusBox.textContent = `⏳ Робот начал серфинг (0/${urls.length})...`;
+  statusBox.textContent = `⏳ ${t('cookie.robotStartedSurfing', {total: urls.length})}`;
   statusBox.style.color = 'var(--accent-cyan)';
   startBtn.disabled = true;
-  startBtn.textContent = 'Прогрев идет...';
+  startBtn.textContent = t('cookie.warmupInProgress');
 
   let unsub = null;
   if (window.hyperion.onWarmupProgress) {
     unsub = window.hyperion.onWarmupProgress((data) => {
       if (data && data.url) {
-        statusBox.textContent = `⏳ [${data.index}/${data.total}] Серфинг: ${data.url}...`;
+        statusBox.textContent = `⏳ ${t('cookie.surfingProgress', {index: data.index, total: data.total, url: data.url})}`;
       }
     });
   }
@@ -2628,22 +2639,22 @@ window.startWarmupSession = async () => {
   try {
     const res = await window.hyperion.warmupProfile(profileId, urls);
     if (res && res.success) {
-      statusBox.textContent = `✓ Прогрев завершен! Посещено сайтов: ${res.visited} из ${urls.length}. История и cookies сохранены.`;
+      statusBox.textContent = `✓ ${t('cookie.warmupCompletedDetails', {visited: res.visited, total: urls.length})}`;
       statusBox.style.color = 'var(--accent-emerald)';
-      startBtn.textContent = 'Готово';
-      showToast(`Прогрев завершен: посещено сайтов: ${res.visited}`, 'success');
+      startBtn.textContent = t('cookie.done');
+      showToast(t('cookie.warmupCompletedToast', {visited: res.visited}), 'success');
       setTimeout(window.closeWarmupRobot, 2500);
     } else {
-      statusBox.textContent = `Ошибка: ${res ? res.error : 'Неизвестная ошибка'}`;
+      statusBox.textContent = `${t('toast.error')}: ${res ? res.error : t('toast.unknownError')}`;
       statusBox.style.color = 'var(--accent-rose)';
       startBtn.disabled = false;
-      startBtn.textContent = 'Запустить прогрев';
+      startBtn.textContent = t('cookie.startWarmup');
     }
   } catch (e) {
-    statusBox.textContent = `Ошибка: ${e.message}`;
+    statusBox.textContent = `${t('toast.error')}: ${e.message}`;
     statusBox.style.color = 'var(--accent-rose)';
     startBtn.disabled = false;
-    startBtn.textContent = 'Запустить прогрев';
+    startBtn.textContent = t('cookie.startWarmup');
   } finally {
     if (unsub) unsub();
   }
@@ -2655,9 +2666,9 @@ window.startWarmupSession = async () => {
 window.promptAddTag = (profileId, event) => {
   if (event) event.stopPropagation();
   openPromptDialog({
-    title: 'Добавить тег к профилю',
-    label: `Название тега (до ${TAG_MAX_LENGTH} символов):`,
-    placeholder: 'Например: Crypto, KYC, Warmup...',
+    title: t('dialog.addTagTitle'),
+    label: t('dialog.tagNameLabel', {max: TAG_MAX_LENGTH}),
+    placeholder: t('dialog.tagPlaceholder'),
     maxLength: TAG_MAX_LENGTH,
     onConfirm: async (cleanTag) => {
       const p = PROFILES.find(x => x.id === profileId);
@@ -2667,7 +2678,7 @@ window.promptAddTag = (profileId, event) => {
       const tagClean = tagRaw.slice(0, TAG_MAX_LENGTH);
 
       if (tagRaw.length > TAG_MAX_LENGTH) {
-        showToast(`Тег обрезан до ${TAG_MAX_LENGTH} символов: "${tagClean}"`, 'warning');
+        showToast(t('toast.tagTrimmed', {max: TAG_MAX_LENGTH, tag: tagClean}), 'warning');
       }
       
       const currentTags = Array.isArray(p.tags) ? [...p.tags] : [];
@@ -2678,7 +2689,7 @@ window.promptAddTag = (profileId, event) => {
           p.tags = currentTags;
           renderProfiles();
         } catch (err) {
-          alert('Ошибка добавления тега: ' + err.message);
+          alert(t('toast.addTagError') + ': ' + err.message);
         }
       }
     }
@@ -2695,7 +2706,7 @@ window.removeTagFromProfile = async (profileId, tagToRemove, event) => {
     p.tags = newTags;
     renderProfiles();
   } catch (err) {
-    alert('Ошибка удаления тега: ' + err.message);
+    alert(t('toast.removeTagError') + ': ' + err.message);
   }
 };
 
@@ -2710,13 +2721,12 @@ window.checkSettingsUpdates = async (isManual = false) => {
   const statusText = document.getElementById('settings-update-status-text');
   const notifBox = document.getElementById('settings-update-notification');
   const checkBtn = document.getElementById('btn-settings-check-update');
-  const globalAlert = document.getElementById('global-update-alert');
-  const globalText = document.getElementById('global-update-text');
+  const settingsDot = document.getElementById('settings-update-dot');
 
   if (checkBtn && isManual) {
     checkBtn.disabled = true;
     const btnSpan = checkBtn.querySelector('span');
-    if (btnSpan) btnSpan.textContent = 'Проверка...';
+    if (btnSpan) btnSpan.textContent = t('update.checking');
   }
 
   try {
@@ -2730,7 +2740,7 @@ window.checkSettingsUpdates = async (isManual = false) => {
       if (d.updateAvailable) {
         CURRENT_UPDATE_INFO = d;
         if (statusText) {
-          statusText.textContent = 'Доступно обновление Hyperion v' + d.latestVersion + '!';
+          statusText.textContent = t('update.available', {version: d.latestVersion});
           statusText.style.color = 'var(--accent-blue, #38bdf8)';
         }
         if (notifBox) {
@@ -2741,46 +2751,46 @@ window.checkSettingsUpdates = async (isManual = false) => {
           const restartBtn = document.getElementById('btn-settings-apply-restart');
           const progressWrap = document.getElementById('settings-update-progress-wrap');
 
-          if (bannerTitle) bannerTitle.textContent = `Доступно обновление Hyperion v${d.latestVersion}`;
-          if (bannerNotes) bannerNotes.textContent = d.releaseNotes || 'Новая версия готова к автоматической установке.';
+          if (bannerTitle) bannerTitle.textContent = t('update.bannerTitle', {version: d.latestVersion});
+          if (bannerNotes) bannerNotes.textContent = d.releaseNotes || t('update.defaultReleaseNotes');
           if (downloadBtn) downloadBtn.style.display = 'inline-flex';
           if (restartBtn) restartBtn.style.display = 'none';
           if (progressWrap) progressWrap.style.display = 'none';
         }
-        if (globalAlert) {
-          globalAlert.style.display = 'flex';
-          if (globalText) globalText.textContent = 'Доступно обновление Hyperion v' + d.latestVersion;
+        if (settingsDot) {
+          settingsDot.style.display = 'inline-block';
+          settingsDot.title = t('update.bannerTitle', {version: d.latestVersion});
         }
       } else {
         if (statusText) {
-          statusText.textContent = 'У вас установлена последняя актуальная версия Hyperion v' + d.currentVersion + '.';
+          statusText.textContent = t('update.upToDateText', {version: d.currentVersion});
           statusText.style.color = 'var(--text-muted)';
         }
         if (notifBox) notifBox.style.display = 'none';
-        if (globalAlert) globalAlert.style.display = 'none';
+        if (settingsDot) settingsDot.style.display = 'none';
 
         if (isManual) {
-          showToast('У вас установлена актуальная версия Hyperion (v' + d.currentVersion + ').', 'info');
+          showToast(t('update.upToDateToast', {version: d.currentVersion}), 'info');
         }
       }
     }
   } catch (err) {
     console.error('Check updates error:', err);
     if (statusText && isManual) {
-      statusText.textContent = 'Не удалось проверить наличие обновлений.';
+      statusText.textContent = t('update.checkFailed');
     }
   } finally {
     if (checkBtn && isManual) {
       checkBtn.disabled = false;
       const btnSpan = checkBtn.querySelector('span');
-      if (btnSpan) btnSpan.textContent = 'Проверить сейчас';
+      if (btnSpan) btnSpan.textContent = t('update.checkNow');
     }
   }
 };
 
 window.startInAppUpdate = async () => {
   if (!CURRENT_UPDATE_INFO || !CURRENT_UPDATE_INFO.downloadUrl) {
-    showToast('Ссылка на обновление не найдена. Попробуйте еще раз.', 'error');
+    showToast(t('update.urlNotFound'), 'error');
     return;
   }
   if (IS_DOWNLOADING_UPDATE) return;
@@ -2797,7 +2807,7 @@ window.startInAppUpdate = async () => {
 
   if (downloadBtn) downloadBtn.style.display = 'none';
   if (progressWrap) progressWrap.style.display = 'block';
-  if (labelText) labelText.textContent = `Загрузка обновления v${CURRENT_UPDATE_INFO.latestVersion}...`;
+  if (labelText) labelText.textContent = t('update.downloadingVersion', {version: CURRENT_UPDATE_INFO.latestVersion});
 
   if (window.hyperion && window.hyperion.onUpdateProgress) {
     window.hyperion.onUpdateProgress((data) => {
@@ -2807,17 +2817,17 @@ window.startInAppUpdate = async () => {
       if (sizeText && data.totalBytes > 0) {
         const mb = (data.downloadedBytes / 1048576).toFixed(1);
         const totalMb = (data.totalBytes / 1048576).toFixed(1);
-        sizeText.textContent = `${mb} МБ из ${totalMb} МБ`;
+        sizeText.textContent = t('update.downloadSize', {mb, totalMb});
       }
       if (speedText && data.speedBytes !== undefined) {
         const speedMb = (data.speedBytes / 1048576).toFixed(1);
-        speedText.textContent = `${speedMb} МБ/с`;
+        speedText.textContent = t('update.downloadSpeed', {speed: speedMb});
       }
     });
   }
 
   try {
-    showToast('Загрузка обновления запущена прямо в приложении...', 'info');
+    showToast(t('update.downloadStarted'), 'info');
     const res = await window.hyperion.downloadUpdate(CURRENT_UPDATE_INFO.downloadUrl);
     if (res && res.success) {
       if (progressBar) {
@@ -2825,19 +2835,19 @@ window.startInAppUpdate = async () => {
         progressBar.style.background = 'var(--accent-emerald)';
       }
       if (percentText) percentText.textContent = '100%';
-      if (labelText) labelText.textContent = '✓ Обновление успешно загружено!';
-      if (sizeText) sizeText.textContent = 'Готово к установке';
+      if (labelText) labelText.textContent = '✓ ' + t('update.downloadSuccess');
+      if (sizeText) sizeText.textContent = t('update.readyToInstall');
       if (speedText) speedText.textContent = '';
       if (restartBtn) restartBtn.style.display = 'inline-flex';
 
-      showToast('Обновление загружено! Нажмите «Перезапустить и применить».', 'success', 6000);
+      showToast(t('update.downloadedToast'), 'success', 6000);
 
       // Auto countdown 5 seconds before applying
       let count = 5;
       const countInterval = setInterval(() => {
         if (!restartBtn) return clearInterval(countInterval);
         const span = restartBtn.querySelector('span');
-        if (span) span.textContent = `Перезапуск для обновления (${count})...`;
+        if (span) span.textContent = t('update.restartingIn', {count});
         count--;
         if (count < 0) {
           clearInterval(countInterval);
@@ -2850,21 +2860,21 @@ window.startInAppUpdate = async () => {
         window.applyInAppUpdate();
       };
     } else {
-      throw new Error(res?.error || 'Не удалось завершить загрузку');
+      throw new Error(res?.error || t('update.downloadFailed'));
     }
   } catch (e) {
     IS_DOWNLOADING_UPDATE = false;
     if (downloadBtn) downloadBtn.style.display = 'inline-flex';
     if (progressWrap) progressWrap.style.display = 'none';
-    showToast(`Ошибка загрузки обновления: ${e.message}`, 'error', 5000);
+    showToast(`${t('update.downloadError')}: ${e.message}`, 'error', 5000);
   }
 };
 
 window.applyInAppUpdate = async () => {
   try {
-    showToast('Применение обновления и перезапуск...', 'info', 3000);
+    showToast(t('update.applyingAndRestarting'), 'info', 3000);
     await window.hyperion.installUpdate();
   } catch (e) {
-    showToast(`Ошибка установки обновления: ${e.message}`, 'error');
+    showToast(`${t('update.installError')}: ${e.message}`, 'error');
   }
 };

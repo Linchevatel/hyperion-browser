@@ -1,0 +1,251 @@
+{
+  "nav": {
+    "profiles": "Profiles",
+    "proxies": "Proxies",
+    "fingerprints": "Fingerprints",
+    "extensions": "Extensions",
+    "settings": "Settings"
+  },
+  "sidebar": {
+    "updateAvailable": "Update available",
+    "updateCenter": "Open update center"
+  },
+  "topbar": {
+    "searchPh": "Search profiles, tags, proxies...",
+    "filterAll": "All",
+    "filterRunning": "Running",
+    "filterStopped": "Stopped",
+    "filterAllOs": "All OS",
+    "newProfile": "New profile",
+    "moreOptions": "More options"
+  },
+  "menu": {
+    "createNew": "Create new profile",
+    "importFile": "Import profile from file",
+    "bulkCreate": "Bulk create profiles"
+  },
+  "folders": {
+    "addTitle": "Create new folder"
+  },
+  "stats": {
+    "totalProfiles": "Total profiles",
+    "runningSessions": "Running sessions",
+    "connectedProxies": "Connected proxies"
+  },
+  "bulk": {
+    "selectedLabel": "Profiles selected:",
+    "startSelected": "Start selected",
+    "stopSelected": "Stop selected",
+    "deleteSelected": "Delete selected"
+  },
+  "table": {
+    "status": "Status",
+    "profile": "Profile",
+    "tags": "Tags",
+    "proxy": "Proxy",
+    "fingerprint": "Digital fingerprint",
+    "plugins": "Plugins",
+    "actions": "Actions"
+  },
+  "empty": {
+    "noProfiles": "No profiles yet",
+    "noProfilesDesc": "Create your first anti-detect profile with a unique hardware fingerprint right now.",
+    "createProfile": "Create profile"
+  },
+  "proxies": {
+    "title": "Proxy manager",
+    "desc": "Manage SOCKS5 / HTTP proxy servers",
+    "importList": "Import list",
+    "addProxy": "Add proxy",
+    "thProto": "Protocol",
+    "thHost": "Host / IP",
+    "thPort": "Port",
+    "thAuth": "Auth",
+    "thPing": "Ping / Status",
+    "thActions": "Actions",
+    "emptyTitle": "Proxy list is empty",
+    "emptyDesc": "Add a SOCKS5 or HTTP proxy to bind to browser sessions.",
+    "emptyBtn": "Add proxy"
+  },
+  "fpview": {
+    "title": "Hardware profile library",
+    "desc": "Ready-made reference combinations of GPUs, CPU cores and resolutions",
+    "createTemplate": "Create template"
+  },
+  "extview": {
+    "title": "Extension catalog & manager",
+    "desc": "Install plugins into profiles from Web Store or unpacked folders",
+    "loadUnpacked": "Load unpacked (folder)",
+    "inputPh": "Paste a Chrome Web Store extension link or 32-char ID...",
+    "installByLink": "Install by link/ID",
+    "installedTitle": "Installed extensions",
+    "installedCount": "0 installed",
+    "catalogTitle": "Verified plugins catalog (24 extensions)",
+    "catalogDesc": "Automatic download from Web Store and binding to profiles",
+    "catAll": "All (24)",
+    "catUtility": "Utilities / Cookies",
+    "catCrypto": "Web3 / Crypto",
+    "catSecurity": "Security / Captcha",
+    "catTraffic": "Traffic / Arbitrage"
+  },
+  "settings": {
+    "title": "Settings",
+    "desc": "Hyperion Anti-Detect Multibrowser configuration",
+    "globalTitle": "Global session settings",
+    "defaultUrlLabel": "Default start page:",
+    "saveBtn": "Save settings",
+    "updateTitle": "Application update",
+    "upToDate": "You are on the latest version. Checks run automatically.",
+    "checkNow": "Check now",
+    "installUpdate": "Install update",
+    "downloadUpdate": "Download & update",
+    "restartApply": "Restart & apply",
+    "progressLabel": "Downloading components...",
+    "maintenanceTitle": "Maintenance & backups",
+    "clearCache": "Clear all session caches",
+    "exportBackup": "Export backup (JSON)",
+    "importBackup": "Import backup (JSON)",
+    "bannerTitleDflt": "Hyperion update available",
+    "bannerNotesDflt": "A new version is ready for automatic installation.",
+    "sizeInfo": "0 MB / 0 MB",
+    "speedInfo": "0 MB/s",
+    "langTitle": "Interface language",
+    "langLabel": "Application interface language:"
+  },
+  "common": {
+    "osLabel": "Operating system",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "modal": {
+    "titleNew": "New profile",
+    "subtitle": "Configure isolation, fingerprint and extensions",
+    "tabGeneral": "General",
+    "tabProxy": "Proxy",
+    "tabFingerprint": "Hardware fingerprint",
+    "tabExtensions": "Extensions",
+    "quickPresets": "Hardware presets (Quick Setup)",
+    "quickPresetsHint": "One-click fingerprint setup",
+    "nameLabel": "Profile name <span class=\"req\">*</span>",
+    "namePh": "E.g.: FB Ads #1, Crypto farming...",
+    "folderLabel": "Folder / Group",
+    "tagsLabel": "Tags (comma-separated)",
+    "startUrlLabel": "Session start tabs (comma-separated URLs; empty = global setting)",
+    "notesLabel": "Profile notes",
+    "notesPh": "Logins, purposes or notes...",
+    "proxyToggle": "Use proxy server",
+    "savedProxyLabel": "Select from saved proxies",
+    "manualOption": "— Enter manually —",
+    "protoLabel": "Protocol",
+    "hostLabel": "Host / IP",
+    "hostPh": "192.168.1.1 or proxy.domain.com",
+    "portLabel": "Port",
+    "userLabel": "Username (optional)",
+    "userPh": "Username",
+    "passLabel": "Password (optional)",
+    "passPh": "Password",
+    "testConn": "Test connection",
+    "fpTitle": "Digital fingerprint configurator",
+    "fpDesc": "Pick GPU, CPU and parameters manually from lists or generate randomly",
+    "randomFp": "Random fingerprint",
+    "gpuLabel": "GPU (WebGL Renderer) <span class=\"badge-mini\">Blink Spoof</span>",
+    "coresLabel": "Processor (CPU cores)",
+    "ramLabel": "Memory (RAM GB)",
+    "resLabel": "Screen resolution",
+    "tzLabel": "Timezone",
+    "localeLabel": "Browser language (Locale)",
+    "webrtcLabel": "WebRTC mode",
+    "canvasNoise": "Canvas hardware noise",
+    "audioNoise": "AudioContext hardware noise",
+    "extPick": "Check extensions to load when this profile starts:",
+    "cookiesTitle": "Session cookies management",
+    "cookiesDesc": "Direct import/export to the profile SQLite database (JSON / Netscape)",
+    "exportBtn": "Export",
+    "importBtn": "Import to database",
+    "cookiesLabel": "Paste cookies (JSON array or Netscape lines):",
+    "saveProfile": "Save profile",
+    "cookiesHint": "Standard export from Cookie-Editor and EditThisCookie extensions is supported"
+  },
+  "proxymodal": {
+    "title": "Add proxy",
+    "protoLabel": "Protocol",
+    "hostLabel": "Host / IP <span class=\"req\">*</span>",
+    "portLabel": "Port <span class=\"req\">*</span>",
+    "rotateLabel": "IP rotation URL (for mobile proxies)",
+    "userLabel": "Username",
+    "userPh": "Username",
+    "passLabel": "Password",
+    "passPh": "Password",
+    "save": "Save proxy"
+  },
+  "importmodal": {
+    "title": "Import proxy list",
+    "hint": "Paste one line per proxy in <code>ip:port:user:pass</code> or <code>protocol://user:pass@ip:port</code> format",
+    "submit": "Import"
+  },
+  "tplmodal": {
+    "title": "Create fingerprint template",
+    "subtitle": "Save a reference hardware configuration for quick profile creation",
+    "nameLabel": "Template name <span class=\"req\">*</span>",
+    "namePh": "E.g.: RTX 4080 Gaming Rig, MacBook M3 Max Dev",
+    "gpuLabel": "GPU (WebGL Renderer)",
+    "coresLabel": "CPU cores",
+    "ramLabel": "RAM",
+    "resLabel": "Screen resolution",
+    "tzLabel": "Timezone",
+    "localeLabel": "Locale (Language)",
+    "save": "Save template"
+  },
+  "bulkmodal": {
+    "title": "Bulk create profiles",
+    "subtitle": "Generate N unique profiles with valid hardware in 1 click",
+    "baseName": "Base name",
+    "countLabel": "Count (1 - 50)",
+    "folderLabel": "Target folder",
+    "startTabs": "Start tabs (comma-separated)",
+    "submit": "Generate profiles"
+  },
+  "warmup": {
+    "title": "Cookie Robot (profile warm-up)",
+    "subtitle": "Background surfing to build history and trusted cookies",
+    "desc": "The robot launches a hidden session and visits each site with pauses, building cache and cookies:",
+    "urlLabel": "Warm-up URL list (one per line):",
+    "progress": "⏳ Background surfing in progress... Please wait.",
+    "start": "Start warm-up"
+  },
+  "prompt": {
+    "title": "Add",
+    "label": "Name:",
+    "confirm": "Add"
+  },
+  "confirm": {
+    "title": "Confirmation",
+    "confirm": "Confirm"
+  },
+  "inspector": {
+    "name": "Profile name",
+    "actionsTitle": "Profile actions",
+    "startProfile": "Start profile",
+    "settingsTitle": "Profile & fingerprint settings",
+    "settings": "Settings",
+    "cookiesTitle": "Import, export and view cookies",
+    "warmupTitle": "Cookie Robot - site warm-up",
+    "warmup": "Warm-up (Robot)",
+    "cloneTitle": "Clone profile",
+    "clone": "Clone",
+    "exportTitle": "Export archive (.hyperion)",
+    "export": "Export",
+    "folderTitle": "Open profile data folder",
+    "folder": "Data folder",
+    "deleteTitle": "Delete profile",
+    "delete": "Delete profile",
+    "fpTitle": "Hardware fingerprint",
+    "screen": "Screen",
+    "plugins": "Plugins",
+    "protection": "Protection",
+    "netTitle": "Network & Proxy",
+    "quickNotes": "Quick notes",
+    "autosave": "Autosave",
+    "notesPh": "Notes, logins, passwords, 2FA..."
+  }
+}

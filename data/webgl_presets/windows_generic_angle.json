@@ -1,0 +1,643 @@
+{
+  "id": "windows_generic_angle",
+  "webgl1": {
+    "extensions": [
+      "ANGLE_instanced_arrays",
+      "EXT_blend_minmax",
+      "EXT_clip_control",
+      "EXT_color_buffer_half_float",
+      "EXT_depth_clamp",
+      "EXT_float_blend",
+      "EXT_frag_depth",
+      "EXT_polygon_offset_clamp",
+      "EXT_shader_texture_lod",
+      "EXT_texture_compression_bptc",
+      "EXT_texture_compression_rgtc",
+      "EXT_texture_filter_anisotropic",
+      "EXT_texture_mirror_clamp_to_edge",
+      "KHR_parallel_shader_compile",
+      "NV_shader_noperspective_interpolation",
+      "OES_draw_buffers_indexed",
+      "OES_element_index_uint",
+      "OES_fbo_render_mipmap",
+      "OES_standard_derivatives",
+      "OES_texture_float",
+      "OES_texture_float_linear",
+      "OES_texture_half_float",
+      "OES_texture_half_float_linear",
+      "OES_vertex_array_object",
+      "OVR_multiview2",
+      "WEBGL_blend_func_extended",
+      "WEBGL_color_buffer_float",
+      "WEBGL_compressed_texture_s3tc",
+      "WEBGL_compressed_texture_s3tc_srgb",
+      "WEBGL_debug_renderer_info",
+      "WEBGL_debug_shaders",
+      "WEBGL_depth_texture",
+      "WEBGL_draw_buffers",
+      "WEBGL_lose_context",
+      "WEBGL_multi_draw",
+      "WEBGL_polygon_mode"
+    ],
+    "parameters": {
+      "32936": {
+        "type": "int",
+        "value": 1
+      },
+      "32937": {
+        "type": "int",
+        "value": 4
+      },
+      "3379": {
+        "type": "int",
+        "value": 16384
+      },
+      "3386": {
+        "type": "intvec",
+        "value": [
+          32767,
+          32767
+        ]
+      },
+      "33901": {
+        "type": "floatvec",
+        "value": [
+          1.0,
+          1024.0
+        ]
+      },
+      "33902": {
+        "type": "floatvec",
+        "value": [
+          1.0,
+          1.0
+        ]
+      },
+      "34024": {
+        "type": "int",
+        "value": 16384
+      },
+      "34047": {
+        "type": "int",
+        "value": 16
+      },
+      "34076": {
+        "type": "int",
+        "value": 16384
+      },
+      "3408": {
+        "type": "int",
+        "value": 4
+      },
+      "3410": {
+        "type": "int",
+        "value": 8
+      },
+      "3411": {
+        "type": "int",
+        "value": 8
+      },
+      "3412": {
+        "type": "int",
+        "value": 8
+      },
+      "3413": {
+        "type": "int",
+        "value": 8
+      },
+      "3414": {
+        "type": "int",
+        "value": 24
+      },
+      "3415": {
+        "type": "int",
+        "value": 0
+      },
+      "34921": {
+        "type": "int",
+        "value": 16
+      },
+      "34930": {
+        "type": "int",
+        "value": 16
+      },
+      "35660": {
+        "type": "int",
+        "value": 16
+      },
+      "35661": {
+        "type": "int",
+        "value": 32
+      },
+      "35724": {
+        "type": "string",
+        "value": "WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)"
+      },
+      "36347": {
+        "type": "int",
+        "value": 4096
+      },
+      "36348": {
+        "type": "int",
+        "value": 30
+      },
+      "36349": {
+        "type": "int",
+        "value": 1024
+      },
+      "37445": {
+        "type": "string",
+        "value": "Google Inc. (Intel)"
+      },
+      "37446": {
+        "type": "string",
+        "value": "ANGLE (Intel, Intel(R) HD Graphics 4000 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "7936": {
+        "type": "string",
+        "value": "WebKit"
+      },
+      "7937": {
+        "type": "string",
+        "value": "WebKit WebGL"
+      },
+      "7938": {
+        "type": "string",
+        "value": "WebGL 1.0 (OpenGL ES 2.0 Chromium)"
+      }
+    },
+    "shader_precision": {
+      "35632_36336": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36337": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36338": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36339": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35632_36340": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35632_36341": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36336": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36337": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36338": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36339": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36340": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36341": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      }
+    }
+  },
+  "webgl2": {
+    "extensions": [
+      "EXT_color_buffer_float",
+      "EXT_color_buffer_half_float",
+      "EXT_disjoint_timer_query_webgl2",
+      "EXT_float_blend",
+      "EXT_texture_compression_bptc",
+      "EXT_texture_compression_rgtc",
+      "EXT_texture_filter_anisotropic",
+      "EXT_texture_norm16",
+      "KHR_parallel_shader_compile",
+      "OES_draw_buffers_indexed",
+      "OES_texture_float_linear",
+      "OVR_multiview2",
+      "WEBGL_compressed_texture_s3tc",
+      "WEBGL_compressed_texture_s3tc_srgb",
+      "WEBGL_debug_renderer_info",
+      "WEBGL_debug_shaders",
+      "WEBGL_lose_context",
+      "WEBGL_multi_draw"
+    ],
+    "parameters": {
+      "3074": {
+        "type": "int",
+        "value": 1029
+      },
+      "32877": {
+        "type": "int",
+        "value": 0
+      },
+      "32878": {
+        "type": "int",
+        "value": 0
+      },
+      "32883": {
+        "type": "int",
+        "value": 2048
+      },
+      "32936": {
+        "type": "int",
+        "value": 1
+      },
+      "32937": {
+        "type": "int",
+        "value": 4
+      },
+      "33000": {
+        "type": "int",
+        "value": 1048576
+      },
+      "33001": {
+        "type": "int",
+        "value": 1048576
+      },
+      "3314": {
+        "type": "int",
+        "value": 0
+      },
+      "3315": {
+        "type": "int",
+        "value": 0
+      },
+      "3316": {
+        "type": "int",
+        "value": 0
+      },
+      "3330": {
+        "type": "int",
+        "value": 0
+      },
+      "3331": {
+        "type": "int",
+        "value": 0
+      },
+      "3332": {
+        "type": "int",
+        "value": 0
+      },
+      "3379": {
+        "type": "int",
+        "value": 16384
+      },
+      "3386": {
+        "type": "intvec",
+        "value": [
+          32767,
+          32767
+        ]
+      },
+      "33901": {
+        "type": "floatvec",
+        "value": [
+          1.0,
+          1024.0
+        ]
+      },
+      "33902": {
+        "type": "floatvec",
+        "value": [
+          1.0,
+          1.0
+        ]
+      },
+      "34024": {
+        "type": "int",
+        "value": 16384
+      },
+      "34045": {
+        "type": "float",
+        "value": 2.0
+      },
+      "34047": {
+        "type": "int",
+        "value": 16
+      },
+      "34076": {
+        "type": "int",
+        "value": 16384
+      },
+      "3408": {
+        "type": "int",
+        "value": 4
+      },
+      "3410": {
+        "type": "int",
+        "value": 8
+      },
+      "3411": {
+        "type": "int",
+        "value": 8
+      },
+      "3412": {
+        "type": "int",
+        "value": 8
+      },
+      "3413": {
+        "type": "int",
+        "value": 8
+      },
+      "3414": {
+        "type": "int",
+        "value": 24
+      },
+      "3415": {
+        "type": "int",
+        "value": 0
+      },
+      "34852": {
+        "type": "int",
+        "value": 8
+      },
+      "34853": {
+        "type": "int",
+        "value": 1029
+      },
+      "34854": {
+        "type": "int",
+        "value": 0
+      },
+      "34855": {
+        "type": "int",
+        "value": 0
+      },
+      "34856": {
+        "type": "int",
+        "value": 0
+      },
+      "34857": {
+        "type": "int",
+        "value": 0
+      },
+      "34858": {
+        "type": "int",
+        "value": 0
+      },
+      "34859": {
+        "type": "int",
+        "value": 0
+      },
+      "34860": {
+        "type": "int",
+        "value": 0
+      },
+      "34921": {
+        "type": "int",
+        "value": 16
+      },
+      "34930": {
+        "type": "int",
+        "value": 16
+      },
+      "35071": {
+        "type": "int",
+        "value": 2048
+      },
+      "35076": {
+        "type": "int",
+        "value": -8
+      },
+      "35077": {
+        "type": "int",
+        "value": 7
+      },
+      "35371": {
+        "type": "int",
+        "value": 12
+      },
+      "35373": {
+        "type": "int",
+        "value": 12
+      },
+      "35374": {
+        "type": "int",
+        "value": 24
+      },
+      "35375": {
+        "type": "int",
+        "value": 24
+      },
+      "35376": {
+        "type": "int",
+        "value": 65536
+      },
+      "35377": {
+        "type": "int",
+        "value": 212992
+      },
+      "35379": {
+        "type": "int",
+        "value": 200704
+      },
+      "35380": {
+        "type": "int",
+        "value": 256
+      },
+      "35657": {
+        "type": "int",
+        "value": 16384
+      },
+      "35658": {
+        "type": "int",
+        "value": 4096
+      },
+      "35659": {
+        "type": "int",
+        "value": 120
+      },
+      "35660": {
+        "type": "int",
+        "value": 16
+      },
+      "35661": {
+        "type": "int",
+        "value": 32
+      },
+      "35723": {
+        "type": "int",
+        "value": 4352
+      },
+      "35724": {
+        "type": "string",
+        "value": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)"
+      },
+      "35968": {
+        "type": "int",
+        "value": 4
+      },
+      "35977": {
+        "type": "bool",
+        "value": false
+      },
+      "35978": {
+        "type": "int",
+        "value": 120
+      },
+      "35979": {
+        "type": "int",
+        "value": 4
+      },
+      "36063": {
+        "type": "int",
+        "value": 8
+      },
+      "36183": {
+        "type": "int",
+        "value": 8
+      },
+      "36203": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "36347": {
+        "type": "int",
+        "value": 4096
+      },
+      "36348": {
+        "type": "int",
+        "value": 30
+      },
+      "36349": {
+        "type": "int",
+        "value": 1024
+      },
+      "36387": {
+        "type": "bool",
+        "value": false
+      },
+      "36388": {
+        "type": "bool",
+        "value": false
+      },
+      "37137": {
+        "type": "number",
+        "value": 0.0
+      },
+      "37154": {
+        "type": "int",
+        "value": 120
+      },
+      "37157": {
+        "type": "int",
+        "value": 120
+      },
+      "37445": {
+        "type": "string",
+        "value": "Google Inc. (Intel)"
+      },
+      "37446": {
+        "type": "string",
+        "value": "ANGLE (Intel, Intel(R) HD Graphics 4000 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      },
+      "37447": {
+        "type": "number",
+        "value": 1000000000.0
+      },
+      "7936": {
+        "type": "string",
+        "value": "WebKit"
+      },
+      "7937": {
+        "type": "string",
+        "value": "WebKit WebGL"
+      },
+      "7938": {
+        "type": "string",
+        "value": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      }
+    },
+    "shader_precision": {
+      "35632_36336": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36337": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36338": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36339": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35632_36340": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35632_36341": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36336": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36337": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36338": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36339": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36340": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36341": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      }
+    }
+  }
+}

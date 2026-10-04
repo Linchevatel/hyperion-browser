@@ -1,0 +1,1119 @@
+{
+  "id": "nvidia_gtx980_linux",
+  "webgl1": {
+    "extensions": [
+      "ANGLE_instanced_arrays",
+      "EXT_blend_minmax",
+      "EXT_color_buffer_half_float",
+      "EXT_depth_clamp",
+      "EXT_float_blend",
+      "EXT_frag_depth",
+      "EXT_shader_texture_lod",
+      "EXT_sRGB",
+      "EXT_texture_compression_bptc",
+      "EXT_texture_compression_rgtc",
+      "EXT_texture_filter_anisotropic",
+      "OES_element_index_uint",
+      "OES_fbo_render_mipmap",
+      "OES_standard_derivatives",
+      "OES_texture_float",
+      "OES_texture_float_linear",
+      "OES_texture_half_float",
+      "OES_texture_half_float_linear",
+      "OES_vertex_array_object",
+      "WEBGL_color_buffer_float",
+      "WEBGL_compressed_texture_etc",
+      "WEBGL_compressed_texture_s3tc",
+      "WEBGL_compressed_texture_s3tc_srgb",
+      "WEBGL_debug_renderer_info",
+      "WEBGL_debug_shaders",
+      "WEBGL_depth_texture",
+      "WEBGL_draw_buffers",
+      "WEBGL_lose_context"
+    ],
+    "parameters": {
+      "10752": {
+        "type": "float",
+        "value": 0.0
+      },
+      "2849": {
+        "type": "float",
+        "value": 1.0
+      },
+      "2884": {
+        "type": "bool",
+        "value": false
+      },
+      "2885": {
+        "type": "int",
+        "value": 1029
+      },
+      "2886": {
+        "type": "int",
+        "value": 2305
+      },
+      "2928": {
+        "type": "floatvec",
+        "value": [
+          0.0,
+          1.0
+        ]
+      },
+      "2929": {
+        "type": "bool",
+        "value": false
+      },
+      "2930": {
+        "type": "bool",
+        "value": true
+      },
+      "2931": {
+        "type": "float",
+        "value": 1.0
+      },
+      "2932": {
+        "type": "int",
+        "value": 513
+      },
+      "2960": {
+        "type": "bool",
+        "value": false
+      },
+      "2961": {
+        "type": "int",
+        "value": 0
+      },
+      "2962": {
+        "type": "int",
+        "value": 519
+      },
+      "2963": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "2964": {
+        "type": "int",
+        "value": 7680
+      },
+      "2965": {
+        "type": "int",
+        "value": 7680
+      },
+      "2966": {
+        "type": "int",
+        "value": 7680
+      },
+      "2967": {
+        "type": "int",
+        "value": 0
+      },
+      "2968": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "2978": {
+        "type": "intvec",
+        "value": [
+          0,
+          0,
+          300,
+          150
+        ]
+      },
+      "3024": {
+        "type": "bool",
+        "value": true
+      },
+      "3042": {
+        "type": "bool",
+        "value": false
+      },
+      "3088": {
+        "type": "intvec",
+        "value": [
+          0,
+          0,
+          300,
+          150
+        ]
+      },
+      "3089": {
+        "type": "bool",
+        "value": false
+      },
+      "3106": {
+        "type": "floatvec",
+        "value": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "3107": {
+        "type": "boolvec",
+        "value": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "32773": {
+        "type": "floatvec",
+        "value": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "32777": {
+        "type": "int",
+        "value": 32774
+      },
+      "32823": {
+        "type": "bool",
+        "value": false
+      },
+      "32824": {
+        "type": "float",
+        "value": 0.0
+      },
+      "32926": {
+        "type": "bool",
+        "value": false
+      },
+      "32928": {
+        "type": "bool",
+        "value": false
+      },
+      "32936": {
+        "type": "int",
+        "value": 1
+      },
+      "32937": {
+        "type": "int",
+        "value": 4
+      },
+      "32938": {
+        "type": "float",
+        "value": 1.0
+      },
+      "32939": {
+        "type": "bool",
+        "value": false
+      },
+      "32968": {
+        "type": "int",
+        "value": 0
+      },
+      "32969": {
+        "type": "int",
+        "value": 1
+      },
+      "32970": {
+        "type": "int",
+        "value": 0
+      },
+      "32971": {
+        "type": "int",
+        "value": 1
+      },
+      "3317": {
+        "type": "int",
+        "value": 4
+      },
+      "33170": {
+        "type": "int",
+        "value": 4352
+      },
+      "3333": {
+        "type": "int",
+        "value": 4
+      },
+      "3379": {
+        "type": "int",
+        "value": 32768
+      },
+      "3386": {
+        "type": "intvec",
+        "value": [
+          32768,
+          32768
+        ]
+      },
+      "33901": {
+        "type": "floatvec",
+        "value": [
+          1.0,
+          2047.0
+        ]
+      },
+      "33902": {
+        "type": "floatvec",
+        "value": [
+          1.0,
+          10.0
+        ]
+      },
+      "34016": {
+        "type": "int",
+        "value": 33984
+      },
+      "34024": {
+        "type": "int",
+        "value": 32768
+      },
+      "34076": {
+        "type": "int",
+        "value": 32768
+      },
+      "3408": {
+        "type": "int",
+        "value": 8
+      },
+      "3410": {
+        "type": "int",
+        "value": 8
+      },
+      "3411": {
+        "type": "int",
+        "value": 8
+      },
+      "3412": {
+        "type": "int",
+        "value": 8
+      },
+      "3413": {
+        "type": "int",
+        "value": 8
+      },
+      "3414": {
+        "type": "int",
+        "value": 24
+      },
+      "3415": {
+        "type": "int",
+        "value": 0
+      },
+      "34816": {
+        "type": "int",
+        "value": 519
+      },
+      "34817": {
+        "type": "int",
+        "value": 7680
+      },
+      "34818": {
+        "type": "int",
+        "value": 7680
+      },
+      "34819": {
+        "type": "int",
+        "value": 7680
+      },
+      "34877": {
+        "type": "int",
+        "value": 32774
+      },
+      "34921": {
+        "type": "int",
+        "value": 16
+      },
+      "34930": {
+        "type": "int",
+        "value": 32
+      },
+      "35660": {
+        "type": "int",
+        "value": 32
+      },
+      "35661": {
+        "type": "int",
+        "value": 192
+      },
+      "35724": {
+        "type": "string",
+        "value": "WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)"
+      },
+      "35738": {
+        "type": "int",
+        "value": 5121
+      },
+      "35739": {
+        "type": "int",
+        "value": 6408
+      },
+      "36003": {
+        "type": "int",
+        "value": 0
+      },
+      "36004": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "36005": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "36347": {
+        "type": "int",
+        "value": 1024
+      },
+      "36348": {
+        "type": "int",
+        "value": 32
+      },
+      "36349": {
+        "type": "int",
+        "value": 1024
+      },
+      "37440": {
+        "type": "bool",
+        "value": false
+      },
+      "37441": {
+        "type": "bool",
+        "value": false
+      },
+      "37443": {
+        "type": "int",
+        "value": 37444
+      },
+      "37445": {
+        "type": "string",
+        "value": "NVIDIA Corporation"
+      },
+      "37446": {
+        "type": "string",
+        "value": "NVIDIA GeForce GTX 980, or similar"
+      },
+      "7936": {
+        "type": "string",
+        "value": "WebKit"
+      },
+      "7937": {
+        "type": "string",
+        "value": "WebKit WebGL"
+      },
+      "7938": {
+        "type": "string",
+        "value": "WebGL 1.0 (OpenGL ES 2.0 Chromium)"
+      }
+    },
+    "shader_precision": {
+      "35632_36336": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36337": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36338": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36339": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35632_36340": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35632_36341": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36336": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36337": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36338": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36339": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36340": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36341": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      }
+    }
+  },
+  "webgl2": {
+    "extensions": [
+      "EXT_color_buffer_float",
+      "EXT_depth_clamp",
+      "EXT_float_blend",
+      "EXT_texture_compression_bptc",
+      "EXT_texture_compression_rgtc",
+      "EXT_texture_filter_anisotropic",
+      "OES_draw_buffers_indexed",
+      "OES_texture_float_linear",
+      "WEBGL_compressed_texture_etc",
+      "WEBGL_compressed_texture_s3tc",
+      "WEBGL_compressed_texture_s3tc_srgb",
+      "WEBGL_debug_renderer_info",
+      "WEBGL_debug_shaders",
+      "WEBGL_lose_context"
+    ],
+    "parameters": {
+      "10752": {
+        "type": "float",
+        "value": 0.0
+      },
+      "2849": {
+        "type": "float",
+        "value": 1.0
+      },
+      "2884": {
+        "type": "bool",
+        "value": false
+      },
+      "2885": {
+        "type": "int",
+        "value": 1029
+      },
+      "2886": {
+        "type": "int",
+        "value": 2305
+      },
+      "2928": {
+        "type": "floatvec",
+        "value": [
+          0.0,
+          1.0
+        ]
+      },
+      "2929": {
+        "type": "bool",
+        "value": false
+      },
+      "2930": {
+        "type": "bool",
+        "value": true
+      },
+      "2931": {
+        "type": "float",
+        "value": 1.0
+      },
+      "2932": {
+        "type": "int",
+        "value": 513
+      },
+      "2960": {
+        "type": "bool",
+        "value": false
+      },
+      "2961": {
+        "type": "int",
+        "value": 0
+      },
+      "2962": {
+        "type": "int",
+        "value": 519
+      },
+      "2963": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "2964": {
+        "type": "int",
+        "value": 7680
+      },
+      "2965": {
+        "type": "int",
+        "value": 7680
+      },
+      "2966": {
+        "type": "int",
+        "value": 7680
+      },
+      "2967": {
+        "type": "int",
+        "value": 0
+      },
+      "2968": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "2978": {
+        "type": "intvec",
+        "value": [
+          0,
+          0,
+          300,
+          150
+        ]
+      },
+      "3024": {
+        "type": "bool",
+        "value": true
+      },
+      "3042": {
+        "type": "bool",
+        "value": false
+      },
+      "3074": {
+        "type": "int",
+        "value": 1029
+      },
+      "3088": {
+        "type": "intvec",
+        "value": [
+          0,
+          0,
+          300,
+          150
+        ]
+      },
+      "3089": {
+        "type": "bool",
+        "value": false
+      },
+      "3106": {
+        "type": "floatvec",
+        "value": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "3107": {
+        "type": "boolvec",
+        "value": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "32773": {
+        "type": "floatvec",
+        "value": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "32777": {
+        "type": "int",
+        "value": 32774
+      },
+      "32823": {
+        "type": "bool",
+        "value": false
+      },
+      "32824": {
+        "type": "float",
+        "value": 0.0
+      },
+      "32877": {
+        "type": "int",
+        "value": 0
+      },
+      "32878": {
+        "type": "int",
+        "value": 0
+      },
+      "32883": {
+        "type": "int",
+        "value": 16384
+      },
+      "32926": {
+        "type": "bool",
+        "value": false
+      },
+      "32928": {
+        "type": "bool",
+        "value": false
+      },
+      "32936": {
+        "type": "int",
+        "value": 1
+      },
+      "32937": {
+        "type": "int",
+        "value": 4
+      },
+      "32938": {
+        "type": "float",
+        "value": 1.0
+      },
+      "32939": {
+        "type": "bool",
+        "value": false
+      },
+      "32968": {
+        "type": "int",
+        "value": 0
+      },
+      "32969": {
+        "type": "int",
+        "value": 1
+      },
+      "32970": {
+        "type": "int",
+        "value": 0
+      },
+      "32971": {
+        "type": "int",
+        "value": 1
+      },
+      "33000": {
+        "type": "int",
+        "value": 1048576
+      },
+      "33001": {
+        "type": "int",
+        "value": 1048576
+      },
+      "3314": {
+        "type": "int",
+        "value": 0
+      },
+      "3315": {
+        "type": "int",
+        "value": 0
+      },
+      "3316": {
+        "type": "int",
+        "value": 0
+      },
+      "3317": {
+        "type": "int",
+        "value": 4
+      },
+      "33170": {
+        "type": "int",
+        "value": 4352
+      },
+      "3330": {
+        "type": "int",
+        "value": 0
+      },
+      "3331": {
+        "type": "int",
+        "value": 0
+      },
+      "3332": {
+        "type": "int",
+        "value": 0
+      },
+      "3333": {
+        "type": "int",
+        "value": 4
+      },
+      "3379": {
+        "type": "int",
+        "value": 32768
+      },
+      "3386": {
+        "type": "intvec",
+        "value": [
+          32768,
+          32768
+        ]
+      },
+      "33901": {
+        "type": "floatvec",
+        "value": [
+          1.0,
+          2047.0
+        ]
+      },
+      "33902": {
+        "type": "floatvec",
+        "value": [
+          1.0,
+          1.0
+        ]
+      },
+      "34016": {
+        "type": "int",
+        "value": 33984
+      },
+      "34024": {
+        "type": "int",
+        "value": 32768
+      },
+      "34045": {
+        "type": "float",
+        "value": 15.0
+      },
+      "34076": {
+        "type": "int",
+        "value": 32768
+      },
+      "3408": {
+        "type": "int",
+        "value": 8
+      },
+      "3410": {
+        "type": "int",
+        "value": 8
+      },
+      "3411": {
+        "type": "int",
+        "value": 8
+      },
+      "3412": {
+        "type": "int",
+        "value": 8
+      },
+      "3413": {
+        "type": "int",
+        "value": 8
+      },
+      "3414": {
+        "type": "int",
+        "value": 24
+      },
+      "3415": {
+        "type": "int",
+        "value": 0
+      },
+      "34816": {
+        "type": "int",
+        "value": 519
+      },
+      "34817": {
+        "type": "int",
+        "value": 7680
+      },
+      "34818": {
+        "type": "int",
+        "value": 7680
+      },
+      "34819": {
+        "type": "int",
+        "value": 7680
+      },
+      "34852": {
+        "type": "int",
+        "value": 8
+      },
+      "34853": {
+        "type": "int",
+        "value": 1029
+      },
+      "34854": {
+        "type": "int",
+        "value": 0
+      },
+      "34855": {
+        "type": "int",
+        "value": 0
+      },
+      "34856": {
+        "type": "int",
+        "value": 0
+      },
+      "34857": {
+        "type": "int",
+        "value": 0
+      },
+      "34858": {
+        "type": "int",
+        "value": 0
+      },
+      "34859": {
+        "type": "int",
+        "value": 0
+      },
+      "34860": {
+        "type": "int",
+        "value": 0
+      },
+      "34877": {
+        "type": "int",
+        "value": 32774
+      },
+      "34921": {
+        "type": "int",
+        "value": 16
+      },
+      "34930": {
+        "type": "int",
+        "value": 32
+      },
+      "35071": {
+        "type": "int",
+        "value": 2048
+      },
+      "35076": {
+        "type": "int",
+        "value": -8
+      },
+      "35077": {
+        "type": "int",
+        "value": 7
+      },
+      "35371": {
+        "type": "int",
+        "value": 14
+      },
+      "35373": {
+        "type": "int",
+        "value": 14
+      },
+      "35374": {
+        "type": "int",
+        "value": 84
+      },
+      "35375": {
+        "type": "int",
+        "value": 84
+      },
+      "35376": {
+        "type": "int",
+        "value": 65536
+      },
+      "35377": {
+        "type": "int",
+        "value": 233472
+      },
+      "35379": {
+        "type": "int",
+        "value": 233472
+      },
+      "35380": {
+        "type": "int",
+        "value": 256
+      },
+      "35657": {
+        "type": "int",
+        "value": 4096
+      },
+      "35658": {
+        "type": "int",
+        "value": 4096
+      },
+      "35659": {
+        "type": "int",
+        "value": 124
+      },
+      "35660": {
+        "type": "int",
+        "value": 32
+      },
+      "35661": {
+        "type": "int",
+        "value": 192
+      },
+      "35723": {
+        "type": "int",
+        "value": 4352
+      },
+      "35724": {
+        "type": "string",
+        "value": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)"
+      },
+      "35738": {
+        "type": "int",
+        "value": 5121
+      },
+      "35739": {
+        "type": "int",
+        "value": 6408
+      },
+      "35968": {
+        "type": "int",
+        "value": 4
+      },
+      "35977": {
+        "type": "bool",
+        "value": false
+      },
+      "35978": {
+        "type": "int",
+        "value": 128
+      },
+      "35979": {
+        "type": "int",
+        "value": 4
+      },
+      "36003": {
+        "type": "int",
+        "value": 0
+      },
+      "36004": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "36005": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "36063": {
+        "type": "int",
+        "value": 8
+      },
+      "36183": {
+        "type": "int",
+        "value": 32
+      },
+      "36203": {
+        "type": "uint",
+        "value": 4294967295
+      },
+      "36347": {
+        "type": "int",
+        "value": 1024
+      },
+      "36348": {
+        "type": "int",
+        "value": 32
+      },
+      "36349": {
+        "type": "int",
+        "value": 1024
+      },
+      "36387": {
+        "type": "bool",
+        "value": false
+      },
+      "36388": {
+        "type": "bool",
+        "value": false
+      },
+      "37137": {
+        "type": "number",
+        "value": 1.8446744073709552e+19
+      },
+      "37154": {
+        "type": "int",
+        "value": 128
+      },
+      "37157": {
+        "type": "int",
+        "value": 128
+      },
+      "37440": {
+        "type": "bool",
+        "value": false
+      },
+      "37441": {
+        "type": "bool",
+        "value": false
+      },
+      "37443": {
+        "type": "int",
+        "value": 37444
+      },
+      "37445": {
+        "type": "string",
+        "value": "NVIDIA Corporation"
+      },
+      "37446": {
+        "type": "string",
+        "value": "NVIDIA GeForce GTX 980, or similar"
+      },
+      "37447": {
+        "type": "number",
+        "value": 1000000000.0
+      },
+      "7936": {
+        "type": "string",
+        "value": "WebKit"
+      },
+      "7937": {
+        "type": "string",
+        "value": "WebKit WebGL"
+      },
+      "7938": {
+        "type": "string",
+        "value": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+      }
+    },
+    "shader_precision": {
+      "35632_36336": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36337": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36338": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35632_36339": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35632_36340": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35632_36341": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36336": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36337": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36338": {
+        "precision": 23,
+        "rangeMax": 127,
+        "rangeMin": 127
+      },
+      "35633_36339": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36340": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      },
+      "35633_36341": {
+        "precision": 0,
+        "rangeMax": 24,
+        "rangeMin": 24
+      }
+    }
+  }
+}

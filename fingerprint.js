@@ -752,6 +752,98 @@ const UA_PRESETS = {
   ]
 };
 
+/**
+ * Mirrors Chromium's ApproximatedDeviceMemory (blink/common/device_memory/approximated_device_memory.cc):
+ * nearest power of two of physical RAM (ties round down), clamped to [2,32] GB on desktop
+ * and [1,8] GB on Android/iOS. navigator.deviceMemory and the Device-Memory client hint
+ * MUST come from these buckets — a raw value (e.g. 24) is an instant spoofing tell.
+ */
+function approxDeviceMemory(ramGb, isMobile = false) {
+  const mb = Math.round(ramGb * 1024);
+  if (mb <= 0) return isMobile ? 1 : 2;
+  let power = 0;
+  let lb = mb;
+  while (lb > 1) { lb >>= 1; power++; }
+  const lowerMb = 1 << power;
+  const upperMb = 1 << (power + 1);
+  let gb = (mb - lowerMb <= upperMb - mb) ? lowerMb / 1024 : upperMb / 1024;
+  const minM = isMobile ? 1 : 2;
+  const maxM = isMobile ? 8 : 32;
+  return Math.min(maxM, Math.max(minM, gb));
+}
+
+// ── Hardware Kits: correlated realistic configurations ─────────────────────
+const fs = require('fs');
+const path = require('path');
+const KITS_CACHE = {};
+
+function loadHardwareKits(osName) {
+  if (KITS_CACHE[osName] !== undefined) return KITS_CACHE[osName];
+  try {
+    const p = path.join(__dirname, 'data', 'hardware_kits', `${osName}.json`);
+    const parsed = JSON.parse(fs.readFileSync(p, 'utf8'));
+    KITS_CACHE[osName] = Array.isArray(parsed) ? parsed : (parsed.kits || []);
+  } catch (e) {
+    KITS_CACHE[osName] = [];
+  }
+  return KITS_CACHE[osName];
+}
+
+// roll — детерминированное число [0,1) из seed-среза
+function weightedPick(items, roll) {
+  const total = items.reduce((a, it) => a + (it.weight || 1), 0);
+  let r = roll * total;
+  for (const it of items) { r -= (it.weight || 1); if (r <= 0) return it; }
+  return items[items.length - 1];
+}
+
+/**
+ * Dropdown-словари из Hardware Kits: GPU и разрешения должны содержать
+ * значения, которые реально генерируются kits — иначе UI-селекторы
+ * сбрасывают их при сохранении профиля (value не найден → первый пункт).
+ */
+function getKitDictionaries() {
+  const out = { GPU_PROFILES: {}, RESOLUTIONS: {} };
+  for (const osName of ['windows', 'macos', 'linux']) {
+    const kits = loadHardwareKits(osName);
+    const gpuSeen = new Set();
+    const gpus = [];
+    const resSeen = new Set();
+    const resolutions = [];
+    for (const kit of kits) {
+      if (kit.webgl && !gpuSeen.has(kit.webgl.renderer)) {
+        gpuSeen.add(kit.webgl.renderer);
+        // "ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 ...)" → "NVIDIA GeForce GTX 980"
+        // Имя может содержать свои скобки ("Intel(R)", "llvmpipe (LLVM ...)"),
+        // поэтому ленивый захват до необязательного хвоста драйвера + ")".
+        let short = kit.webgl.renderer;
+        const m = short.match(/^ANGLE \([^,]+, (.+?)(?: (?:Direct3D|OpenGL|Metal)[^)]*)?\)$/);
+        if (m) short = m[1].trim();
+        short = short.replace(/, or similar$/, '');
+        gpus.push({
+          id: kit.id,
+          name: short,
+          vendor: kit.webgl.vendor,
+          renderer: kit.webgl.renderer,
+          gl_vendor: kit.webgl.vendor,
+          gl_renderer: kit.webgl.renderer
+        });
+      }
+      for (const d of (kit.displays || [])) {
+        const key = `${d.width}x${d.height}`;
+        if (!resSeen.has(key)) {
+          resSeen.add(key);
+          const dprStr = d.devicePixelRatio && d.devicePixelRatio !== 1 ? ` (×${d.devicePixelRatio})` : '';
+          resolutions.push({ width: d.width, height: d.height, label: `${d.width}×${d.height}${dprStr}` });
+        }
+      }
+    }
+    out.GPU_PROFILES[osName] = gpus;
+    out.RESOLUTIONS[osName] = resolutions;
+  }
+  return out;
+}
+
 function generateFingerprint(osName = "windows", profileId = null, browserVersion = "155", overrides = {}) {
   osName = (osName || "windows").toLowerCase();
   if (!GPU_PROFILES[osName]) osName = "windows";
@@ -769,7 +861,9 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
   const s7 = parseInt(fullHash.slice(56, 64), 16); // misc (model, etc.)
 
   const gpus = GPU_PROFILES[osName];
-  const gpu = gpus[(s0 >>> 0) % gpus.length];
+  let gpu = gpus[(s0 >>> 0) % gpus.length];
+  let kit = null;
+  let display = null;
 
   let res;
   let cores;
@@ -842,12 +936,37 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
     chBitness  = "64";
     isMobile   = true;
   } else {
-    // Desktop (windows, macos, linux)
-    res = RESOLUTIONS[(s1 >>> 0) % RESOLUTIONS.length];
-    const coresOptions = [4, 6, 8, 12, 16];
-    const ramOptions   = [8, 16, 32, 64];
-    cores    = coresOptions[(s2 >>> 0) % coresOptions.length];
-    ram      = ramOptions[(s3 >>> 0) % ramOptions.length];
+    // Desktop (windows, macos, linux) — correlated Hardware Kits
+    const kits = loadHardwareKits(osName);
+    if (kits.length > 0) {
+      kit = weightedPick(kits, (s0 >>> 0) / 4294967296);
+      const displays = (kit.displays && kit.displays.length) ? kit.displays : null;
+      display = displays ? weightedPick(displays, (s1 >>> 0) / 4294967296) : null;
+      const coreOpts = (kit.navigator && kit.navigator.hardwareConcurrency && kit.navigator.hardwareConcurrency.length)
+        ? kit.navigator.hardwareConcurrency : [4, 6, 8, 12, 16];
+      const ramOpts  = (kit.ram_gb && kit.ram_gb.length) ? kit.ram_gb : [8, 16, 32];
+      cores = coreOpts[(s2 >>> 0) % coreOpts.length];
+      ram   = ramOpts[(s3 >>> 0) % ramOpts.length];
+      if (display) {
+        res = { width: display.width, height: display.height };
+      } else {
+        res = RESOLUTIONS[(s1 >>> 0) % RESOLUTIONS.length];
+      }
+      // GPU из кита (коррелирован с экраном/CPU/RAM)
+      gpu = {
+        vendor:      kit.webgl.vendor,
+        renderer:    kit.webgl.renderer,
+        gl_vendor:   kit.webgl.vendor,
+        gl_renderer: kit.webgl.renderer
+      };
+    } else {
+      // Legacy fallback (данные kits отсутствуют)
+      res = RESOLUTIONS[(s1 >>> 0) % RESOLUTIONS.length];
+      const coresOptions = [4, 6, 8, 12, 16];
+      const ramOptions   = [8, 16, 32, 64];
+      cores    = coresOptions[(s2 >>> 0) % coresOptions.length];
+      ram      = ramOptions[(s3 >>> 0) % ramOptions.length];
+    }
     isMobile = false;
     chModel  = "";
     chArch   = "x86";
@@ -869,13 +988,19 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
       chVersion  = "6.8.0";
       pixelRatio = 1.0;
     }
+    // Реальный DPR из данных кита (важнее дефолта ОС: 1707x960@1.5 — ноутбук 150%)
+    if (display && display.devicePixelRatio) pixelRatio = display.devicePixelRatio;
   }
 
+  const uaMajor = String(browserVersion || "154").split('.')[0];
   const uas = UA_PRESETS[osName] || UA_PRESETS.windows;
   let ua = uas[(s4 >>> 0) % uas.length];
   if (osName === "android" && chModel) {
-    ua = `Mozilla/5.0 (Linux; Android 14; ${chModel}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36`;
+    ua = `Mozilla/5.0 (Linux; Android 14; ${chModel}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${uaMajor}.0.0.0 Mobile Safari/537.36`;
   }
+  // UA всегда заявляет мажорную версию реально вшитого движка (не устаревший пресет)
+  ua = ua.replace(/Chrome\/\d+[\d.]*/g, `Chrome/${uaMajor}.0.0.0`);
+  ua = ua.replace(/CriOS\/\d+[\d.]*/g, `CriOS/${uaMajor}.0.0.0`);
 
   // Independent canvas and audio seeds — no correlation with GPU or resolution
   const canvasSeed = ((s5 >>> 0) % 100000) / 10000000.0; // range: ~0.000001 – 0.009999
@@ -918,21 +1043,25 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
     screen: {
       width:        res.width,
       height:       res.height,
-      avail_width:  res.width,
-      avail_height: res.height - availHeightOffset,
-      color_depth:  24,
+      avail_width:  (display && display.availWidth)  ? display.availWidth  : res.width,
+      avail_height: (display && display.availHeight) ? display.availHeight : (res.height - availHeightOffset),
+      color_depth:  (display && display.colorDepth)  ? display.colorDepth  : 24,
       pixel_ratio:  pixelRatio
     },
     hardware: {
-      concurrency: cores,
-      memory:      ram
+      concurrency:   cores,
+      memory:        ram,
+      device_memory: approxDeviceMemory(ram, isMobile)
     },
     webgl: {
       unmasked_vendor:   gpu.vendor,
       unmasked_renderer: gpu.renderer,
       vendor:            gpu.gl_vendor,
-      renderer:          gpu.gl_renderer
+      renderer:          gpu.gl_renderer,
+      preset:            (kit && kit.webgl && kit.webgl.preset) ? kit.webgl.preset : null
     },
+    kit_id:         kit ? kit.id : null,
+    speech_voices:  (kit && kit.speechVoices) ? kit.speechVoices : [],
     canvas_noise: true,
     canvas_seed:  canvasSeed,
     audio_noise:  true,
@@ -948,7 +1077,10 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
     if (overrides.user_agent) fp.user_agent = overrides.user_agent;
     if (overrides.hardware) {
       if (overrides.hardware.concurrency) fp.hardware.concurrency = parseInt(overrides.hardware.concurrency);
-      if (overrides.hardware.memory) fp.hardware.memory = parseInt(overrides.hardware.memory);
+      if (overrides.hardware.memory) {
+        fp.hardware.memory = parseInt(overrides.hardware.memory);
+        fp.hardware.device_memory = approxDeviceMemory(fp.hardware.memory, isMobile);
+      }
     }
     if (overrides.screen) {
       if (overrides.screen.width) fp.screen.width = parseInt(overrides.screen.width);
@@ -978,6 +1110,8 @@ function generateFingerprint(osName = "windows", profileId = null, browserVersio
 
 module.exports = {
   generateFingerprint,
+  approxDeviceMemory,
+  getKitDictionaries,
   GPU_PROFILES,
   RESOLUTIONS,
   CPU_CORES_LIST,
