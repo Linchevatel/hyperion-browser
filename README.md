@@ -1,4 +1,4 @@
-# 🌌 Hyperion Anti-Detect Multibrowser
+# 🌌 Hyperion Browser
 
 **🇷🇺 [Читать на русском](README.ru.md)**
 
@@ -6,86 +6,95 @@
 
 ![Hyperion — Anti-Detect Multibrowser](pictures/banner-hero.jpg)
 
-**Next-generation professional anti-detect multibrowser with deep Chromium kernel-level browser fingerprint modification**
+**Open-source browser profile manager with custom Chromium, proxies, and fingerprint settings**
 
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows-blue.svg)](https://github.com/Linchevatel/hyperion-browser)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 </div>
 
+[Download releases](https://github.com/Linchevatel/hyperion-browser/releases) · [Quickstart & build instructions](docs/QUICKSTART.md) · [FAQ](docs/FAQ.md) · [Security](SECURITY.md)
+
+## About
+
+Hyperion is an Electron desktop application for managing separate Chromium browser profiles. It offers proxy configuration and fingerprint settings, with source patches for a custom Chromium engine. It can be used for testing and keeping browsing contexts separate; use it only where you have authorization and respect site terms.
+
+### Who is it for?
+
+- **QA and web developers:** repeat tests with separate cookies, extensions, proxy settings, and configurable browser properties.
+- **Media buying and marketing:** separate work profiles for advertising projects, client dashboards, and landing-page testing.
+- **Multi-account management:** manage multiple permitted accounts with separate cookies, extensions, and proxy settings.
+- **Crypto and Web3:** separate profiles for dApps, testnets, and projects using wallet extensions. Wallets connect through browser extensions.
+- **Agencies and e-commerce:** keep browsing sessions separate for stores, client projects, and work accounts.
+- **Users managing distinct browsing contexts:** keep project-specific sessions organized without mixing browser data.
+- **Browser researchers:** inspect the implementation and reproduce tests against the published Chromium patches.
+
+### What makes Hyperion useful?
+
+The profile manager and Chromium patches are available to inspect. Profile organization, proxy configuration, extensions, and fingerprint controls live in one desktop UI, with English and Russian interfaces. Correlated hardware presets provide a starting configuration instead of requiring every field to be entered manually.
+
+## Download and first launch
+
+1. Open [GitHub Releases](https://github.com/Linchevatel/hyperion-browser/releases) and choose an available asset for your OS/architecture: Linux AppImage, `.deb`, `.rpm`, or Windows installer/portable `.exe`. Availability varies by release; macOS packages are not part of the current release workflow.
+2. Install or run it as a regular user. For a Linux AppImage, mark the downloaded file executable before opening it. See [quickstart](docs/QUICKSTART.md) for commands and troubleshooting.
+3. In Settings, check the browser executable path. Create a disposable profile, configure a proxy if needed, and launch it. Verify the observed IP and settings before using sensitive accounts.
+
+## Features and boundaries
+
+### Custom Chromium and fingerprint settings
+
+**Hyperion overrides browser fingerprint properties according to profile settings: User-Agent, platform, CPU concurrency, memory, screen, and supported Canvas, Audio, and WebGL properties. These overrides are implemented by Hyperion’s modified Chromium engine.**
+
+<div align="center">
+<img src="pictures/feature-cpp-engine.jpg" alt="Hyperion custom Chromium engine illustration" width="880" />
+<img src="pictures/feature-fingerprint.jpg" alt="Browser fingerprint settings illustration" width="880" />
+</div>
+
+- Settings for user agent, platform, CPU concurrency, reported memory, screen dimensions, Canvas/Audio noise, and WebGL vendor/renderer.
+- Chromium C++ patches implement selected overrides; a separate WebGL preset patch handles selected parameters, extension filtering, and shader precision. Settings are configured per profile.
+- A generated helper extension complements media, voice, and proxy authentication settings.
+- On Linux, fontconfig connects bundled fonts to browser profiles.
+
+Windows, macOS, and mobile profile presets provide an initial fingerprint configuration for further customization.
+
+### Proxies and network settings
+
+<div align="center">
+<img src="pictures/feature-network.jpg" alt="Proxy configuration illustration" width="880" />
+</div>
+
+HTTP, HTTPS, and SOCKS5 proxy configuration, authentication helpers, IP/geolocation checks, and configured Change-IP URL requests are implemented. Authenticated SOCKS5 uses a local HTTP-to-SOCKS bridge. Launch applies WebRTC policies to restrict non-proxied UDP. Connect your own proxy or one from your chosen provider.
+
+### Cookie warm-up
+
+<div align="center">
+<img src="pictures/feature-cookie-robot.jpg" alt="Cookie warm-up illustration" width="880" />
+</div>
+
+The built-in helper visits selected sites in headless Chromium using the profile directory to collect cookies and site data. It supports preparation of test sessions and automation of repeated visits.
+
+### Profile management
+
+<div align="center">
+<img src="pictures/feature-profiles.jpg" alt="Separate browser profile management illustration" width="880" />
+</div>
+
+- Separate browser data directories, folders/tags, cloning, templates, and bulk create/start/stop/delete operations.
+- Cookie import/export, extension installation from Chrome Web Store or local folders, and fingerprint configuration preview.
+- `.hyperion` export contains profile configuration and cookies that the helper can export, **not all history, cache, local storage, or session storage**.
+- JSON backup contains manager configuration and metadata, **not a full backup of browser profile directories**.
+
+## Documentation
+
+[Quickstart](docs/QUICKSTART.md) · [FAQ](docs/FAQ.md) · [Security policy](SECURITY.md)
+
+Have a question or found a bug? Use the [issue forms](https://github.com/Linchevatel/hyperion-browser/issues/new/choose).
+
 ---
 
-## 📖 About the Project & Key Differentiators
+## 🎬 Interface demo
 
-**Hyperion** is an anti-detect multibrowser designed for secure multi-accounting and isolated profile management. Built specifically for affiliate marketing, traffic arbitrage, crypto projects and airdrops, e-commerce, and uncompromising online privacy.
-
-### What Sets Hyperion Apart from Other Solutions:
-
-1. **Chromium C++ Kernel-Level Protection vs. Surface JS Injections**
-
-   <div align="center">
-   <img src="pictures/feature-cpp-engine.jpg" alt="Chromium C++ kernel-level protection" width="880" />
-   </div>
-
-   Most popular anti-detect browsers rely on vanilla Chromium builds and attempt on-the-fly fingerprint spoofing using browser extensions or injected user scripts. Modern anti-fraud and bot detection systems (Cloudflare, DataDome, Pixelscan, CreepJS, Kasada) immediately detect such masking via JavaScript prototype chain analysis, property descriptor anomalies, and timing inconsistencies.  
-   In Hyperion, fingerprint parameters are baked **directly into the compiled C++ engine of the browser**. To websites and anti-fraud engines, Hyperion appears as a genuine, untampered machine used by a real human, with zero traces of emulation or automation.
-
-2. **Maximum Speed & Minimal Resource Footprint**  
-   Without cumbersome extensions or heavy JS injection overhead, every profile remains lightning-fast and responsive. Profiles launch instantly, consume minimal RAM, and maintain rock-solid stability even with dozens of active concurrent windows.
-
-3. **Guaranteed Zero Leaks**  
-   Hyperion provides uncompromising protection against real IP leaks via WebRTC, completely isolated local storage, and separated font environments for every profile.
-
----
-
-## ⚡ Features
-
-### 🛡️ Unique Hardware Fingerprints
-
-<div align="center">
-<img src="pictures/feature-fingerprint.jpg" alt="Browser fingerprint protection" width="880" />
-</div>
-
-Each profile receives its own consistent and balanced browser fingerprint:
-- **Canvas & WebAudio**: Deterministic per-session canvas noise and audio buffer randomization that produces a unique fingerprint while keeping rendered graphics visually sharp and natural.
-- **GPU & WebGL Spoofing**: Authentic emulation of GPU vendor/renderer strings (NVIDIA GeForce, AMD Radeon, Apple Silicon) and low-level WebGL parameters.
-- **Hardware Concurrency & Specs**: Independent configuration of CPU cores (hardware concurrency), device memory (RAM), screen resolution, device pixel ratio (DPR), and operating system platform.
-- **Human-Like Behavior**: Complete absence of automation flags (e.g. `navigator.webdriver`) — websites detect no test environments or bot frameworks.
-
-### 🔤 Isolated System Font Packs
-Each profile has its own independent font bundle mimicking authentic Windows and macOS environments (Arial, Times New Roman, Verdana, Georgia, Comic Sans, Trebuchet MS, Impact, Courier New, etc.). The browser exposes them in complete isolation without requiring any third-party fonts to be installed on your host OS.
-
-### 🌐 Network Security & Proxies
-
-<div align="center">
-<img src="pictures/feature-network.jpg" alt="Global proxy network and encryption" width="880" />
-</div>
-
-- **WebRTC Zero-Leak**: Enforced filtering and blocking of non-proxied candidate addresses. Your real ISP IP address will never leak past the proxy during audio/video WebRTC handshakes.
-- **Universal Protocol Support**: Seamless integration with HTTP, HTTPS, and SOCKS5 proxies, including username/password authentication.
-- **Built-in Diagnostics**: Live checking of connection status, latency/ping, external IP, and geolocation directly in the profile table.
-
-### 🤖 Autonomous Profile Warm-Up (Cookie Robot)
-
-<div align="center">
-<img src="pictures/feature-cookie-robot.jpg" alt="Autonomous cookie warm-up robot" width="880" />
-</div>
-
-The built-in headless warm-up module autonomously browses curated lists of popular, high-authority websites in the background. It organically accumulates browser cache, history, and cookies, establishing high initial trust scores with anti-fraud systems for newly created profiles.
-
-### 🗂️ Profile Management & Bulk Operations
-
-<div align="center">
-<img src="pictures/feature-profiles.jpg" alt="Independent digital identities in isolated profiles" width="880" />
-</div>
-
-- **Folders & Tags**: Group profiles by campaign or client, assign color tags, and find accounts instantly with fast filtering.
-- **Bulk Profile Creation**: One-click generation of dozens of unique profiles with randomized, mathematically consistent fingerprint attributes.
-- **Batch Launch & Termination**: Rapidly launch or terminate selected batches of browser profiles.
-- **Portable `.hyperion` Profiles**: Export any profile with all cookies, session storage, and settings intact into a single portable file for team sharing or migration between machines.
-- **Database Backup & Restore**: Full application database snapshot and recovery at any time.
-
----
+![Hyperion: creating profiles, browsing hardware presets and extensions](assets/demos/hyperion-overview.gif)
 
 ## 📸 Screenshots (Interface Preview)
 
@@ -106,7 +115,7 @@ The built-in headless warm-up module autonomously browses curated lists of popul
 <br/><br/>
 
 ### Hardware & GPU Fingerprint Fine-Tuning
-*Native C++ Canvas/Audio noise, GPU vendor/renderer spoofing, CPU cores, RAM, and WebRTC leak protection:*
+*Canvas/Audio, WebGL, CPU, memory, and WebRTC settings (behavior depends on the engine):*
 <br/>
 <img src="assets/screenshots/fingerprint.png" alt="Hardware fingerprint settings" width="950" />
 
@@ -118,101 +127,6 @@ The built-in headless warm-up module autonomously browses curated lists of popul
 <img src="assets/screenshots/extensions.png" alt="Extension manager" width="950" />
 
 </div>
-
----
-
-## 📦 Build & Run for Linux
-
-### 1. System Requirements
-- **OS**: Modern Linux distribution (Ubuntu 20.04+, Debian 11+, Fedora 38+, Arch Linux, etc.).
-- **Node.js**: Version 20.x or newer.
-- **Python**: Version 3.8+ (for auxiliary build scripts).
-- **Tools**: `git`, `curl`, `jq`, `rpm` (required for building rpm packages).
-
----
-
-### 2. Quick Start from Source
-
-1. **Clone the repository:**
-   ```bash
-   git clone git@github.com:Linchevatel/hyperion-browser.git
-   cd hyperion-browser
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Run the application:**
-   ```bash
-   ./hyperion-app
-   # or
-   npm start
-   ```
-
----
-
-### 3. Building Distribution Packages (.AppImage, .deb, .rpm, .exe)
-
-An automated packaging pipeline is preconfigured to build native installers:
-
-```bash
-# Build Linux packages (.AppImage, .deb, .rpm):
-npm run dist:linux
-
-# Build Windows packages (.exe installer and portable edition):
-npm run dist:win
-```
-
-Built packages will be available in the `dist/` directory:
-- `dist/Hyperion-Browser-1.0.0.AppImage` (portable standalone executable, no installation needed)
-- `dist/hyperion-browser_1.0.0_amd64.deb` (for Debian, Ubuntu, Linux Mint)
-- `dist/hyperion-browser-1.0.0.x86_64.rpm` (for Fedora, RHEL, CentOS)
-- `dist/Hyperion-Setup-1.0.0.exe` (Windows installer)
-
----
-
-### 4. Compiling Modified Chromium C++ Kernel from Source
-
-If you want to manually compile the Chromium kernel with our C++ anti-detect patches:
-
-1. **Install Chromium Depot Tools:**
-   ```bash
-   git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-   export PATH="$PWD/depot_tools:$PATH"
-   ```
-
-2. **Fetch Chromium source code:**
-   ```bash
-   mkdir chromium && cd chromium
-   fetch --nohooks chromium
-   cd src
-   ```
-
-3. **Apply the Hyperion patch:**
-   ```bash
-   git apply /path/to/hyperion-browser/patches/hyperion_core_fingerprint.patch
-   ```
-
-4. **Generate compilation config (Release):**
-   ```bash
-   gn gen out/Release --args="is_debug=false is_component_build=false symbol_level=0 is_official_build=true proprietary_codecs=true ffmpeg_branding=\"Chrome\" enable_nacl=false blink_symbol_level=0"
-   ```
-
-5. **Start the build:**
-   ```bash
-   autoninja -C out/Release chrome
-   ```
-
-6. **Copy the compiled binaries into the Hyperion working directory:**
-   ```bash
-   mkdir -p ~/hyperion-browser
-   cp out/Release/chrome ~/hyperion-browser/
-   cp out/Release/*.pak out/Release/*.bin out/Release/icudtl.dat ~/hyperion-browser/
-   ```
-
-The Hyperion client will automatically discover and load the custom engine at `~/hyperion-browser/chrome`.
 
 ---
 
@@ -231,5 +145,6 @@ If you would like to support the ongoing development and maintenance of Hyperion
 
 ## 📄 License
 
-This project is licensed under the **MIT License**.  
+The Hyperion application is licensed under the **MIT License**. Chromium and bundled third-party components retain their respective licenses; MIT does not replace those terms.
+
 Author & Creator: **Linchevatel**.

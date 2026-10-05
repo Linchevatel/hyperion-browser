@@ -1,0 +1,31 @@
+name: Feature request / Предложить улучшение
+description: Describe a use case and desired improvement / Опишите задачу и улучшение
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or Russian is welcome. Check existing issues first.
+        Можно писать на русском или английском. Сначала посмотрите существующие issues.
+        Do not include credentials, cookies or private profile data. / Не прикладывайте секреты и данные профилей.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case / Задача или проблема
+      description: What are you trying to accomplish? / Чего хотите добиться?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement / Предлагаемое улучшение
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and workarounds / Альтернативы и обходные решения
+  - type: input
+    id: environment
+    attributes:
+      label: Relevant OS and app version / ОС и версия приложения, если важно

@@ -1,0 +1,70 @@
+name: Bug report / Сообщить об ошибке
+description: Report a reproducible problem / Опишите воспроизводимую проблему
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or Russian is welcome. / Можно писать на русском или английском.
+        Never attach cookies, tokens, proxy credentials, full profiles or backups. Redact logs and screenshots.
+        Не прикладывайте cookies, токены, пароли прокси, полные профили и резервные копии. Очистите логи и скриншоты.
+        For vulnerabilities, follow SECURITY.md instead of opening a public report.
+        Об уязвимостях сообщайте по SECURITY.ru.md, а не в публичном issue.
+  - type: input
+    id: app-version
+    attributes:
+      label: Hyperion version / Версия Hyperion
+      placeholder: "1.0.23"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS, architecture, desktop / ОС, архитектура, окружение
+      placeholder: "ALT Linux 11, x86_64, XFCE"
+    validations:
+      required: true
+  - type: input
+    id: installation
+    attributes:
+      label: Installation source and format / Источник и формат установки
+      description: "Release URL, package or source revision; format / Ссылка на релиз, пакет или ревизия исходников; формат: AppImage, RPM, DEB, EXE."
+    validations:
+      required: true
+  - type: input
+    id: engine
+    attributes:
+      label: Actual browser engine / Фактический движок браузера
+      description: Version and origin if known; no full command line / Версия и происхождение, если известны; не вставляйте полную командную строку.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce / Шаги воспроизведения
+      description: Use a disposable profile and non-sensitive data / Используйте пробный профиль и данные без секретов.
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior / Ожидаемый результат
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / Фактический результат
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or screenshots / Очищенные логи или скриншоты
+      description: Minimal excerpts without secrets, private URLs or personal paths / Короткие фрагменты без секретов, приватных URL и личных путей.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check / Проверка данных
+      options:
+        - label: I removed secrets and did not attach profiles or backups / Секреты удалены, профили и копии не приложены
+          required: true

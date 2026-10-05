@@ -267,13 +267,6 @@ allocation, framebuffer completeness, draw buffers, readPixels и rendered pixel
 обосновать одной подменой этих трёх API: getContextAttributes, остальные queries,
 WebGPU, canvas rendering и side channels остаются отдельными поверхностями.
 
-## Независимое ревью
-
-Дизайн и драфт выполнены основной сессией Codex. Попытка второго мнения через
-Gemini/`agy` завершилась `FAILED_PRECONDITION: User location is not supported`;
-независимое ревью не получено. До production требуется ручное C++/Blink ревью,
-особенно transport/sandbox и extension dependency semantics.
-
 ## Transport: final decision (b64 switch)
 
 Решение: `--fingerprint-webgl-preset-b64=<base64url(minified-json)>`; этот раздел заменяет прежние рекомендации file/IPC transport выше.
