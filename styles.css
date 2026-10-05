@@ -34,8 +34,14 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: 'Hyperion Emoji';
+  src: url('assets/fonts/emoji-subset.ttf') format('truetype');
+  font-display: block;
+}
+
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), 'Hyperion Emoji', sans-serif;
   background-color: var(--bg-main);
   background-image: radial-gradient(ellipse 70% 30% at 50% 0%, rgba(239, 68, 68, 0.06) 0%, transparent 70%);
   color: var(--text-main);
