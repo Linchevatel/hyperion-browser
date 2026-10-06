@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hyperion — Open-source Chromium Profile Manager</title>
+  <meta name="description" content="Hyperion is an open-source browser profile manager for Linux and Windows with separate Chromium profiles, proxies, extensions, cookie tools and configurable fingerprint settings.">
+  <meta property="og:title" content="Hyperion — Open-source Chromium Profile Manager">
+  <meta property="og:description" content="Separate Chromium profiles, proxies, extensions, cookie tools and configurable fingerprint settings in one desktop app.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/Linchevatel/hyperion-browser/main/assets/social-preview.png">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="https://raw.githubusercontent.com/Linchevatel/hyperion-browser/main/assets/icons/512x512.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Hyperion home">
+      <img src="https://raw.githubusercontent.com/Linchevatel/hyperion-browser/main/assets/icons/512x512.png" alt="">
+      <span>HYPERION</span>
+    </a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#engine">Engine</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/Linchevatel/hyperion-browser">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Open-source Chromium profile manager</p>
+        <h1>Organize separate browser profiles in one desktop app.</h1>
+        <p class="lead">Hyperion brings profiles, proxies, extensions, cookie tools and configurable browser fingerprint settings together for Linux and Windows.</p>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/Linchevatel/hyperion-browser/releases/latest">Download latest release</a>
+          <a class="button secondary" href="https://github.com/Linchevatel/hyperion-browser">View source</a>
+        </div>
+        <div class="meta">
+          <span>Linux</span>
+          <span>Windows</span>
+          <span>English / Русский</span>
+        </div>
+      </div>
+      <div class="hero-media" aria-label="Hyperion interface preview">
+        <img src="https://raw.githubusercontent.com/Linchevatel/hyperion-browser/main/assets/demos/hyperion-overview.gif" alt="Hyperion interface demo">
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="section-heading">
+        <p class="eyebrow">Built for browser workflows</p>
+        <h2>Everything stays in one place.</h2>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <h3>Separate profiles</h3>
+          <p>Create isolated Chromium profiles with their own data, folders, tags, templates and bulk actions.</p>
+        </article>
+        <article class="card">
+          <h3>Proxy configuration</h3>
+          <p>Use HTTP, HTTPS or SOCKS5 proxies, check connectivity and assign proxy settings per profile.</p>
+        </article>
+        <article class="card">
+          <h3>Extensions and cookies</h3>
+          <p>Manage extensions and move cookies between workflows with import/export and warm-up helpers.</p>
+        </article>
+        <article class="card">
+          <h3>Fingerprint settings</h3>
+          <p>Configure supported User-Agent, hardware, screen, Canvas, Audio and WebGL properties through the custom engine.</p>
+        </article>
+        <article class="card">
+          <h3>Practical interface</h3>
+          <p>Switch between English and Russian, inspect profile configuration and manage sessions from one UI.</p>
+        </article>
+        <article class="card">
+          <h3>Open source</h3>
+          <p>The Electron interface, packaging logic and Chromium patches are available in the repository.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="engine" class="section split">
+      <div>
+        <p class="eyebrow">Custom engine</p>
+        <h2>Fingerprint settings use modified Chromium.</h2>
+        <p>Hyperion includes source patches for selected browser properties. The desktop manager and browser engine are separate components, so engine compatibility matters for fingerprint-dependent features.</p>
+      </div>
+      <div class="engine-panel">
+        <img src="https://raw.githubusercontent.com/Linchevatel/hyperion-browser/main/assets/screenshots/fingerprint.png" alt="Hyperion fingerprint settings">
+      </div>
+    </section>
+
+    <section id="faq" class="section">
+      <div class="section-heading">
+        <p class="eyebrow">FAQ</p>
+        <h2>Common questions.</h2>
+      </div>
+      <div class="faq-list">
+        <details>
+          <summary>Is Hyperion open source?</summary>
+          <p>Yes. The application code and Chromium patches are published in the GitHub repository.</p>
+        </details>
+        <details>
+          <summary>Does Hyperion emulate another operating system?</summary>
+          <p>No. Profile presets configure browser properties; they do not launch another OS or a complete physical device emulator.</p>
+        </details>
+        <details>
+          <summary>Where can I report bugs or ask questions?</summary>
+          <p>Use GitHub Issues for bugs and GitHub Discussions for questions and feedback.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="section cta">
+      <div>
+        <p class="eyebrow">Try Hyperion</p>
+        <h2>Download the latest release.</h2>
+        <p>Available as Linux AppImage, DEB, RPM and Windows installer/portable packages.</p>
+      </div>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/Linchevatel/hyperion-browser/releases/latest">Download</a>
+        <a class="button secondary" href="https://github.com/Linchevatel/hyperion-browser#-support-the-project">Support development</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>© Hyperion</span>
+    <a href="https://github.com/Linchevatel/hyperion-browser/releases">Releases</a>
+    <a href="https://github.com/Linchevatel/hyperion-browser/discussions">Discussions</a>
+    <a href="https://github.com/Linchevatel/hyperion-browser/blob/main/docs/QUICKSTART.md">Quickstart</a>
+  </footer>
+</body>
+</html>
