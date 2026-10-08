@@ -63,14 +63,6 @@ const EXTENSIONS_FILE = path.join(CONFIG_DIR, 'extensions.json');
 const TEMPLATES_FILE = path.join(CONFIG_DIR, 'templates.json');
 const SETTINGS_FILE = path.join(CONFIG_DIR, 'settings.json');
 
-// i18n: загрузка словарей, IPC get-locales/set-language, персист языка в settings.json
-i18nMain.init(ipcMain, {
-  readSettings: () => readJson(SETTINGS_FILE, {}),
-  writeSettings: (patch) => {
-    const cur = readJson(SETTINGS_FILE, {});
-    fs.writeFileSync(SETTINGS_FILE, JSON.stringify({ ...cur, ...patch }, null, 2));
-  }
-});
 const PROFILES_DATA_DIR = path.join(CONFIG_DIR, 'profiles_data');
 const EXTENSIONS_DIR = path.join(CONFIG_DIR, 'extensions');
 function getChromeBinary() {
@@ -376,6 +368,14 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  i18nMain.init(ipcMain, {
+    getSystemLocale: () => app.getLocale(),
+    readSettings: () => readJson(SETTINGS_FILE, {}),
+    writeSettings: (patch) => {
+      const cur = readJson(SETTINGS_FILE, {});
+      fs.writeFileSync(SETTINGS_FILE, JSON.stringify({ ...cur, ...patch }, null, 2));
+    }
+  });
   createWindow();
 
   app.on('activate', () => {

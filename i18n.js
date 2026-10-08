@@ -16,7 +16,7 @@
  */
 (function () {
   const I18N = {
-    lang: 'ru',
+    lang: 'en',
     dict: {},
 
     /** Разрешить ключ 'a.b.c' по словарю. Нет ключа — вернуть сам ключ. */
@@ -62,6 +62,7 @@
 
     /** Обновить состояние переключателя языка (select в настройках) */
     _syncSwitcher() {
+      document.documentElement.lang = this.lang;
       const el = document.getElementById('btn-lang-toggle');
       if (el && el.tagName === 'SELECT') el.value = this.lang;
     },
@@ -70,7 +71,7 @@
     async init() {
       try {
         const loc = await window.hyperion.getLocales();
-        this.lang = loc.lang || 'ru';
+        this.lang = loc.lang === 'ru' ? 'ru' : 'en';
         this.dict = loc.dict || {};
       } catch (e) {
         console.error('[i18n] failed to load locales:', e);
@@ -90,7 +91,7 @@
         try {
           await window.hyperion.setLanguage(next);
           const loc = await window.hyperion.getLocales();
-          this.lang = loc.lang || next;
+          this.lang = loc.lang === 'ru' ? 'ru' : 'en';
           this.dict = loc.dict || {};
         } catch (err) { console.error(err); return; }
         // Живое переключение БЕЗ reload: статика — через data-i18n,

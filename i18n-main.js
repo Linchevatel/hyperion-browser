@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 
-let currentLang = 'ru';
+let currentLang = 'en';
 const dicts = {};
 
 function loadDict(lang) {
@@ -50,7 +50,7 @@ function t(key, params) {
 }
 
 function getLang() { return currentLang; }
-function setLang(l) { currentLang = l === 'en' ? 'en' : 'ru'; }
+function setLang(l) { currentLang = l === 'ru' ? 'ru' : 'en'; }
 
 /**
  * Регистрирует IPC-хендлеры.
@@ -63,11 +63,21 @@ function init(ipcMain, opts = {}) {
   loadDict('ru');
   loadDict('en');
 
-  // Подхватить сохранённый язык
+  let savedLang;
   try {
     const st = opts.readSettings ? opts.readSettings() : {};
-    if (st && st.language) setLang(st.language);
+    savedLang = st && st.language;
   } catch (e) { /* ignore */ }
+
+  if (savedLang === 'en' || savedLang === 'ru') {
+    setLang(savedLang);
+  } else {
+    let locale = '';
+    try {
+      locale = opts.getSystemLocale ? opts.getSystemLocale() : '';
+    } catch (e) { /* ignore */ }
+    setLang(/^ru(?:[-_.@]|$)/i.test(String(locale || '').trim()) ? 'ru' : 'en');
+  }
 
   ipcMain.handle('get-locales', () => ({
     lang: currentLang,
